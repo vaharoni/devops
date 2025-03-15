@@ -34,7 +34,6 @@ async function run(cmdObj: CLICommandParser) {
     process.exit(1);
   }
 
-  // Initially this was stored under tmp in the repo root. However, bun and Nx don't work independently in subfolders.
   const destFolder = `${os.tmpdir()}/image-${image}-${Date.now()}`;
   // Avoid clutter stdout, as the caller will want to capture the final output to cd into it
   console.warn(`Creating build in ${destFolder}`);

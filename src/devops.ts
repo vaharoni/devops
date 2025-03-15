@@ -16,7 +16,6 @@ import prisma from "./cli/prisma";
 import run from "./cli/run";
 import runMany from "./cli/run-many";
 import test from "./cli/test";
-import verify from "./cli/verify";
 import init from "./cli/init";
 import redis from "./cli/redis";
 
@@ -34,7 +33,6 @@ const allImports = [
   redis,
   console,
   test,
-  verify,
   constant,
   scale,
   k8s,

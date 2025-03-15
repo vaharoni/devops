@@ -19,15 +19,9 @@ function run(cmdObj: CLICommandParser) {
   const workspace = options.args[0];
   const env = cmdObj.envForced ? cmdObj.env : "test";
   if (workspace) {
-    new CommandExecutor(`bunx nx run ${workspace}:test`, {
-      env,
-      checkEnvYaml: true,
-    }).spawn();
+    new CommandExecutor(`devops run ${workspace}:test --env ${env}`).spawn();
   } else {
-    new CommandExecutor("bunx nx run-many -t test", {
-      env,
-      checkEnvYaml: true,
-    }).spawn();
+    new CommandExecutor(`devops run-many test --env ${env}`).spawn();
   }
 }
 

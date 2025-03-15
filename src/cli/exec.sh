@@ -5,9 +5,6 @@
 # Changes the current directory to some-dir and then runs the following command before returning to the original directory:
 #   some-command arg1 arg2
 #
-# We need this until this Nx issue is fixed:
-#   https://github.com/nrwl/nx/issues/22994
-# 
 # We cannot use `cwd` in exec or spawn since dotenvx won't inject the env variables properly
 
 # Change to the provided directory
