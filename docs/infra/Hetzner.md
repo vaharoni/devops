@@ -4,7 +4,7 @@ We generally follow the instructions from the [hetzner-k3s][1] repo.
 
 ## Limitations
 
-- All nodes set up this way have their IP publically exposed. An attempt to follow [these instructions][5] to set up a NAT server failed. See the failed attempt [here](./AbandonedNATSetupHetzner.md).
+- All nodes set up this way have their IP publically exposed. An attempt to follow [these instructions][5] to set up a NAT server failed. See the failed attempt [here](AbandonedNATSetupHetzner.md).
 
 ## Step 1: Create the cluster
 
@@ -20,7 +20,7 @@ Locally, generate SSH keys:
 ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_hcloud
 ```
 
-Edit the [hcloud-config.yaml](../../infra/hetzner/hcloud-config.yaml) file to suit your needs. The file was created by combining [these instructions][3] and this [tutorial][4].
+Edit the `.devops/infra/hetzner/hcloud-config.yaml` file that was generated after running `devops init` to suit your needs. The file was created by combining [these instructions][3] and this [tutorial][4].
 
 For the `k3s_version` field, check the current avaiable k3s releases by running:
 
@@ -63,7 +63,7 @@ You can always find the right credentials by SSHing into the master node and pri
 
 ## Step 2: Set up the cluster's Ingress Controller
 
-Edit the file [ingress-nginx-annotations.yaml](../../infra//hetzner/ingress-nginx-annotations.yaml) to suit your needs. Specifically, set `load-balancer.hetzner.cloud/location`.
+Edit the file `.devops/infra/hetzner/ingress-nginx-annotations.yaml` to suit your needs. Specifically, set `load-balancer.hetzner.cloud/location`.
 
 Add the Ingress controller:
 
@@ -86,7 +86,7 @@ kubectl apply -f .devops/infra/hetzner/ingress-nginx-configmap.yaml
 
 ## Step 3: finalize your Cloudflare setup
 
-Follow [these instructions](./CloudFlareSetup.md) before proceeding to the next step.
+Follow [these instructions](CloudFlareSetup.md) before proceeding to the next step.
 
 ## Step 4: Setup Let's encrypt cert manager
 
@@ -125,7 +125,7 @@ To see the full list of customizable values by harbor, you can run:
 helm show values harbor/harbor > tmp/harbor-values.yaml
 ```
 
-But in general this is unnecessary as a satisfactory [harbor-values.yaml](../../infra/hetzner/harbor-values.yaml) is already provided.
+But in general this is unnecessary as a satisfactory `.devops/infra/hetzner/harbor-values.yaml` file is already provided.
 
 Issue a certificate from Lets Encrypt:
 

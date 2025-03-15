@@ -75,7 +75,7 @@ kubectl -n db-production create secret generic s3-backup-bucket-secret \
 
 This was loosely based on [this repo](https://gitlab.com/ongresinc/stackgres.git), which was referenced in [this part](https://stackgres.io/doc/latest/administration/cluster-creation/best-practices/) of the documentation.
 
-However, most files were removed in favor of the defaults. The defaults that Stackgres applies can be found in [.devops/postgres/StackgresDefaults.md](.devops/postgres/StackgresDefaults.md). Also, it seems that some of the examples refer to old naming conventions with regards to labels. `role=master` was replaced by `role=primary`, and `cluster` and `cluster-name` are now preceded by `stackgres.io/`.
+However, most files were removed in favor of the defaults. The defaults that Stackgres applies can be found in [StackgresDefaults.md](StackgresDefaults.md). Also, it seems that some of the examples refer to old naming conventions with regards to labels. `role=master` was replaced by `role=primary`, and `cluster` and `cluster-name` are now preceded by `stackgres.io/`.
 
 Go through the files under `devops/postgres` and check the configuration. In particular, you will likely need to adjust:
 
@@ -92,7 +92,3 @@ kubectl apply -f .devops/postgres/staging/cluster
 kubectl apply -f .devops/postgres/production/configurations
 kubectl apply -f .devops/postgres/production/cluster
 ```
-
-## Step 4: Day to day operations
-
-To connect to the database

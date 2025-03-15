@@ -10,9 +10,9 @@ error: no context exists with the name: "glitchy-master1"
 
 When SSHing into the servers, the `k3s.yaml` file was not present under `/etc/rancher/k3s` like in typical successful installations.
 
-Use [the typical setup](./Hetzner.md) instead.
+Use [the typical setup](Hetzner.md) instead.
 
-The below is a record of what was attempted. The failed `hcloud-config.yaml` used can be found [here](../../infra/hetzner/abandoned/hcloud-config.yaml).
+The below is a record of what was attempted. The failed `hcloud-config.yaml` used can be found [here](.devops/infra/hetzner/abandoned/hcloud-config.yaml).
 
 # Overview
 

@@ -19,7 +19,7 @@ helm install nginx-ingress ingress-nginx/ingress-nginx --set controller.publishS
 
 ## Step 3: Finalize your Cloudflare setup
 
-Follow [these instructions](./CloudFlareSetup.md).
+Follow [these instructions](CloudFlareSetup.md).
 
 ## Step 4: Set up github secrets
 

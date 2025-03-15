@@ -4,7 +4,7 @@ Do this once you are done with the basic cluster creation on either Hetzner or D
 
 ## Setup constants
 
-Updade the file [config/constants.yaml](../../../config/constants.yaml).
+Updade the file `.devops/config/constants.yaml` that was created after running `devops init`.
 
 ## Install the metrics server
 

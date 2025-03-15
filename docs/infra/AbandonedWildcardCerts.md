@@ -2,7 +2,7 @@ The below was done thinking it was required to have all Ingress behind TLS to al
 
 ## Changes to k8s generators
 
-In `.devops/k8s/manifest-templates/templates/env-setup.yaml`, add the following to create a wildcard certificate per domain:
+In `k8s/templates/env-setup.yaml`, add the following to create a wildcard certificate per domain:
 
 ```yaml
 ---
@@ -21,7 +21,7 @@ spec:
     - "*.$MONOREPO_DOMAIN_NAME"
 ```
 
-In `.devops/k8s/manifest-templates/templates/ingress.yaml`, add the following under `spec` to use that wildcard certificate:
+In `k8s/templates/ingress.yaml`, add the following under `spec` to use that wildcard certificate:
 
 ```yaml
 tls:
