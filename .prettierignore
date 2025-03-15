@@ -1,0 +1,5 @@
+# Disable for now
+*
+
+*.spec.ts
+*.md
