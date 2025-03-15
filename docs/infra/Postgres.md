@@ -5,7 +5,7 @@ We follow [StackGres](https://stackgres.io/doc/latest/) to install Postgres on o
 1. It makes it very easy to install Postgres extensions
 2. It supports Citus out of the box
 
-While we do not install Citus as part of this initial setup, having the capability to (relatively) easily install Citus if ever need it in the future is advantegeous.
+While we do not install Citus as part of this initial setup, having the capability to (relatively) easily install Citus if ever needed is advantegeous.
 
 ## Step 1: Install the operator
 

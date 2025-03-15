@@ -1,6 +1,8 @@
 Currently, Hetzner and Digital Ocean are supported.
 You will need to receive these secrets from the administrator of the existing cluster.
 
+Make sure to place the `kubeconfig` file you receive from the administrator under `tmp/kubeconfig`. This path is set by `.envrc` to automatically use the right cluster whenever you cd into the project directory.
+
 ## To join an existing Hetzner cluster
 
 ```shell

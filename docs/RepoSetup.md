@@ -31,12 +31,20 @@ gh secret set GH_PAT_TOKEN --body <token>
 and store the same token in a `.envrc` file with the following content:
 
 ```toml
+# Allow installing @vaharoni/devops locally by using the personal access token
 export GH_PAT_TOKEN=<token>
+
+# Switch to the right cluster automatically
+if [ -f "$PWD/tmp/kubeconfig" ]; then
+  export KUBECONFIG="$PWD/tmp/kubeconfig"
+else
+  export KUBECONFIG="${HOME}/.kube/config"
+fi
 ```
 
 Make sure to add this file to `.gitignore`.
 
-To automatically set and unset the env variables based on the `.envrc` file, run this from the repo folder:
+To execute this `.envrc` file whenever you cd into the directory run this from the repo folder:
 
 ```shell
 direnv allow
