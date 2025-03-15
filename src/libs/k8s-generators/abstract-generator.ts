@@ -4,6 +4,7 @@ import { envToNamespace, secretName } from "./k8s-constants";
 import yaml from "yaml";
 import url from "url";
 import path from "path";
+import { BASE_SECRET_KEY } from "../k8s-base-secret";
 
 const __file__ = url.fileURLToPath(import.meta.url);
 const __src__ = path.join(path.dirname(__file__), "../../..", "src");
@@ -51,6 +52,7 @@ export class AbstractGenerator {
       MONOREPO_ENV: this.monorepoEnv,
       MONOREPO_NAMESPACE: this.namespace,
       MONOREPO_SECRET_NAME: secretName(),
+      MONOREPO_BASE_SECRET_KEY: BASE_SECRET_KEY
     };
   }
 

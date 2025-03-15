@@ -35,6 +35,11 @@ spec:
                   value: $MONOREPO_NAMESPACE
                 - name: IS_KUBERNETES
                   value: 'true'
+                - name: MONOREPO_BASE_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: $MONOREPO_SECRET_NAME
+                      key: $MONOREPO_BASE_SECRET_KEY
               volumeMounts:
                 - name: secret-injection-hook
                   mountPath: /etc/kubernetes/secrets

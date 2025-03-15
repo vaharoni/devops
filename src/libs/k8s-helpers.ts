@@ -11,3 +11,15 @@ export function kubectlCommand(
     return `kubectl ${cmd}`;
   }
 }
+
+export function patchSecretCommand(monorepoEnv: string, secretName: string, secretKey: string, secretValue: string) {
+  const redactedCommand = kubectlCommand(
+    `patch secret ${secretName} -p='{"stringData": {"${secretKey}": **REDACTED**}}'`,
+    { monorepoEnv }
+  );
+  const fullCommand = redactedCommand.replace(
+    "**REDACTED**",
+    secretValue
+  );
+  return { fullCommand, redactedCommand };
+}

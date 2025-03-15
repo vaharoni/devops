@@ -6,7 +6,7 @@ import {
   generateImageConfigMap,
   generateImageDeployments,
 } from "./k8s-generate";
-import { envToNamespace, imageConfigMap } from "./k8s-generators/k8s-constants";
+import { envToNamespace, imageConfigMap, secretName } from "./k8s-generators/k8s-constants";
 import { k8sJobWaiter } from "./k8s-job-waiter";
 import { kubectlCommand } from "./k8s-helpers";
 import { getWorkspace } from "./workspace-discovery";

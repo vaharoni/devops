@@ -8,3 +8,4 @@ kind: Secret
 metadata:
   namespace: $MONOREPO_NAMESPACE
   name: $MONOREPO_SECRET_NAME
+  

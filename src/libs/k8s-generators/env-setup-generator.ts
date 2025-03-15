@@ -1,5 +1,5 @@
 import { AbstractGenerator } from "./abstract-generator";
-import { domainNameForEnv, secretName } from "./k8s-constants";
+import { domainNameForEnv } from "./k8s-constants";
 
 export class EnvSetupGenerator extends AbstractGenerator {
   static method = "composite" as const;

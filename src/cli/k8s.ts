@@ -2,6 +2,7 @@ import {
   copySecretHarborToNamespace,
   patchServiceAccountImagePullSecret,
 } from "../libs/hetzner/reg-secret";
+import { patchBaseSecret } from "../libs/k8s-base-secret";
 import {
   generateDbMigrateJob,
   generateEnvSetup,
@@ -22,7 +23,6 @@ import {
 } from "../libs/k8s-lifecycle";
 import {
   CLICommandParser,
-  CommandExecutor,
   StrongParams,
   printUsageAndExit,
 } from "./common";
@@ -111,9 +111,11 @@ const config = {
     gen: (opt: StrongParams) =>
       handleGenerate(generateEnvSetup(opt.required("env"))),
     create: (opt: StrongParams) => {
-      createEnvSetup(opt.required("env"));
-      copySecretHarborToNamespace(opt.required("env"));
-      patchServiceAccountImagePullSecret(opt.required("env"));
+      const env = opt.required("env");
+      createEnvSetup(env);
+      patchBaseSecret(env);
+      copySecretHarborToNamespace(env);
+      patchServiceAccountImagePullSecret(env);
     },
     delete: (opt: StrongParams) => deleteEnvSetup(opt.required("env")),
     check: (opt: StrongParams) =>
