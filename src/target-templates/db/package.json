@@ -1,0 +1,14 @@
+{
+  "name": "db",
+  "main": "db-client.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "generate": "prisma generate",
+    "migrate-deploy": "prisma migrate deploy"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.5.0",
+    "prisma": "^6.5.0"
+  }
+}

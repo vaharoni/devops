@@ -21,6 +21,8 @@ RUN --mount=type=secret,id=GH_PAT_TOKEN \
 
 ENV PATH="/app/node_modules/.bin:$PATH"
 
+# For prisma client, if used
+RUN devops run-many generate
 RUN devops run-many build
 
 # The config folder will be mounted when the pod starts with up-to-date env variables that are used in runtime by server-side code

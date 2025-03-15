@@ -16,7 +16,7 @@ let _workspacesLoaded = false;
 
 function workspaces() {
   if (!_workspacesLoaded) {
-    for (const workspaceGlob of rootPkgJson.workspaces) {
+    for (const workspaceGlob of (rootPkgJson.workspaces ?? [])) {
       globSync(path.join(workspaceGlob, "package.json")).forEach(
         (packageJsonPath) => {
           // Skip packages under node_modules directories in case hoisting did not work

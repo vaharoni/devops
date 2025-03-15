@@ -1,0 +1,7 @@
+{
+  "name": "dml",
+  "type": "module",
+  "dependencies": {
+    "db": "workspace:*"
+  }
+}
