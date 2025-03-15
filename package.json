@@ -1,10 +1,13 @@
 {
   "name": "@vaharoni/devops",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Devops utility",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist/**/*", "src/**/*"],
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "exit 0"
