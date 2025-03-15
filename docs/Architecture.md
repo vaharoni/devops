@@ -1,8 +1,8 @@
 # The devops architecture
 
-## Overivew of the monorepo structure
+## Overview of the monorepo structure
 
-The main idea is for a single k8s cluster to be able to support multiple projects. Each of these projects is expected to have its own git monorepo. In the future, the devops project could be extracted out to a private npm package to better support upgrades across repos.
+The main idea is for a single k8s cluster to be able to support multiple projects. Each of these projects is expected to have its own git monorepo.
 
 Each project needs to support multiple applications (e.g. an API and a web app). Each of these applications could depend on third party libraries as well as libraries within the monorepo, typically under `libs`.
 
@@ -42,7 +42,7 @@ During the deployment process, in addition to deploying manifests per applicatio
 
 For each project, there are typically 2 environments - one for production and one for staging. These are reflected in k8s namespaces and should be created once by running `devops k8s create env-setup` for each environment.
 
-Each environment has a `Secret` object that contains all the env variables for that environment. Each pod first mounts this secret as a `.env` file which is injected when using `devops run` or `devops exec` to execute scripts. You can manage environment variables using `devops env`. To help catch missing environment variables early, each package (i.e. application or lib) can declare its environment dependencies in an `env.yaml` file. The `devops run` and `devops exec` commands first check that the mounted `Secret` conforms with the dependencies declared in all `env.yaml` files. Check out the structure of `env.yaml` files in the [.devops/env.example.yaml](../env.example.yaml) that was generated after running `devops init`.
+Each environment has a `Secret` object that contains all the env variables for that environment. Each pod first mounts this secret as a `.env` file which is injected when using `devops run` or `devops exec` to execute scripts. You can manage environment variables using `devops env`. To help catch missing environment variables early, each package (i.e. application or lib) can declare its environment dependencies in an `env.yaml` file. The `devops run` and `devops exec` commands first check that the mounted `Secret` conforms with the dependencies declared in all `env.yaml` files. Check out the structure of `env.yaml` files in the `.devops/env.example.yaml` that was generated after running `devops init`.
 
 In addition, each image maintains a `ConfigMap` object per environment where the latest git SHA of its successful deployment is stored. This `ConfigMap` is updated as the very last step of the deployment process by the github action. When a deployment workflow begins, each image retrieves this version and checks to see whether any of its content were updated between the `HEAD` commit and that version. If there were changes in any file in one of the packages the image depends on, the image is deemed "affected" and is built and deployed. In a multi image setup, this can speed up deployment as only relevant images are rebuilt.
 

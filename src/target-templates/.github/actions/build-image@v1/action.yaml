@@ -4,6 +4,9 @@ inputs:
   image-name:
     description: 'The image name'
     required: true
+  gh_pat_token:
+    description: "GitHub personal access token"
+    required: true
   install-script:
     description: "Custom installation script"
     required: false
@@ -112,7 +115,7 @@ runs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
         secrets: |
-          GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+          GH_PAT_TOKEN=${{ inputs.gh_pat_token }}
 
     - name: Prune registry
       if: steps.check_affected.outputs.affected == 'true'

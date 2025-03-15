@@ -14,10 +14,12 @@ RUN npm install -g bun
 COPY . .
 
 # Install dependencies using bun
-# Mount the GITHUB_TOKEN secret and use it during bun install
-RUN --mount=type=secret,id=GITHUB_TOKEN \
-  GITHUB_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) && \
+# Mount the GH_PAT_TOKEN secret and use it during bun install
+RUN --mount=type=secret,id=GH_PAT_TOKEN \
+  GH_PAT_TOKEN=$(cat /run/secrets/GH_PAT_TOKEN) && \
   bun install
+
+ENV PATH="/app/node_modules/.bin:$PATH"
 
 RUN devops run-many build
 

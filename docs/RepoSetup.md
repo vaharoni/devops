@@ -14,7 +14,7 @@ Create `.npmrc` with the following content:
 
 ```text
 @vaharoni:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+//npm.pkg.github.com/:_authToken=${GH_PAT_TOKEN}
 ```
 
 Then, follow [these instructions][1] to create a classic personal access token (PAT) on Github with `read:packages` permission.
@@ -24,7 +24,7 @@ Then, follow [these instructions][1] to create a classic personal access token (
 Store the token in a `.envrc` file with the following content:
 
 ```toml
-export GITHUB_TOKEN=<token>
+export GH_PAT_TOKEN=<token>
 ```
 
 Make sure to add this file to `.gitignore`.

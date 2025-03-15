@@ -6,4 +6,11 @@ Let me know the name of the repo so that I can set up the appropriate permission
 
 - [Repo setup](./docs/RepoSetup.md)
 - [The devops architecture](./docs/Architecture.md)
+
+If you are setting up a new cluster:
+
 - [How to setup a Kubernetes cluster infrastructure](./docs/infra/README.md)
+
+If you are joining an existing cluster:
+
+- [How to join an existing Kubernetes cluster](./docs/JoiningCluster.md)
