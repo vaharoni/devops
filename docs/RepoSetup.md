@@ -1,6 +1,7 @@
 # Prerequisites
 
-- Install direnv (`brew install direnv`)
+- [Install direnv](https://direnv.net/docs/installation.html) (`brew install direnv`)
+- [Install the github CLI](https://cli.github.com/) (`brew install gh`)
 - [Install bun](https://bun.sh/docs/installation) (`brew install oven-sh/bun/bun`)
 - [Install kubectl](https://kubernetes.io/docs/tasks/tools/) (`brew install kubectl`)
 
@@ -21,7 +22,13 @@ Then, follow [these instructions][1] to create a classic personal access token (
 
 [1]: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token
 
-Store the token in a `.envrc` file with the following content:
+Push the token to github secrets:
+
+```shell
+gh secret set GH_PAT_TOKEN --body <token>
+```
+
+and store the same token in a `.envrc` file with the following content:
 
 ```toml
 export GH_PAT_TOKEN=<token>
