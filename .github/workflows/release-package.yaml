@@ -30,6 +30,9 @@ jobs:
           registry-url: "https://npm.pkg.github.com/"
           scope: "@vaharoni"
       - run: bun install --frozen-lockfile
+      - run: bunx npm login
+        env:
+          NPM_CONFIG_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: bun publish
         env:
           NPM_CONFIG_TOKEN: ${{ secrets.GITHUB_TOKEN }}
