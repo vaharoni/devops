@@ -8,14 +8,14 @@ import concurrently, {
 const oneLiner =
   "Runs a script concurrently in all projects that define it in their package.json";
 const keyExamples = `
-    $ ./devops run-many build
+    $ devops run-many build
 `.trim();
 
 const usage = `
 ${oneLiner}
 
 USAGE
-    ./devops run-many <script-name> [--kill-others-on-fail]
+    devops run-many <script-name> [--kill-others-on-fail]
 
 EXAMPLES
     ${keyExamples}
@@ -33,7 +33,7 @@ async function run(cmdObj: CLICommandParser) {
     if (projectData.data.scripts?.[script]) {
       commands.push({
         name: workspace,
-        command: `./devops --env ${cmdObj.env} run ${workspace}:${script} ${remaining}`,
+        command: `devops --env ${cmdObj.env} run ${workspace}:${script} ${remaining}`,
       });
     }
   });

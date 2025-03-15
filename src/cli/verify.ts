@@ -1,18 +1,24 @@
 import chalk from "chalk";
 import { getWorkspace, workspaceNames } from "../libs/workspace-discovery";
 import { CLICommandParser, printUsageAndExit } from "./common";
+import url from "url";
+import path from "path";
+
+const __file__ = url.fileURLToPath(import.meta.url);
+const __src__ = path.join(path.dirname(__file__), "../..", "src");
+const execShPath = path.join(__src__, "cli/exec.sh");
 
 const oneLiner = "Runs verify in all projects or one specific project";
 const keyExamples = `
-    $ ./devops verify
-    $ ./devops verify project
+    $ devops verify
+    $ devops verify project
 `.trim();
 
 const usage = `
 ${oneLiner}
 
 USAGE
-    ./devops verify [workspace]
+    devops verify [workspace]
 
 EXAMPLES
     ${keyExamples}
@@ -41,7 +47,7 @@ function run(cmdObj: CLICommandParser) {
     if ("verify" in scripts) {
       console.log(chalk.blue(`\nRunning verify in ${workspaceName}\n`));
       await cmdObj
-        .executorFromEnv(`.devops/cli/exec.sh ${rootPath} bun run verify`, {
+        .executorFromEnv(`${execShPath} ${rootPath} bun run verify`, {
           checkEnvYaml: false,
         })
         .spawn();

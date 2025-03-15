@@ -2,14 +2,11 @@ import chalk from "chalk";
 import fs from "fs";
 import { globSync } from "glob";
 import path from "path";
-import url from "url";
 import type { PkgData, ProjectData } from "../types";
 import { WorkspaceDependencies } from "./dependencies";
 import { getImageData, getImageNames } from "./config";
 
-const __file__ = url.fileURLToPath(import.meta.url);
-const __root__ = path.join(path.dirname(__file__), "../..");
-const rootPkgJsonPath = path.join(__root__, "package.json");
+const rootPkgJsonPath = path.join(process.cwd(), "package.json");
 const rootPkgJson = JSON.parse(fs.readFileSync(rootPkgJsonPath, "utf8")) as {
   workspaces: string[];
 };

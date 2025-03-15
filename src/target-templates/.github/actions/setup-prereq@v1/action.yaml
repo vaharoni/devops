@@ -13,7 +13,7 @@ runs:
 
     - name: Install the devops tool
       shell: bash
-      run: .devops/install.sh
+      run: bun install @vaharoni/devops
 
     - name: set $MONOREPO_ENV
       shell: bash

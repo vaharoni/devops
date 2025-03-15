@@ -2,8 +2,8 @@ import { CLICommandParser, CommandExecutor, printUsageAndExit } from "./common";
 
 const oneLiner = "Runs tests in all projects or one specific project";
 const keyExamples = `
-$ ./devops test
-$ ./devops test project
+$ devops test
+$ devops test project
 `;
 
 const usage = `

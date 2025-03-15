@@ -16,7 +16,7 @@ runs:
       id: check_affected
       shell: bash
       run: |
-        AFFECTED=$(./devops affected image $IMAGE_NAME --from-live-version)
+        AFFECTED=$(devops affected image $IMAGE_NAME --from-live-version)
         echo "affected=$AFFECTED" >> $GITHUB_OUTPUT
         echo "affected=$AFFECTED"
         if [[ "$AFFECTED" == "true" ]]; then
@@ -29,5 +29,5 @@ runs:
       shell: bash
       if: steps.check_affected.outputs.affected == 'true'
       run: |
-        ./devops k8s create deployments ${{ env.IMAGE_NAME }} ${{ github.sha }}
-        ./devops k8s set version node-services ${{ github.sha }}
+        devops k8s create deployments ${{ env.IMAGE_NAME }} ${{ github.sha }}
+        devops k8s set version node-services ${{ github.sha }}

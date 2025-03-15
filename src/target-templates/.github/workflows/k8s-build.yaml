@@ -14,7 +14,7 @@ jobs:
   build_node_services:
     runs-on: ubuntu-latest
     steps:
-      # Fetch the last 50 commits so that ./devops affected works
+      # Fetch the last 50 commits so that devops affected works
       - name: Checkout repo and history
         uses: actions/checkout@v4
         with:
@@ -41,7 +41,7 @@ jobs:
     needs: [build_node_services]
     runs-on: ubuntu-latest
     steps:
-      # Fetch the last 50 commits so that ./devops affected works
+      # Fetch the last 50 commits so that devops affected works
       - name: Checkout repo and history
         uses: actions/checkout@v4
         with:

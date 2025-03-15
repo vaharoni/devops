@@ -10,14 +10,14 @@ import { getMonorepoSecret } from "../libs/k8s-secrets-manager";
 const oneLiner =
   "Copies all dependencies of an image to a temporary folder in preparation for a Docker build";
 const keyExamples = `
-    $ ./devops prep-build node-services
+    $ devops prep-build node-services
 `.trim();
 
 const usage = `
 ${oneLiner}
 
 USAGE
-    ./devops prep-build <image>
+    devops prep-build <image>
 
 EXAMPLES
     ${keyExamples}
@@ -28,7 +28,7 @@ async function run(cmdObj: CLICommandParser) {
   const [image] = cmdObj.args;
   const imageData = getImageData(image);
   const dockerFile = imageData["docker-file"];
-  const dockerFilePath = path.join(".devops/k8s/docker-images", dockerFile);
+  const dockerFilePath = path.join(".devops/docker-images", dockerFile);
   if (!fs.existsSync(dockerFilePath)) {
     console.error(`The dockerfile ${dockerFilePath} does not exist`);
     process.exit(1);
@@ -44,7 +44,7 @@ async function run(cmdObj: CLICommandParser) {
   console.warn(`COPYING Dockerfile`);
   fs.copySync(dockerFilePath, path.join(destFolder, "Dockerfile"));
 
-  // Copy ./devops
+  // Copy devops
   console.warn(`COPYING .devops`);
   fs.copySync(".devops", path.join(destFolder, ".devops"));
 

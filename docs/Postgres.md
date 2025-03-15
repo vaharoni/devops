@@ -37,7 +37,7 @@ kubectl get secret -n stackgres stackgres-restapi-admin --template '{{ printf "u
 kubectl get secret -n stackgres stackgres-restapi-admin --template '{{ printf "password = %s\n" (.data.clearPassword | base64decode) }}'
 ```
 
-Stackgres recommends to keep the auto-generated password somewhere safe and then remove it from the secret by running the following. Note that then you won't be able to get the password by running `./devops db password ui`:
+Stackgres recommends to keep the auto-generated password somewhere safe and then remove it from the secret by running the following. Note that then you won't be able to get the password by running `devops db password ui`:
 
 ```shell
 kubectl patch secret -n stackgres stackgres-restapi-admin --type json -p '[{"op":"remove","path":"/data/clearPassword"}]'
@@ -77,11 +77,11 @@ This was loosely based on [this repo](https://gitlab.com/ongresinc/stackgres.git
 
 However, most files were removed in favor of the defaults. The defaults that Stackgres applies can be found in [.devops/postgres/StackgresDefaults.md](.devops/postgres/StackgresDefaults.md). Also, it seems that some of the examples refer to old naming conventions with regards to labels. `role=master` was replaced by `role=primary`, and `cluster` and `cluster-name` are now preceded by `stackgres.io/`.
 
-Go through the files under `./devops/postgres` and check the configuration. In particular, you will likely need to adjust:
+Go through the files under `devops/postgres` and check the configuration. In particular, you will likely need to adjust:
 
-- `./devops/postgres/*/cluster/SGCluster.yaml` - check out the size of the persistent volume, the number of instances, and the storage class
-- `./devops/postgres/*/configurations/07-SGObjectStorage.yaml` - check out the bucket name and endpoint
-- `./devops/postgres/*/configurations/08-SGScript.yaml` - check out the script name of the database created
+- `devops/postgres/*/cluster/SGCluster.yaml` - check out the size of the persistent volume, the number of instances, and the storage class
+- `devops/postgres/*/configurations/07-SGObjectStorage.yaml` - check out the bucket name and endpoint
+- `devops/postgres/*/configurations/08-SGScript.yaml` - check out the script name of the database created
 
 To create the clusters, run:
 

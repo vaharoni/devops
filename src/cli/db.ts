@@ -12,13 +12,13 @@ import { CLICommandParser, printUsageAndExit, StrongParams } from "./common";
 const oneLiner =
   "Utilities to help day to day operations of production and staging databases";
 const keyExamples = `
-    $ ./devops db list
-    $ ./devops db backups
-    $ ./devops db password  ui
-    $ ./devops db password  db-staging
-    $ ./devops db tunnel    db-staging
-    $ ./devops db patroni   db-staging
-    $ ./devops db psql      db-staging
+    $ devops db list
+    $ devops db backups
+    $ devops db password  ui
+    $ devops db password  db-staging
+    $ devops db tunnel    db-staging
+    $ devops db patroni   db-staging
+    $ devops db psql      db-staging
 `.trim();
 
 const usage = `

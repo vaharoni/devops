@@ -17,10 +17,12 @@ import run from "./cli/run";
 import runMany from "./cli/run-many";
 import test from "./cli/test";
 import verify from "./cli/verify";
+import init from "./cli/init";
 
 const [_node, _scriptPath, ...commandArgs] = process.argv;
 
 const allImports = [
+  init,
   run,
   runMany,
   exec,
@@ -61,7 +63,7 @@ const GENERAL_USAGE = `
 Devops utilities for the monorepo.
 
 USAGE
-    ./devops <command> <args> <env-options>
+    devops <command> <args> <env-options>
 
 CHOOSING ENV with <env-options>
     By default, all commands run under the env specified in MONOREPO_ENV env variable, or development if it does not exist.
@@ -71,8 +73,8 @@ CHOOSING ENV with <env-options>
 
     To override the environment in which a command is executed in, use --env <some-env>. This overrides the MONOREPO_ENV variable.
     You can use it anywhere in the command, i.e. the following are equivalent:
-    $ ./devops --env staging run project:task
-    $ ./devops run project:task --env staging
+    $ devops --env staging run project:task
+    $ devops run project:task --env staging
 
     Supported environments: development, staging, test, and production.
 

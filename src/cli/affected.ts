@@ -9,10 +9,10 @@ import { CLICommandParser, printUsageAndExit, StrongParams } from "./common";
 const oneLiner =
   "Command to check whether an image or a workspace is affected by certain commit(s)";
 const keyExamples = `
-    $ ./devops affected list-images
-    $ ./devops affected workspace db --base <sha1> --head <sha2>
-    $ ./devops affected image node-services --from-live-version
-    $ ./devops affected find-migrator --from-live-version
+    $ devops affected list-images
+    $ devops affected workspace db --base <sha1> --head <sha2>
+    $ devops affected image node-services --from-live-version
+    $ devops affected find-migrator --from-live-version
 `;
 
 const usage = `
@@ -20,22 +20,22 @@ ${oneLiner}
 
 GENERAL USAGE
   List
-    ./devops affected list-images --base [SHA1] --head [SHA2]
-    ./devops affected list-images --from-live-version
+    devops affected list-images --base [SHA1] --head [SHA2]
+    devops affected list-images --from-live-version
 
     These return a list of all images affected by the given commits.
 
   Checkers
-    ./devops affected workspace <workspace> --base [SHA1] --head [SHA2]
+    devops affected workspace <workspace> --base [SHA1] --head [SHA2]
 
-    ./devops affected image     <image>     --base [SHA1] --head [SHA2]
-    ./devops affected image     <image>     --from-live-version
+    devops affected image     <image>     --base [SHA1] --head [SHA2]
+    devops affected image     <image>     --from-live-version
 
     These return "true" or "false". 
 
   Finders
-    ./devops affected find-migrator --base [SHA1] --head [SHA2]
-    ./devops affected find-migrator --from-live-version
+    devops affected find-migrator --base [SHA1] --head [SHA2]
+    devops affected find-migrator --from-live-version
 
     When --base and --head are used, it checks whether the db project is affected. If it is, it returns the name of one random 
     affected image.
@@ -48,7 +48,7 @@ GENERAL USAGE
     Which commits are regarded for the affected calculation can be changed using:
     --base               Base of the current branch (HEAD^ by default)
     --head               Latest commit of the current branch (HEAD by default)
-    --from-live-version  Use the live version of the image/workspace as the base (see ./devops k8s get version)
+    --from-live-version  Use the live version of the image/workspace as the base (see devops k8s get version)
 
     If --from-live-version is present, --base and --head are ignored.
 

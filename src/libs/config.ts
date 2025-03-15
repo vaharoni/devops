@@ -1,7 +1,6 @@
 import { readFileSync } from "fs";
 import yaml from "yaml";
 import path from "path";
-import url from "url";
 import { getWorkspace } from "./workspace-discovery";
 import { z } from "zod";
 
@@ -23,12 +22,13 @@ const imageSchema = z.record(singleImageSchema);
 export type SingleImageSchema = z.infer<typeof singleImageSchema>;
 export type ImageSchema = z.infer<typeof imageSchema>;
 
-const __file__ = url.fileURLToPath(import.meta.url);
-const __root__ = path.join(path.dirname(__file__), "../..");
-const constantsFilePath = path.join(__root__, "config/constants.yaml");
-const imagesFilePath = path.join(__root__, "config/images.yaml");
+const constantsFilePath = path.join(
+  process.cwd(),
+  ".devops/config/constants.yaml"
+);
+const imagesFilePath = path.join(process.cwd(), ".devops/config/images.yaml");
 
-// We want these to be lazy loaded so that calling ./devops in a context that does not need the config files won't fail
+// We want these to be lazy loaded so that calling devops in a context that does not need the config files won't fail
 export const { getConst } = processConstFile();
 export const { getImageData, getImageNames } = processImagesFile();
 
@@ -42,7 +42,7 @@ function processConstFile() {
     try {
       constantsYaml = readFileSync(constantsFilePath, "utf8");
     } catch (e) {
-      console.error("Error reading config/constants.yaml");
+      console.error("Error reading .devops/config/constants.yaml");
       process.exit(1);
     }
     constants = yaml.parse(constantsYaml);
@@ -52,7 +52,9 @@ function processConstFile() {
   function getConst(key: AvailableConstKeys) {
     const value = constFileData()[key];
     if (!value) {
-      console.error(`Missing constant in config/constants.yaml: ${key}`);
+      console.error(
+        `Missing constant in .devops/config/constants.yaml: ${key}`
+      );
       process.exit(1);
     }
     return value;
@@ -71,7 +73,7 @@ function processImagesFile() {
       const imagesYaml = readFileSync(imagesFilePath, "utf8");
       images = yaml.parse(imagesYaml);
     } catch (e) {
-      console.error("Error reading config/images.yaml");
+      console.error("Error reading .devops/config/images.yaml");
       process.exit(1);
     }
     const parseRes = imageSchema.safeParse(images);
@@ -87,7 +89,9 @@ function processImagesFile() {
   function getImageData(imageName: string): SingleImageSchema {
     const imageData = imagesFileData()[imageName];
     if (!imageData) {
-      console.error(`Image ${imageName} not found in config/images.yaml`);
+      console.error(
+        `Image ${imageName} not found in .devops/config/images.yaml`
+      );
       process.exit(1);
     }
 
@@ -95,7 +99,7 @@ function processImagesFile() {
       const data = getWorkspace(project);
       if (!data.data) {
         console.error(
-          `Project ${project} not found for image ${imageName} in config/images.yaml`
+          `Project ${project} not found for image ${imageName} in .devops/config/images.yaml`
         );
         process.exit(1);
       }

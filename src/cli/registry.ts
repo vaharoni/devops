@@ -9,10 +9,10 @@ import { CLICommandParser, StrongParams, printUsageAndExit } from "./common";
 
 const oneLiner = "Manage container repositories";
 const keyExamples = `
-    $ ./devops registry server-url
-    $ ./devops registry reg-url
-    $ ./devops registry repo-url my-image sha
-    $ ./devops registry prune    my-image
+    $ devops registry server-url
+    $ devops registry reg-url
+    $ devops registry repo-url my-image sha
+    $ devops registry prune    my-image
 `.trim();
 
 const usage = `
@@ -20,14 +20,14 @@ ${oneLiner}
 
 USAGE
   Get base URLs
-      ./devops registry server-url
-      ./devops registry reg-url
+      devops registry server-url
+      devops registry reg-url
 
   Gets the URL of an image in the container registry:
-    ./devops registry repo-url <image> <sha> --env <env>
+    devops registry repo-url <image> <sha> --env <env>
 
   Prunes the repository of old images to enforce the "image-versions-to-keep" constant in config/constants.yaml:
-    ./devops registry prune <image> --env <env>
+    devops registry prune <image> --env <env>
 
     This is only relevant when the "infra" constant is set to "digitalocean".
 

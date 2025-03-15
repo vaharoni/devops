@@ -2,10 +2,16 @@ import fs from "fs";
 import { CommandExecutor } from "../../cli/common";
 import { envToNamespace, secretName } from "./k8s-constants";
 import yaml from "yaml";
+import url from "url";
+import path from "path";
+
+const __file__ = url.fileURLToPath(import.meta.url);
+const __src__ = path.join(path.dirname(__file__), "../../..", "src");
 
 // prettier-ignore
-const COMPOSITE_TEMPLATES_INDEX_PATH = ".devops/k8s/manifest-templates/composite-templates.yaml";
-const MANIFEST_TEMPLATES_PATH = ".devops/k8s/manifest-templates/templates";
+const COMPOSITE_TEMPLATES_INDEX_PATH = path.join(__src__, "k8s/composite-templates.yaml");
+// prettier-ignore
+const MANIFEST_TEMPLATES_PATH = path.join(__src__, "k8s/templates");
 
 const { getCompositeTemplateContent } = processCompositeTemplatesIndex();
 

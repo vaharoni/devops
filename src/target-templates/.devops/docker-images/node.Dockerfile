@@ -9,13 +9,17 @@ ENV NODE_ENV=production
 
 RUN npm install -g bun
 
-# This assumes ./devops prep-build was called by the host, which creates the config/ folder with necessary env variables
-# that are needed to be statitcally resolved by ./devops run-many build (e.g. NEXT_PUBLIC_*)
+# This assumes devops prep-build was called by the host, which creates the config/ folder with necessary env variables
+# that are needed to be statitcally resolved by devops run-many build (e.g. NEXT_PUBLIC_*)
 COPY . .
 
-RUN bun install
+# Install dependencies using bun
+# Mount the GITHUB_TOKEN secret and use it during bun install
+RUN --mount=type=secret,id=GITHUB_TOKEN \
+  GITHUB_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) && \
+  bun install
 
-RUN ./devops run-many build
+RUN devops run-many build
 
 # The config folder will be mounted when the pod starts with up-to-date env variables that are used in runtime by server-side code
 RUN rm -rf config/

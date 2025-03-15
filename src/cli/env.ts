@@ -15,12 +15,12 @@ import { getDecendentData } from "../libs/workspace-discovery";
 
 const oneLiner = "Commands to manipulate env variables";
 const keyExamples = `
-$ ./devops env get --env staging
-$ ./devops env get KEY1 KEY2 --env staging
-$ ./devops env set KEY1=123 KEY2=345 --env staging
-$ ./devops env delete KEY1 KEY2 --env staging
-$ ./devops env validate
-$ ./devops env validate myproject
+$ devops env get --env staging
+$ devops env get KEY1 KEY2 --env staging
+$ devops env set KEY1=123 KEY2=345 --env staging
+$ devops env delete KEY1 KEY2 --env staging
+$ devops env validate
+$ devops env validate myproject
 `;
 
 const usage = `
@@ -72,7 +72,7 @@ function run(cmdObj: CLICommandParser) {
       // We have to have a _validate so that we go through a CommandExecutor which injects env variables into the process
       cmdObj
         .executorFromEnv(
-          `./devops env _validate ${
+          `devops env _validate ${
             project ? "--skip-dotenv" : ""
           } ${envYamlFiles.join(" ")}`,
           { quiet: false }

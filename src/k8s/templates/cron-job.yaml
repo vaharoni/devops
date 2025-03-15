@@ -21,9 +21,9 @@ spec:
             - image: $MONOREPO_IMAGE_PATH
               name: $MONOREPO_SERVICE_NAME
               command:
-                - .devops/k8s/docker-entrypoints/node-exec.sh
+                - .devops/docker-entrypoints/node-exec.sh
               args:
-                - ./devops
+                - devops
                 - exec
                 - --in
                 - jobs

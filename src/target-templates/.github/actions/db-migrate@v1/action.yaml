@@ -7,7 +7,7 @@ runs:
       shell: bash
       run: |
         set +e
-        IMAGE=$(./devops affected find-migrator --from-live-version)
+        IMAGE=$(devops affected find-migrator --from-live-version)
         status=$?
         set -e
         if [[ $status -eq 13 ]]; then
@@ -15,7 +15,7 @@ runs:
         elif [[ $status -ne 0 ]]; then
           exit $status
         elif [[ "$IMAGE" != "" ]]; then
-          ./devops k8s create db-migrate-job $IMAGE ${{ github.sha }} --timeout 240
+          devops k8s create db-migrate-job $IMAGE ${{ github.sha }} --timeout 240
         else
           echo "No image requires a DB migration"
         fi

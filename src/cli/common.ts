@@ -59,7 +59,7 @@ export class CLICommandParser {
   }
 
   // Example:
-  //    const cmd = new CLICommandParser('./devops run --some-flag --in workspace arg1'.split(' '));
+  //    const cmd = new CLICommandParser('devops run --some-flag --in workspace arg1'.split(' '));
   //    cmd.parseOptions({ boolean: ['--some-flag'], params: ['--in'] })
   //    # => { args: ['arg1'], options: { '--some-flag': true, '--in': 'workspace' } }
   //
@@ -280,7 +280,7 @@ export class CommandExecutor {
     if (!this.checkEnvYaml) return;
     const envYamlFiles = globSync("**/env.yaml");
     const checkEnvCmd = new CommandExecutor(
-      `./devops env _validate ${envYamlFiles.join(" ")}`,
+      `devops env _validate ${envYamlFiles.join(" ")}`,
       { env: this.env, quiet: true, checkEnvYaml: false }
     );
     checkEnvCmd.exec();

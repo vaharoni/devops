@@ -27,7 +27,7 @@ runs:
       id: determine_infrastructure
       shell: bash
       run: |
-        INFRA=$(./devops constant infra)
+        INFRA=$(devops constant infra)
         echo "infra=$INFRA" >> $GITHUB_OUTPUT
 
     - name: Connect to Digital Ocean

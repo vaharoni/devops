@@ -30,16 +30,16 @@ import {
 const oneLiner =
   "Kubernetes helper utility that manages the cluster lifecycle during deployment";
 const keyExamples = `
-    $ ./devops k8s check  env-setup      --env production
-    $ ./devops k8s gen    env-setup      --env production
-    $ ./devops k8s create env-setup      --env production
-    $ ./devops k8s gen    deployments    node-services <sha>
-    $ ./devops k8s create deployments    node-services <sha>
-    $ ./devops k8s create db-migrate-job node-services <sha> --timeout 120
-    $ ./devops k8s delete deployments    node-services
-    $ ./devops k8s get    version        node-services
-    $ ./devops k8s set    version        node-services <sha>
-    $ ./devops k8s unset  version        node-services
+    $ devops k8s check  env-setup      --env production
+    $ devops k8s gen    env-setup      --env production
+    $ devops k8s create env-setup      --env production
+    $ devops k8s gen    deployments    node-services <sha>
+    $ devops k8s create deployments    node-services <sha>
+    $ devops k8s create db-migrate-job node-services <sha> --timeout 120
+    $ devops k8s delete deployments    node-services
+    $ devops k8s get    version        node-services
+    $ devops k8s set    version        node-services <sha>
+    $ devops k8s unset  version        node-services
 `.trim();
 
 const usage = `
@@ -47,15 +47,15 @@ ${oneLiner}
 
 USAGE
     Image-independent commands:
-        ./devops k8s <sub-command> env-setup --env <env>
+        devops k8s <sub-command> env-setup --env <env>
 
         Note that on Hetzner, "create" does a bit more than generating a YAML file and applying it. It also copies 
         the Harbor secret to the namespace and patches the default service account to use it.
 
     Image-specific commands:
-        ./devops k8s <sub-command> deployments <image> <sha>
-        ./devops k8s <sub-command> db-migrate-job <image> <sha> --timeout <timeout>
-        ./devops k8s <sub-command> version <image> <sha>
+        devops k8s <sub-command> deployments <image> <sha>
+        devops k8s <sub-command> db-migrate-job <image> <sha> --timeout <timeout>
+        devops k8s <sub-command> version <image> <sha>
 
     sub-command can be:
     - gen       prints to stdout
@@ -101,7 +101,7 @@ function handleEnvCheck(exists: boolean) {
     The environment does not exist in the cluster.
     In order to create resources for it in the cluster, it must be first set up. This is done to protect from unintentional resource creation.
     To set up the environment, run the following from your dev machine:
-    $ ./devops k8s create env-setup --env <env>
+    $ devops k8s create env-setup --env <env>
   `);
   process.exit(1);
 }

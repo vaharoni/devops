@@ -25,5 +25,5 @@ runs:
       shell: bash
 
     - name: verify namepsace exists
-      run: ./devops k8s check env-setup --env ${{ github.ref_name }}
+      run: devops k8s check env-setup --env ${{ github.ref_name }}
       shell: bash

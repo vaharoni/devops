@@ -9,12 +9,12 @@
     "src/**/*"
   ],
   "bin": {
-    "devops-init": "dist/scripts/init.js"
+    "devops": "dist/devops.js",
+    "dotenvx": "./node_modules/.bin/dotenvx"
   },
   "scripts": {
     "build": "tsc",
-    "test": "vitest run",
-    "init": "node dist/scripts/init.js"
+    "test": "vitest run"
   },
   "repository": {
     "type": "git",

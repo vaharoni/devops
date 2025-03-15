@@ -3,15 +3,15 @@ import { CLICommandParser, printUsageAndExit } from "./common";
 
 const oneLiner = "Utilities to manage and run DML scripts in the db project";
 const keyExamples = `
-    $ ./devops dml create --name my-dml-name
-    $ ./devops dml run 20250113153318_my_dml_name
+    $ devops dml create --name my-dml-name
+    $ devops dml run 20250113153318_my_dml_name
 `;
 
 const usage = `
 ${oneLiner}
 
 CREATE DML SCRIPTS
-    ./devops dml create --name <dml-semantic-name>
+    devops dml create --name <dml-semantic-name>
 
     This command creates a new folder under /dml using the current timestamp and a 
     snake-case version of the name. Inside the folder, a file called migrate.ts is created. 
@@ -21,7 +21,7 @@ CREATE DML SCRIPTS
     files, csv files, etc. You can also add optional scripts, such as rollback.ts.
 
 RUN DML SCRIPTS
-    ./devops dml run <dml-folder-name> [script-file-name] [-- arg1 arg2 ...]
+    devops dml run <dml-folder-name> [script-file-name] [-- arg1 arg2 ...]
 
     The dml-folder-name must be the full name, including the timestamp. This follows prisma 
     conventions. 
@@ -36,8 +36,8 @@ RUN DML SCRIPTS
 
 EXAMPLES
     ${keyExamples.trim()}
-    $ ./devops dml run 20250113153318_my_dml_name rollback
-    $ ./devops dml run 20250113153318_my_dml_name -- staging
+    $ devops dml run 20250113153318_my_dml_name rollback
+    $ devops dml run 20250113153318_my_dml_name -- staging
 `;
 
 const dmlFileTemplate = `
@@ -94,7 +94,7 @@ function runDml(
   cmdObj
     .executorFromEnv(
       // prettier-ignore
-      `./devops exec --in dml bun ${folderName}/${script} ${args.join(" ")}`
+      `devops exec --in dml bun ${folderName}/${script} ${args.join(" ")}`
     )
     .exec();
 }

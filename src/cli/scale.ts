@@ -6,15 +6,15 @@ import {
 import { CLICommandParser, printUsageAndExit, StrongParams } from "./common";
 
 const oneLiner = "Scales a deployment to the specified number of replicas";
-const keyExamples = `$ ./devops scale set node-services www 3 --env production`;
+const keyExamples = `$ devops scale set node-services www 3 --env production`;
 
 const usage = `
 ${oneLiner}
 
 GENERAL USAGE
-    ./devops scale set <image-name> <workspace-name> <replica-count>
-    ./devops scale get <image-name> [<workspace-name>]
-    ./devops scale reset <image-name> [<workspace-name>]
+    devops scale set <image-name> <workspace-name> <replica-count>
+    devops scale get <image-name> [<workspace-name>]
+    devops scale reset <image-name> [<workspace-name>]
 
 NOTE
     Performing 'set' stores the scale count in the image config map so that it persists across deployments.
