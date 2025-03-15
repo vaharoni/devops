@@ -1,0 +1,30 @@
+{
+  "name": "jobs",
+  "type": "module",
+  "version": "0.0.1",
+  "main": "index.ts",
+  "nx": {
+    "projectType": "application"
+  },
+  "scripts": {
+    "print-token": "bunx tsx print-token.ts",
+    "verify": "tsc -p ./tsconfig.json --noEmit"
+  },
+  "author": "",
+  "license": "ISC",
+  "deployment": {
+    "manifest": "cron-job",
+    "cronJobs": [
+      {
+        "name": "test",
+        "cron": "*/15 * * * *",
+        "curl": [
+          "jobs",
+          "-X",
+          "POST",
+          "http://example/ping-from-jobs"
+        ]
+      }
+    ]
+  }
+}

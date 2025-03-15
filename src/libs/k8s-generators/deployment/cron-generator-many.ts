@@ -34,10 +34,8 @@ export class CronGeneratorMany extends BaseDeploymentGenerator {
           projectData
         ).generate("cron-job");
         const jsonData = yaml.parse(manifest);
-        const currArgs =
-          jsonData.spec.jobTemplate.spec.template.spec.containers[0].args;
-        jsonData.spec.jobTemplate.spec.template.spec.containers[0].args =
-          currArgs.concat(job.curl);
+        const currArgs = jsonData.spec.jobTemplate.spec.template.spec.containers[0].args;
+        jsonData.spec.jobTemplate.spec.template.spec.containers[0].args = currArgs.concat(job.curl);
         return yaml.stringify(jsonData);
       })
       .join("\n---\n");

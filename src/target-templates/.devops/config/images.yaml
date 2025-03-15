@@ -19,3 +19,4 @@ node-services:
   debug-template: debug-console
   applications:
   - example
+  - jobs

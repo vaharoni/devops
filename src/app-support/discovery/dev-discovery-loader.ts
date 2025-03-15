@@ -1,7 +1,7 @@
 import fs from "fs";
 import { globSync } from "glob";
 
-import { type PkgData } from "../types";
+import { type PkgData } from "../../types";
 
 let _devDiscoveryLoader: DevDiscoveryLoader | undefined;
 

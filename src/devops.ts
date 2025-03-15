@@ -18,6 +18,8 @@ import runMany from "./cli/run-many";
 import test from "./cli/test";
 import init from "./cli/init";
 import redis from "./cli/redis";
+import internalCurl from "./cli/internal-curl";
+import jwt from "./cli/jwt";
 
 const [_node, _scriptPath, ...commandArgs] = process.argv;
 
@@ -39,6 +41,8 @@ const allImports = [
   registry,
   affected,
   prepBuild,
+  internalCurl,
+  jwt
 ];
 
 const commands: {

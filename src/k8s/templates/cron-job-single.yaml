@@ -24,10 +24,7 @@ spec:
                 - .devops/docker-entrypoints/node-exec.sh
               args:
                 - devops
-                - exec
-                - --in
-                - jobs
-                - ./internal-curl
+                - internal-curl
               env:
                 - name: MONOREPO_ENV
                   value: $MONOREPO_ENV

@@ -1,2 +1,3 @@
 export * from "./types/index";
-export * from "./discovery/service-endpoint";
+export * from "./app-support/discovery/service-endpoint";
+export * from "./app-support/crypto";

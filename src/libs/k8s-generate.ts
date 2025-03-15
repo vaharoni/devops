@@ -34,6 +34,10 @@ export function generateImageDeployments(
     .map((projectData) => {
       const manifest = projectData.data.deployment!.manifest;
       const generatorClass = generatorLookup[manifest];
+      if (!generatorClass) {
+        console.error(`Unsupported manifest type: ${manifest} for project ${projectData.data.name}`);
+        process.exit(1);
+      }
       const generator = new generatorClass(
         monorepoEnv,
         image,
