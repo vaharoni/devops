@@ -18,6 +18,7 @@ import runMany from "./cli/run-many";
 import test from "./cli/test";
 import verify from "./cli/verify";
 import init from "./cli/init";
+import redis from "./cli/redis";
 
 const [_node, _scriptPath, ...commandArgs] = process.argv;
 
@@ -30,6 +31,7 @@ const allImports = [
   prisma,
   dml,
   db,
+  redis,
   console,
   test,
   verify,
