@@ -1,0 +1,16 @@
+# Note that cron-job-many is supported dynamically through the generators
+env-setup-production:
+  - env-setup.yaml
+env-setup-staging:
+  - env-setup.yaml
+backend-process:
+  - deployment-process.yaml
+internal-service:
+  - deployment-web.yaml
+  - service.yaml
+external-service:
+  - deployment-web.yaml
+  - service.yaml
+  - ingress.yaml
+debug-console:
+  - deployment-debug.yaml

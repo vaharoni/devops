@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: $MONOREPO_SERVICE_NAME
+  labels:
+    app: $MONOREPO_SERVICE_NAME
+    env: $MONOREPO_ENV
+  namespace: $MONOREPO_NAMESPACE
+spec:
+  selector:
+    app: $MONOREPO_SERVICE_NAME
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: $MONOREPO_PKG_PORT

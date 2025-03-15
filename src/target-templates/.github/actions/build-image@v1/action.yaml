@@ -1,0 +1,119 @@
+name: "Build image"
+description: "Build the specified image if it's affected"
+inputs:
+  image-name:
+    description: 'The image name'
+    required: true
+  install-script:
+    description: "Custom installation script"
+    required: false
+    default: |
+      bun install
+  cache-paths:
+    description: "Paths to cache, separated by newlines"
+    required: false
+    default: |
+      ~/.bun
+      **/node_modules
+  hash-files:
+    description: "File to hash for cache key"
+    required: false
+    default: "**/bun.lockb"
+outputs:
+  affected:
+    description: "Whether the image is affected"
+    value: ${{ steps.check_affected.outputs.affected }}    
+runs:
+  using: "composite"
+  steps:
+    - name: Setup basic vars
+      shell: bash
+      run: |
+        echo "IMAGE_NAME=${{ inputs.image-name }}" >> $GITHUB_ENV
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Check if affected
+      id: check_affected
+      shell: bash
+      run: |
+        AFFECTED=$(./devops affected image $IMAGE_NAME --from-live-version)
+        echo "affected=$AFFECTED" >> $GITHUB_OUTPUT
+        if [[ "$AFFECTED" == "true" ]]; then
+          echo "${{ env.IMAGE_NAME }} is affected. Proceeding with build."
+        else
+          echo "${{ env.IMAGE_NAME }} is not affected. Skipping."
+        fi
+
+    - name: Prepare build
+      shell: bash
+      if: steps.check_affected.outputs.affected == 'true'
+      run: |
+        echo "CACHE_PREFIX=v1-${{ runner.os }}-${{ env.IMAGE_NAME }}-${{ github.ref_name }}" >> $GITHUB_ENV
+        echo "ECR_URL=$(./devops registry repo-url ${{ env.IMAGE_NAME }} ${{ github.sha }})" >> $GITHUB_ENV
+        echo "FOLDER=$(./devops prep-build ${{ env.IMAGE_NAME }})" >> $GITHUB_ENV
+
+    - name: Prepare cache paths
+      shell: bash
+      if: steps.check_affected.outputs.affected == 'true'
+      run: |
+        folder="${{ env.FOLDER }}"
+        computed_paths=""
+        while IFS= read -r line || [ -n "$line" ]; do
+          # Skip empty lines
+          [ -z "$line" ] && continue
+          # If the path is relative, prepend the folder
+          if [[ "$line" != /* && "$line" != ~* ]]; then
+            line="$folder/$line"
+          fi
+          computed_paths+="$line"$'\n'
+        done <<< "${{ inputs.cache-paths }}"
+        echo "Resolved cache paths:"
+        echo "${computed_paths}"
+
+        # Use multiline syntax for setting CACHE_PATHS
+        echo "CACHE_PATHS<<EOF" >> $GITHUB_ENV
+        echo "${computed_paths}" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV        
+
+    - name: Restore cache
+      if: steps.check_affected.outputs.affected == 'true'
+      id: restore-cache
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{ env.CACHE_PATHS }}
+        key: ${{ env.CACHE_PREFIX }}-${{ hashFiles(inputs.hash-files) }}
+        restore-keys: |
+          ${{ env.CACHE_PREFIX }}-
+
+    - name: Install dependencies
+      shell: bash
+      if: steps.check_affected.outputs.affected == 'true'
+      run: |
+        cd ${{ env.FOLDER }}
+        ${{ inputs.install-script }}
+
+    - name: Save cache
+      uses: actions/cache/save@v4
+      if: steps.check_affected.outputs.affected == 'true'
+      id: save-cache
+      with:
+        path: ${{ env.CACHE_PATHS }}
+        key: ${{ steps.restore-cache.outputs.cache-primary-key }}
+
+    - name: Build and push Docker image
+      if: steps.check_affected.outputs.affected == 'true'
+      uses: docker/build-push-action@v6
+      with:
+        context: ${{ env.FOLDER }}
+        push: true
+        tags: ${{ env.ECR_URL }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Prune registry
+      if: steps.check_affected.outputs.affected == 'true'
+      shell: bash
+      run: |
+        ./devops registry prune ${{ env.IMAGE_NAME }}

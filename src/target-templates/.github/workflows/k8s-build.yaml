@@ -1,0 +1,69 @@
+name: "Monorepo Build and Deploy"
+
+on:
+  push:
+    branches:
+      - staging
+      - production
+
+permissions:
+  contents: read
+
+jobs:
+  # Repeat per image
+  build_node_services:
+    runs-on: ubuntu-latest
+    steps:
+      # Fetch the last 50 commits so that ./devops affected works
+      - name: Checkout repo and history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      - name: Setup prerequesites
+        uses: ./.github/actions/setup-prereq@v1
+
+      - name: Connect to infrastructure
+        uses: ./.github/actions/connect-to-infra@v1
+        with:
+          do_access_token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          do_cluster_name: ${{ secrets.DIGITALOCEAN_CLUSTER_NAME }}
+          hetzner_kubeconfig: ${{ secrets.HCLOUD_KUBECONFIG }}
+          harbor_user: ${{ secrets.HARBOR_USER }}
+          harbor_password: ${{ secrets.HARBOR_PASSWORD }}
+
+      - uses: ./.github/actions/build-image@v1
+        with:
+          image-name: node-services
+
+  finalize_build:
+    # Update to include all images built
+    needs: [build_node_services]
+    runs-on: ubuntu-latest
+    steps:
+      # Fetch the last 50 commits so that ./devops affected works
+      - name: Checkout repo and history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      - name: Setup prerequesites
+        uses: ./.github/actions/setup-prereq@v1
+
+      - name: Connect to infrastructure
+        uses: ./.github/actions/connect-to-infra@v1
+        with:
+          do_access_token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          do_cluster_name: ${{ secrets.DIGITALOCEAN_CLUSTER_NAME }}
+          hetzner_kubeconfig: ${{ secrets.HCLOUD_KUBECONFIG }}
+          harbor_user: ${{ secrets.HARBOR_USER }}
+          harbor_password: ${{ secrets.HARBOR_PASSWORD }}
+
+      - name: Run DB Migrate
+        uses: ./.github/actions/db-migrate@v1
+
+      # Repeat per image
+      - name: Deploy node services
+        uses: ./.github/actions/deploy-image@v1
+        with:
+          image-name: node-services

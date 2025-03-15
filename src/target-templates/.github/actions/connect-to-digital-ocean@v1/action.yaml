@@ -1,0 +1,29 @@
+name: "Connect to Digital Ocean"
+description: "Sets up kubernetes connection to Digital Ocean and ensures connection"
+inputs:
+  access_token:
+    description: "DigitalOcean access token"
+    required: true
+  cluster_name:
+    description: "DigitalOcean cluster name"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ inputs.access_token }}
+
+    - name: Log in to DigitalOcean Container Registry with short-lived credentials
+      run: doctl registry login --expiry-seconds 1200
+      shell: bash
+
+    - name: Save DigitalOcean kubeconfig with short-lived credentials
+      run: | 
+        doctl kubernetes cluster kubeconfig save --expiry-seconds 1200 ${{ inputs.cluster_name }}
+      shell: bash
+
+    - name: verify namepsace exists
+      run: ./devops k8s check env-setup --env ${{ github.ref_name }}
+      shell: bash

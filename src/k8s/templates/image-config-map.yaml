@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: $MONOREPO_IMAGE_CONFIG_MAP
+  namespace: $MONOREPO_NAMESPACE
+  labels:
+    env: $MONOREPO_ENV
+data:
+  jsonKey: '${MONOREPO_JSON_DATA}'

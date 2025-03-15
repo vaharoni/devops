@@ -1,0 +1,25 @@
+expose:
+  type: ingress
+  ingress:
+    hosts:
+      core: $REGISTRY_DOMAIN
+  tls:
+    certSource: secret
+    secret:
+      secretName: tls-secret
+externalURL: https://$REGISTRY_DOMAIN
+persistence:
+  enabled: true
+  persistentVolumeClaim:
+    registry:
+      storageClass: "hcloud-volumes"
+      accessMode: ReadWriteOnce
+      size: 20Gi
+    jobservice:
+      storageClass: "hcloud-volumes"
+      accessMode: ReadWriteOnce
+      size: 5Gi
+    chartmuseum:
+      storageClass: "hcloud-volumes"
+      accessMode: ReadWriteOnce
+      size: 5Gi

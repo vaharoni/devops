@@ -1,0 +1,33 @@
+name: "Deploy image"
+description: "Deploy the specified image if it's affected and set its version"
+inputs:
+  image-name:
+    description: 'The image name'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Setup basic vars
+      shell: bash
+      run: |
+        echo "IMAGE_NAME=${{ inputs.image-name }}" >> $GITHUB_ENV
+
+    - name: Check if affected
+      id: check_affected
+      shell: bash
+      run: |
+        AFFECTED=$(./devops affected image $IMAGE_NAME --from-live-version)
+        echo "affected=$AFFECTED" >> $GITHUB_OUTPUT
+        echo "affected=$AFFECTED"
+        if [[ "$AFFECTED" == "true" ]]; then
+          echo "${{ env.IMAGE_NAME }} is affected. Proceeding with deployment."
+        else
+          echo "${{ env.IMAGE_NAME }} is not affected. Skipping."
+        fi
+
+    - name: Deploy
+      shell: bash
+      if: steps.check_affected.outputs.affected == 'true'
+      run: |
+        ./devops k8s create deployments ${{ env.IMAGE_NAME }} ${{ github.sha }}
+        ./devops k8s set version node-services ${{ github.sha }}

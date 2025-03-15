@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: $MONOREPO_SERVICE_NAME
+  namespace: $MONOREPO_NAMESPACE
+  labels:
+    app: $MONOREPO_SERVICE_NAME
+    env: $MONOREPO_ENV
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: $MONOREPO_PKG_SUBDOMAIN.$MONOREPO_DOMAIN_NAME
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: $MONOREPO_SERVICE_NAME
+                port:
+                  number: 80

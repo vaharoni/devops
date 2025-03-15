@@ -1,0 +1,23 @@
+name: "DB Migrate"
+description: "Run DB migrate on an affected image, if applicable"
+runs:
+  using: "composite"
+  steps:
+    - name: run-db-migrate
+      shell: bash
+      run: |
+        set +e
+        IMAGE=$(./devops affected find-migrator --from-live-version)
+        status=$?
+        set -e
+        if [[ $status -eq 13 ]]; then
+          echo "db project missing, skipping DB migration"
+        elif [[ $status -ne 0 ]]; then
+          exit $status
+        elif [[ "$IMAGE" != "" ]]; then
+          ./devops k8s create db-migrate-job $IMAGE ${{ github.sha }} --timeout 240
+        else
+          echo "No image requires a DB migration"
+        fi
+
+

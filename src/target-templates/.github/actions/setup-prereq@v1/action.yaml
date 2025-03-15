@@ -1,0 +1,22 @@
+name: "Install prerequesites"
+description: "Sets up Node, Bun, and devops"
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 23
+
+    - name: Setup bun
+      uses: oven-sh/setup-bun@v2
+
+    - name: Install the devops tool
+      shell: bash
+      run: .devops/install.sh
+
+    - name: set $MONOREPO_ENV
+      shell: bash
+      run: |
+        BRANCH_NAME=${{ github.ref_name }}
+        echo "MONOREPO_ENV=$BRANCH_NAME" >> $GITHUB_ENV

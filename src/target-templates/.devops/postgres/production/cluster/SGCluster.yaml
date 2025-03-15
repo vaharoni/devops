@@ -1,0 +1,47 @@
+apiVersion: stackgres.io/v1
+kind: SGCluster
+metadata:
+  namespace: db-production
+  name: db-production
+spec:
+  postgres:
+    version: '17.4'
+    # extensions:
+    # - name: 'pg_repack'
+    # - name: 'pg_trgm'
+  instances: 2
+  # sgInstanceProfile: 'size-m'
+  profile: 'production'
+  pods:
+    persistentVolume:
+      size: '20Gi'
+      storageClass: 'hcloud-volumes-retain'
+    scheduling:
+      tolerations:
+        - key: "stackgres"
+          operator: "Exists"
+          effect: "NoSchedule"
+  configurations:
+    # sgPostgresConfig: 'pgconfig'
+    # sgPoolingConfig: 'poolconfig'
+    backups:
+    - sgObjectStorage: 'backupconfig'
+      cronSchedule: '30 02 * * *'
+      retention: 7
+      compression: lz4
+      performance:
+        maxDiskBandwidth: 26214400 #25 MB per seceod
+        maxNetworkBandwidth: 52428800 #50 MB per second
+        uploadDiskConcurrency: 2
+  # We do not use for now as it requires adding a few more nodes
+  # distributedLogs:
+  #   sgDistributedLogs: 'distributedlogs'
+  managedSql:
+    scripts:
+      - sgScript: create-db-script
+  postgresServices:
+    primary:
+      type: ClusterIP
+    replicas:
+      type: ClusterIP
+  prometheusAutobind: true

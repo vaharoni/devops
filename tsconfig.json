@@ -1,12 +1,30 @@
 {
+  "include": ["src/**/*"],
   "compilerOptions": {
     "outDir": "./dist",
-    "module": "ES6",
-    "target": "ES6",
     "declaration": true,
     "declarationMap": true,
     "emitDeclarationOnly": false,
-    "strict": true
-  },
-  "include": ["src/**/*"]
+
+    // Enable latest features
+    "lib": ["ESNext", "DOM"],
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleDetection": "force",
+    "allowJs": true,
+
+    // Bundler mode
+    "moduleResolution": "bundler",
+    "verbatimModuleSyntax": true,
+
+    // Best practices
+    "strict": true,
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+
+    // Some stricter flags (disabled by default)
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noPropertyAccessFromIndexSignature": false
+  }
 }

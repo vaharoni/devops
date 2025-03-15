@@ -1,0 +1,31 @@
+name: "Connect to Hetzner"
+description: "Sets up kubernetes connection to Hetzner and ensures connection"
+inputs:
+  kubeconfig:
+    description: "The Hetzner kubeconfig file"
+    required: true
+  harbor_user:
+    description: "The user name for the harbor registry"
+    required: true
+  harbor_password:
+    description: "The password for the harbor registry"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Create a kubeconfig file
+      run: | 
+        mkdir -p ~/.kube
+        echo "${{ inputs.kubeconfig }}" > ~/.kube/config
+        chmod 600 ~/.kube/config
+      shell: bash
+
+    - name: Verify cluster connection and that namepsace exists
+      run: ./devops k8s check env-setup --env ${{ github.ref_name }}
+      shell: bash
+
+    - name: Connect to the registry
+      run: | 
+        server_url=$(./devops registry server-url)
+        docker login $server_url -u '${{ inputs.harbor_user }}' -p ${{ inputs.harbor_password }}
+      shell: bash

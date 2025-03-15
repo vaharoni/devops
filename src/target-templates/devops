@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+DIR=$(dirname $0)
+pushd "$DIR" > /dev/null
+.devops/devops.ts "$@"
+EXIT_CODE=$?
+
+popd > /dev/null
+
+exit $EXIT_CODE
