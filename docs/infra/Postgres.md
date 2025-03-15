@@ -92,3 +92,25 @@ kubectl apply -f .devops/postgres/staging/cluster
 kubectl apply -f .devops/postgres/production/configurations
 kubectl apply -f .devops/postgres/production/cluster
 ```
+
+## Step 4: Setup the DATABASE_URL env variables in your cluster
+
+In general, the databases should be accessible from within the cluster through the following DNS addresses:
+```shell
+db-staging.db-staging
+db-production.db-production
+```
+
+The specific setup here may be different depending on how you choose to create your application databases inside the `08-SGScript.yaml` files.
+
+Here is a simple example on how to do this for the staging database.
+
+First, figure out the super user password:
+```shell
+devops db password db-staging
+```
+
+Then set up the env variable accordingly (in this example for a database called `glitchy`):
+```shell
+devops env set DATABASE_URL=postgresql://postgres:<password>@db-staging.db-staging:5432/glitchy --env staging
+```

@@ -95,7 +95,9 @@ async function run(cmdObj: CLICommandParser) {
       break;
     }
     case "find-migrator": {
-      console.log(findImageWithAffectedWorkspace("db", commonOpts));
+      const migrator = findImageWithAffectedWorkspace("db", commonOpts)
+      if (!migrator) break;
+      console.log(migrator);
       break;
     }
     default:

@@ -58,3 +58,12 @@ devops init
 ```
 
 Follow the instructions provided by the `init` command.
+
+Then run:
+```shell
+bun install
+```
+
+# Setting up the database
+
+Note that by default the `db` project exists with basic prisma configuration. It requires the `DATABASE_URL` env variable to exist. In addition, the prisma schema needs to contain some content in order for the `generate` command to return exit code 0. If you don't need a relational database for now, simply delete the folders `db` and `dml`. You can always recover back by running `devops init` again.
