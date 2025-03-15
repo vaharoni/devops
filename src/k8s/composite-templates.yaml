@@ -1,4 +1,4 @@
-# Note that cron-job-many is supported dynamically through the generators
+# Note that cron-job is supported dynamically through the generators
 env-setup-production:
   - env-setup.yaml
 env-setup-staging:

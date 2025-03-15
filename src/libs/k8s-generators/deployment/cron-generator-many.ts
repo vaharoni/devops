@@ -4,7 +4,7 @@ import { BaseDeploymentGenerator } from "./base-deployment-generator";
 import { CronGeneratorSingle } from "./cron-generator-single";
 
 export class CronGeneratorMany extends BaseDeploymentGenerator {
-  static supported = ["cron-job-many"];
+  static supported = ["cron-job"];
 
   generate(_folder?: string) {
     const jobs = this.projectData.data.deployment?.cronJobs;
@@ -21,7 +21,7 @@ export class CronGeneratorMany extends BaseDeploymentGenerator {
           data: {
             name,
             deployment: {
-              manifest: "cron-job",
+              manifest: "cron-job-single",
               service_name: name,
               cron: job.cron,
             },
