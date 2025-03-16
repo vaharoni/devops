@@ -103,7 +103,7 @@ By default, `devops init` creates a `db` project with a basic prisma configurati
 - it requires the `DATABASE_URL` env variable to exist. If you're reusing the existing Postgres cluster, you'll want to have the administrator create a database schema for you. You can then run something like `devops env set DATABASE_URL=<url> --env staging` to set up this env variable. If you're creating an entirely new database cluster, you will want to follow the [Postgres setup guide](./infra/Postgres.md), skipping the "Install the operator" step.
 - the prisma schema needs to contain some content in order for the `prisma generate` command to work without failing. You'll need to set up your first application table before proceeding.
 
-If you don't need a relational database for now, simply delete the folders `db` and `dml` folders (the latter depends on the former). You can always recover them back by running `devops init` again (it does not override any changes you make otherwise).
+If you don't need a relational database for now, simply delete the folders `db` and `dml` (the latter depends on the former). You can always recover them back by running `devops init` again (it does not override any changes you make otherwise).
 
 ## Step 4: Uploading github secrets
 
