@@ -25,5 +25,4 @@ runs:
     - name: Install the devops tool
       shell: bash
       run: | 
-        bun install @vaharoni/devops
-        echo "$(pwd)/node_modules/.bin" >> $GITHUB_PATH
+        bun install -g @vaharoni/devops
