@@ -71,12 +71,6 @@ First, set up you `kubeconfig` per the instructions of scenario 1.
 
 ## Step 1: Install the SDK and generate code
 
-Install the SDK into the repo by adding the same package to the project (in the future these may be separated to different packages):
-
-```shell
-bun add @vaharoni/devops
-```
-
 Then run the `init` command and make sure to follow the instructions that it outputs:
 ```shell
 devops init
@@ -88,6 +82,14 @@ bun install
 ```
 
 If you aren't creating your own kubernetes cluster, postgres cluster, or redis cluster you can safely delete the folders `infra`, `postgres`, and `redis` under `.devops`.
+
+Install the SDK into the root package of your repo by adding the same package to the project (in the future these may be separated to different packages):
+
+```shell
+bun add @vaharoni/devops
+```
+
+To avoid versioning issues, you should not add the `@vaharoni/devops` package in the `package.json` of libs or apps inside the monorepo. They will be able to import it thanks to the repo-wide installation.
 
 ## Step 2: Create your repo-specific namespaces
 
