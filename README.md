@@ -1,16 +1,17 @@
-If you are viewing this file, it means your github account has access to this repo.
-However, each repo you intend to use this tool in will need to get permissios to access it from within github actions.
-Let me know the name of the repo so that I can set up the appropriate permissions.
+# devops for Monorepos
+
+Monorepos support multiple apps, allowing them to reuse functionality through shared libraries. `devops` is a tool that helps deploy and manage such setup on a kubernetes cluster using github actions. 
+
+`devops` is...
+- **a generator** - it generates boilerplate code when starting a new monorepo, such as github actions and docker images
+- **a CLI** - making it easy to manage your local and remote env variables, connect to your remote databases, or launch remote console
+- **a builder** - identifies which folders need to reside in every docker image through dependency discovery
+- **a gitops deployer** - sets up github actions to watch pushes to `staging` and `production` branches, identifies which images are affected by those commits, and determines whether to run db migrations
+- **an SDK** - helps with inter-application communication, by addressing the minor differences between local and remote environments in the DNS of endpoints, and by issuing tokens so that apps can validate traffic originated from within the cluster
+- **a scheduler** - leverages kubernetes to execute curl commands to your endpoints at a certain cron schedule to trigger some background processes
+- **a set of instructions** - for how to install kubernetes clusters from scratch with support for multi environments, postgres, and redis
 
 # Documentation
 
 - [Repo setup](./docs/RepoSetup.md)
 - [The devops architecture](./docs/Architecture.md)
-
-If you are setting up a new cluster:
-
-- [How to setup a Kubernetes cluster infrastructure](./docs/infra/README.md)
-
-If you are joining an existing cluster:
-
-- [How to join an existing Kubernetes cluster](./docs/JoiningCluster.md)
