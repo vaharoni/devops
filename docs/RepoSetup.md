@@ -1,3 +1,5 @@
+Note: a global install such as `bun install -g @vaharoni/devops` would have been nice, as it would have allowed to just run `devops`. Unfortunately, it doesn't work with private packages without some hacks. So whenever encountering `devops`, prefix the command with `bunx`.
+
 # Prerequisites
 
 ## Install some software
@@ -52,13 +54,6 @@ To execute this `.envrc` file whenever you cd into the directory run this from t
 direnv allow
 ```
 
-## Install the CLI
-
-To get access to the `devops` CLI globally:
-```shell
-bun install -g @vaharoni/devops
-```
-
 # Scenario 1: Cloning an existing repository that already works with an existing cluster
 
 Place the `kubeconfig` file you receive from the administrator under `tmp/kubeconfig`. This path is set by `.envrc` to automatically use the right cluster whenever you cd into the project directory.
@@ -71,9 +66,10 @@ First, set up you `kubeconfig` per the instructions of scenario 1.
 
 ## Step 1: Install the SDK and generate code
 
-Then run the `init` command and make sure to follow the instructions that it outputs:
+Install the CLI and run the `init` command. Make sure to follow the instructions that it outputs:
 ```shell
-devops init
+bun install @vaharoni/devops
+bunx devops init
 ```
 
 Then install the dependencies:
@@ -97,8 +93,8 @@ Updade the file `.devops/config/constants.yaml` that was created after running `
 
 Then create your staging and production namespaces:
 ```shell
-devops k8s create env-setup --env staging
-devops k8s create env-setup --env production
+bunx devops k8s create env-setup --env staging
+bunx devops k8s create env-setup --env production
 ```
 
 ## Step 3: Creating or connecting to the Postgres cluster
