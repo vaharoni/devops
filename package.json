@@ -10,8 +10,7 @@
     "src/**/*"
   ],
   "bin": {
-    "devops": "dist/devops.js",
-    "dotenvx": "./node_modules/.bin/dotenvx"
+    "devops": "dist/devops.js"
   },
   "scripts": {
     "build": "tsc",

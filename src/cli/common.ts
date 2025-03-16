@@ -272,7 +272,7 @@ export class CommandExecutor {
     if (envFiles.length === 0) {
       return "";
     } else {
-      return `bun dotenvx -q run -f ${envFiles.join(" ")} -- `;
+      return `bunx dotenvx -q run -f ${envFiles.join(" ")} -- `;
     }
   }
 
