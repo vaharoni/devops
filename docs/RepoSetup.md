@@ -136,4 +136,4 @@ gh secret set DIGITALOCEAN_CLUSTER_NAME --body <cluster-name>
 
 # Scenario 3: Creating a new cluster
 
-Follow the guide [How to setup a Kubernetes cluster infrastructure](./docs/infra/README.md).
+Follow the guide [How to setup a Kubernetes cluster infrastructure](./infra/README.md).
