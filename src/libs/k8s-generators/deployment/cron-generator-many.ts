@@ -21,7 +21,7 @@ export class CronGeneratorMany extends BaseDeploymentGenerator {
           data: {
             name,
             deployment: {
-              manifest: "cron-job-single",
+              template: "cron-job-single",
               service_name: name,
               cron: job.cron,
             },

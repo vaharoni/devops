@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "deployment": {
-    "manifest": "cron-job",
+    "template": "cron-job",
     "cronJobs": [
       {
         "name": "test",

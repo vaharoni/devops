@@ -7,7 +7,7 @@ be verified by the receiver.
 To add a cron job, add an entry in `package.json` under `deployments.cronJobs`:
 ```json
   "deployment": {
-    "manifest": "cron-job",
+    "template": "cron-job",
     "cronJobs": [
       {
         "name": "call-check-something-in-example",

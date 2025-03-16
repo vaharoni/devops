@@ -28,7 +28,7 @@ Each application project should have in its `package.json` a custom key called `
 
 ```json
 "deployment": {
-  "manifest": "external-service",
+  "template": "external-service",
   "service-name": "www",
   "port": 3000
 }

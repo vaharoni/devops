@@ -6,7 +6,7 @@
   "deployment": {
     "service_name": "example",
     "port": 3001,
-    "manifest": "external-service"
+    "template": "external-service"
   },
   "scripts": {
     "start": "tsx index.ts",

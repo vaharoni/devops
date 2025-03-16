@@ -123,7 +123,7 @@ export function getImageDebugData(imageName: string): ProjectData {
     data: {
       name: `${imageName}-debug`,
       deployment: {
-        manifest: "debug-console",
+        template: "debug-console",
       },
     },
   };

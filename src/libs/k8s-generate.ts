@@ -24,18 +24,18 @@ export function generateImageDeployments(
   image: string,
   gitSha: string
 ) {
-  const allManifests = [
+  const candidatesList = [
     getImageDebugData(image),
     ...getImageDescendentData(image),
   ];
   const scaleCountMap = getWorkspaceScale(monorepoEnv, image);
-  const manifest = allManifests
+  const manifest = candidatesList
     .filter((projectData) => projectData.data.deployment)
     .map((projectData) => {
-      const manifest = projectData.data.deployment!.manifest;
-      const generatorClass = generatorLookup[manifest];
+      const template = projectData.data.deployment!.template;
+      const generatorClass = generatorLookup[template];
       if (!generatorClass) {
-        console.error(`Unsupported manifest type: ${manifest} for project ${projectData.data.name}`);
+        console.error(`Unsupported template ${template} for project ${projectData.data.name}`);
         process.exit(1);
       }
       const generator = new generatorClass(
@@ -45,7 +45,7 @@ export function generateImageDeployments(
         projectData,
         scaleCountMap[projectData.data.name]
       );
-      return generator.generate(manifest);
+      return generator.generate(template);
     })
     .join("\n---\n");
 

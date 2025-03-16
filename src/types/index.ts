@@ -14,7 +14,7 @@ export type PkgData = {
   /** When a deployment data is available, a k8s deployment is created */
   deployment?: {
     /** The name of the composite template to build in order to support this deployment */
-    manifest: string;
+    template: string;
     /** For services, this will be the subdomain of the exposed service */
     service_name?: string;
     /** For services, the port to expose */
