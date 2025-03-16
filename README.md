@@ -5,7 +5,7 @@ Monorepos support multiple apps, allowing them to reuse functionality through sh
 `devops` is...
 - **a generator** - it generates boilerplate code when starting a new monorepo, such as github actions and docker images
 - **a CLI** - making it easy to manage your local and remote env variables, connect to your remote databases, or launch remote console
-- **a builder** - identifies which folders need to reside in every docker image through dependency discovery
+- **a builder** - identifies which folders need to reside in which docker image through dependency discovery
 - **a gitops deployer** - sets up github actions to watch pushes to `staging` and `production` branches, identifies which images are affected by those commits, and determines whether to run db migrations
 - **an SDK** - helps with inter-application communication, by addressing the minor differences between local and remote environments in the DNS of endpoints, and by issuing tokens so that apps can validate traffic originated from within the cluster
 - **a scheduler** - leverages kubernetes to execute curl commands to your endpoints at a certain cron schedule to trigger some background processes
