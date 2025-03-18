@@ -2,7 +2,7 @@ import chalk from "chalk";
 import { execSync, spawn } from "child_process";
 import fs from "fs";
 import { globSync } from "glob";
-import { ALL_SUPPORTED_ENVS } from "../libs/k8s-generators/k8s-constants";
+import { ALL_SUPPORTED_ENVS } from "../libs/k8s-constants";
 
 type ParsedArgs = {
   args: string[];
@@ -304,7 +304,7 @@ export function printUsageAndExit(text: string): never {
 }
 
 export class StrongParams {
-  constructor(private usage: string, private args: Record<string, string>) {}
+  constructor(private usage: string, private args: Record<string, string | undefined>) {}
 
   required(key: string) {
     if (!this.args[key]) {

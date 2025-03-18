@@ -66,6 +66,7 @@ To finish the setup:
 2. add the following to your .gitignore:
   **/.DS_Store
   **/.env*
+  config/kubeconfig
   tmp/**
   !tmp/**/.gitkeep
 `;

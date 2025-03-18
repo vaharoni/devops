@@ -3,14 +3,12 @@
 import { CLICommandParser, printUsageAndExit } from "./cli/common";
 import affected from "./cli/affected";
 import constant from "./cli/constant";
-import scale from "./cli/scale";
 import console from "./cli/console";
 import db from "./cli/db";
 import dml from "./cli/dml";
 import registry from "./cli/registry";
 import env from "./cli/env";
 import exec from "./cli/exec";
-import k8s from "./cli/k8s";
 import prepBuild from "./cli/prep-build";
 import prisma from "./cli/prisma";
 import run from "./cli/run";
@@ -20,10 +18,15 @@ import init from "./cli/init";
 import redis from "./cli/redis";
 import internalCurl from "./cli/internal-curl";
 import jwt from "./cli/jwt";
+import namespace from "./cli/namespace";
+import image from "./cli/image";
+import template from "./cli/template";
+import job from "./cli/job";
 
 const [_node, _scriptPath, ...commandArgs] = process.argv;
 
 const allImports = [
+  // day-to-day
   init,
   run,
   runMany,
@@ -35,12 +38,16 @@ const allImports = [
   redis,
   console,
   test,
-  constant,
-  scale,
-  k8s,
-  registry,
-  affected,
+  //= Infra
+  namespace,
+  image,
+  template,
+  job,
+  //= Deployment
   prepBuild,
+  affected,
+  constant,
+  registry,
   internalCurl,
   jwt
 ];
@@ -92,18 +99,18 @@ COMMANDS
         [cmd.key, " ".repeat(keyLength - cmd.key.length), cmd.oneLiner].join("")
       )
       .join(newLine)}
-
-EXAMPLES
-    ${Object.values(commands)
-      .map((cmd) =>
-        cmd.keyExamples
-          .split("\n")
-          .map((x) => x.trim())
-          .filter(Boolean)
-          .join(newLine)
-      )
-      .join(newLine)}
 `;
+
+// EXAMPLES
+//     ${Object.values(commands)
+//       .map((cmd) =>
+//         cmd.keyExamples
+//           .split("\n")
+//           .map((x) => x.trim())
+//           .filter(Boolean)
+//           .join(newLine)
+//       )
+//       .join(newLine)}
 
 const commandObj = new CLICommandParser(commandArgs);
 const chosenCommand = commands[commandObj.command];

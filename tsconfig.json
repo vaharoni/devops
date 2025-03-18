@@ -1,6 +1,6 @@
 {
   "include": ["src/**/*"],
-  "exclude": ["src/target-templates/**/*"],
+  "exclude": ["src/target-templates/**/*", "tmp/**/*"],
   "compilerOptions": {
     "outDir": "./dist",
     "declaration": true,

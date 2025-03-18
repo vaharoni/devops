@@ -1,0 +1,30 @@
+# While this works when setting Cloudflare TLS encryption mode to "full", it fails when too big layers are attempted to be pushed
+expose:
+  type: ingress
+  ingress:
+    hosts:
+      core: $REGISTRY_DOMAIN
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      ingress.kubernetes.io/ssl-redirect: "false"
+      ingress.kubernetes.io/proxy-body-size: "0"
+  tls:
+    enabled: false
+externalURL: https://$REGISTRY_DOMAIN
+persistence:
+  enabled: true
+  persistentVolumeClaim:
+    registry:
+      storageClass: "hcloud-volumes"
+      accessMode: ReadWriteOnce
+      size: 20Gi
+    jobservice:
+      storageClass: "hcloud-volumes"
+      accessMode: ReadWriteOnce
+      size: 5Gi
+    chartmuseum:
+      storageClass: "hcloud-volumes"
+      accessMode: ReadWriteOnce
+      size: 5Gi

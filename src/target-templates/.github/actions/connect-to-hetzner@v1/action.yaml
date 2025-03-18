@@ -21,7 +21,7 @@ runs:
       shell: bash
 
     - name: Verify cluster connection and that namepsace exists
-      run: devops k8s check env-setup --env ${{ github.ref_name }}
+      run: devops namespace check --env ${{ github.ref_name }}
       shell: bash
 
     - name: Connect to the registry

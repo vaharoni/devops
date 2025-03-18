@@ -1,0 +1,49 @@
+# INSTALLATION
+# 1. Install Helm: https://helm.sh/docs/intro/install/
+# 2. Add ingress-nginx Helm repo: helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+# 3. Update information of available charts: helm repo update
+# 4. Install ingress-nginx:
+# helm upgrade --install \
+# ingress-nginx ingress-nginx/ingress-nginx \
+# --set controller.ingressClassResource.default=true \ # Remove this line if you don’t want Nginx to be the default Ingress Controller
+# -f ./ingress-nginx-annotations.yaml \
+# --namespace ingress-nginx \
+# --create-namespace
+
+# LIST of all ANNOTATIONS: https://github.com/hetznercloud/hcloud-cloud-controller-manager/blob/master/internal/annotation/load_balancer.go
+
+controller:
+  kind: DaemonSet
+  service:
+    annotations:
+      # Germany:
+      # - nbg1 (Nuremberg)
+      # - fsn1 (Falkenstein)
+      # Finland:
+      # - hel1 (Helsinki)
+      # USA:
+      # - ash (Ashburn, Virginia)
+      # Without this, the load balancer won’t be provisioned and will stay in "pending" state.
+      # You can check this state using "kubectl get svc -n ingress-nginx"
+      load-balancer.hetzner.cloud/location: nbg1
+
+      # Name of the load balancer. This name will appear in your Hetzner cloud console under "Your project -> Load Balancers".
+      # NOTE: This is NOT the load balancer created automatically for HA clusters. You need to specify a different name here to create a separate load balancer for ingress Nginx.
+      load-balancer.hetzner.cloud/name: ingress-lb
+
+      # Ensures communication between the load balancer and cluster nodes happens through the private network.
+      load-balancer.hetzner.cloud/use-private-ip: "true"
+
+      # [ START: Use these annotations if you care about seeing the actual client IP ]
+      # "uses-proxyprotocol" enables the proxy protocol on the load balancer so that the ingress controller and applications can see the real client IP.
+      # "hostname" is needed if you use cert-manager (LetsEncrypt SSL certificates). It fixes HTTP01 challenges for cert-manager (https://cert-manager.io/docs/).
+      # Check this link for more details: https://github.com/compumike/hairpin-proxy
+      # In short: the easiest fix provided by some providers (including Hetzner) is to configure the load balancer to use a hostname instead of an IP.
+      load-balancer.hetzner.cloud/uses-proxyprotocol: 'true'
+
+      # 1. "yourDomain.com" must be correctly configured in DNS to point to the Nginx load balancer; otherwise, certificate provisioning won’t work.
+      # 2. If you use multiple domains, specify any one.
+      # load-balancer.hetzner.cloud/hostname: yourDomain.com
+      # [ END: Use these annotations if you care about seeing the actual client IP ]
+
+      load-balancer.hetzner.cloud/http-redirect-https: 'false'

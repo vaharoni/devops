@@ -4,7 +4,7 @@ import {
   containerRegistryPath,
   containerRegistryRepoName,
   containerRegistryRepoPath,
-} from "../libs/k8s-generators/k8s-constants";
+} from "../libs/k8s-constants";
 import { CLICommandParser, StrongParams, printUsageAndExit } from "./common";
 
 const oneLiner = "Manage container repositories";

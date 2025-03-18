@@ -34,7 +34,7 @@ Create the cluster based on the config, by running the following inside the `het
 hetzner-k3s create --config .devops/infra/hetzner/hcloud-config.yaml
 ```
 
-If you don't already have an existing `~/.kube/config` file, simply copy `tmp/kubeconfig` over to `~/.kube/config`. Otherwise, merge the data from `tmp/kubeconfig` by copying each entry created under the key `users`, `contexts`, `clsuters` under its appropriate place in your existing `~/.kube/config`.
+If you don't already have an existing `~/.kube/config` file, simply copy `config/kubeconfig` over to `~/.kube/config`. Otherwise, merge the data from `config/kubeconfig` by copying each entry created under the key `users`, `contexts`, `clsuters` under its appropriate place in your existing `~/.kube/config`.
 
 Regardless of the way, consider editing the `context[].name` key of the added entry in your `~/.kube/config` file to give it a friendly name, such as `hcloud`. Kubernetes uses the term "context" as a convenience to combine user information with cluster information under a single key to make it easy to switch between contexts. Assuming you did so, to test that everything works run:
 
@@ -45,12 +45,12 @@ kubectl config use-context hcloud
 kubectl get all
 ```
 
-Keep the non-merged `tmp/kubeconfig` file where it is. You'll need to set it as a github secret in the last step.
+Keep the non-merged `config/kubeconfig` file where it is. You'll need to set it as a github secret in the last step.
 
-Note: if you recreate the cluster multiple times and forget to delete `tmp/kubeconfig` of older attempts, you may get with the file holding incorrect credentials leading to "You must be logged in to the server" errors when running:
+Note: if you recreate the cluster multiple times and forget to delete `config/kubeconfig` of older attempts, you may get with the file holding incorrect credentials leading to "You must be logged in to the server" errors when running:
 
 ```shell
-KUBECONFIG=./tmp/kubeconfig kubectl get all
+KUBECONFIG=./config/kubeconfig kubectl get all
 ```
 
 You can always find the right credentials by SSHing into the master node and printing `/etc/rancher/k3s/k3s.yaml`. That file is the same as `kubeconfig`, though note you have to change the server address to the public IP of the master node.
@@ -197,10 +197,10 @@ kubectl apply -f .devops/infra/hetzner/retain-storage-class.yaml
 
 ## Step 8: Set up github secrets
 
-To be able to deploy to your cluster using github actions, set the github secret `HCLOUD_KUBECONFIG` to contain the `tmp/kubeconfig` file:
+To be able to deploy to your cluster using github actions, set the github secret `HCLOUD_KUBECONFIG` to contain the `config/kubeconfig` file:
 
 ```shell
-gh secret set HCLOUD_KUBECONFIG < tmp/kubeconfig
+gh secret set HCLOUD_KUBECONFIG < config/kubeconfig
 ```
 
 To be able to push docker containers to the registry, run the following:

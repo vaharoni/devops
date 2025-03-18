@@ -1,6 +1,6 @@
 import { CommandExecutor } from "../../cli/common";
 import { getConst } from "../config";
-import { envToNamespace } from "../k8s-generators/k8s-constants";
+import { envToNamespace } from "../k8s-constants";
 import { kubectlCommand } from "../k8s-helpers";
 
 function isApplicable() {

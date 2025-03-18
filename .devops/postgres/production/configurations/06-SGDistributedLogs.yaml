@@ -1,0 +1,11 @@
+# We do not use for now as it requires adding a few more nodes
+
+# apiVersion: stackgres.io/v1
+# kind: SGDistributedLogs
+# metadata:
+#   name: distributedlogs
+#   namespace: db-production
+# spec:
+#   persistentVolume:
+#     size: 10Gi
+

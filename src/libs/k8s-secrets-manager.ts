@@ -1,6 +1,6 @@
 import { CommandExecutor } from "../cli/common";
-import { secretName } from "./k8s-generators/k8s-constants";
-import { kubectlCommand, patchSecretCommand } from "./k8s-helpers";
+import { secretName } from "./k8s-constants";
+import { kubectlCommand, patchSecretKeyCommand } from "./k8s-helpers";
 
 // This env file should not be used in local development
 const SECRET_FILE_NAME = "env_json";
@@ -12,7 +12,7 @@ function execUpdateSecret(
   monorepoEnv: string,
   secretValue: Record<string, string>
 ) {
-  const { fullCommand, redactedCommand } = patchSecretCommand(monorepoEnv, secretName(), SECRET_FILE_NAME, JSON.stringify(JSON.stringify(secretValue)));
+  const { fullCommand, redactedCommand } = patchSecretKeyCommand(monorepoEnv, secretName(), SECRET_FILE_NAME, JSON.stringify(JSON.stringify(secretValue)));
   new CommandExecutor(fullCommand, { quiet: true, redactedCommand }).exec();
 }
 

@@ -39,14 +39,22 @@ and store the same token in a `.envrc` file with the following content:
 export GH_PAT_TOKEN=<token>
 
 # Switch to the right cluster automatically
-if [ -f "$PWD/tmp/kubeconfig" ]; then
-  export KUBECONFIG="$PWD/tmp/kubeconfig"
+if [ -f "$PWD/config/kubeconfig" ]; then
+  export KUBECONFIG="$PWD/config/kubeconfig"
 else
   export KUBECONFIG="${HOME}/.kube/config"
 fi
 ```
 
-Make sure to add this file to `.gitignore`.
+Make sure to add the following to your `.gitignore`:
+```text
+.envrc
+**/.DS_Store
+**/.env*
+config/kubeconfig
+tmp/**
+!tmp/**/.gitkeep
+```
 
 To execute this `.envrc` file whenever you cd into the directory run this from the repo folder:
 
@@ -56,7 +64,7 @@ direnv allow
 
 # Scenario 1: Cloning an existing repository that already works with an existing cluster
 
-Place the `kubeconfig` file you receive from the administrator under `tmp/kubeconfig`. This path is set by `.envrc` to automatically use the right cluster whenever you cd into the project directory.
+Place the `kubeconfig` file you receive from the administrator under `config/kubeconfig`. This path is set by `.envrc` to automatically use the right cluster whenever you cd into the project directory.
 
 That's it. You can now use all the power of the `devops` CLI.
 
@@ -110,7 +118,7 @@ If you don't need a relational database for now, simply delete the folders `db` 
 ### When joining an existing Hetzner cluster
 
 ```shell
-gh secret set HCLOUD_KUBECONFIG < tmp/kubeconfig
+gh secret set HCLOUD_KUBECONFIG < config/kubeconfig
 ```
 
 To be able to push docker containers to the registry, run the following:

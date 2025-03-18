@@ -1,6 +1,6 @@
 import { getImageNames } from "./config";
 import { commitExists, isAffected } from "./git-helpers";
-import { getImageVersion } from "./k8s-lifecycle";
+import { getImageVersion } from "./k8s-image-config";
 import {
   getImageDescendentData,
   getWorkspace,

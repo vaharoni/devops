@@ -29,5 +29,5 @@ runs:
       shell: bash
       if: steps.check_affected.outputs.affected == 'true'
       run: |
-        devops k8s create deployments ${{ env.IMAGE_NAME }} ${{ github.sha }}
-        devops k8s set version node-services ${{ github.sha }}
+        devops image deployment create ${{ env.IMAGE_NAME }} ${{ github.sha }}
+        devops image version set ${{ env.IMAGE_NAME }} ${{ github.sha }}

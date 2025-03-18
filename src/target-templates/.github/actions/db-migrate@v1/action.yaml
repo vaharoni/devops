@@ -15,7 +15,7 @@ runs:
         elif [[ $status -ne 0 ]]; then
           exit $status
         elif [[ "$IMAGE" != "" ]]; then
-          devops k8s create db-migrate-job $IMAGE ${{ github.sha }} --timeout 240
+          devops job db-migrate create $IMAGE ${{ github.sha }} --timeout 240
         else
           echo "No image requires a DB migration"
         fi

@@ -1,0 +1,22 @@
+# The file structure is as follows:
+#
+# <image-name>:
+#   docker-file: <name-of-dockerfile>
+#   debug-template: <debug-template>
+#   applications:
+#   - <application-name>
+#   - <application-name>
+#
+# Where:
+# <image-name>          The name of the image. Github action should refer to this name in a hard-coded manner when invoking devops scripts.
+# <name-of-dockerfile>  Name of the dockerfile in .devops/docker-images
+# <debug-template>      Each image comes with a debug pod that can be acccessed as a console. This is the name of the template to use. Only "debug-console" is currently supported.
+# applications          List of applications that use this image. There is no need to specify dependencies - they will be derived as long as they are declared in package.json.
+#
+
+node-services:
+  docker-file: node.Dockerfile
+  debug-template: debug-console
+  applications:
+  - example
+  - jobs

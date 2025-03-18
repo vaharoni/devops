@@ -117,18 +117,6 @@ export function getImageDescendentData(imageName: string) {
   );
 }
 
-export function getImageDebugData(imageName: string): ProjectData {
-  return {
-    rootPath: "not-available",
-    data: {
-      name: `${imageName}-debug`,
-      deployment: {
-        template: "debug-console",
-      },
-    },
-  };
-}
-
 export function getWorkspaceImages(workspaceName: string) {
   const _verifyPresence = getWorkspace(workspaceName);
   return workspaceImages()[workspaceName] ?? [];
