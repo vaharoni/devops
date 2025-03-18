@@ -61,12 +61,13 @@ To finish the setup:
     "applications/**",
     "db/**",
     "dml/**"
-  ]
+  ],
 
 2. add the following to your .gitignore:
-  **/.DS_Store
-  **/.env*
-  config/kubeconfig
-  tmp/**
-  !tmp/**/.gitkeep
+.envrc
+**/.DS_Store
+**/.env*
+config/kubeconfig
+tmp/**
+!tmp/**/.gitkeep
 `;
