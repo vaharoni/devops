@@ -1,9 +1,10 @@
 import {
   findImagesAffected,
-  findImageWithAffectedWorkspace,
+  findImagesWithAffectedWorkspace,
   isImageAffected,
   isWorkspaceAffected,
 } from "../libs/affected-entities";
+import { getImageData } from "../libs/config";
 import { CLICommandParser, printUsageAndExit, StrongParams } from "./common";
 
 const oneLiner =
@@ -95,9 +96,14 @@ async function run(cmdObj: CLICommandParser) {
       break;
     }
     case "find-migrator": {
-      const migrator = findImageWithAffectedWorkspace("db", commonOpts)
-      if (!migrator) break;
-      console.log(migrator);
+      const migrator = findImagesWithAffectedWorkspace("db", commonOpts)
+      if (!migrator.length) break;
+      const firstMigrator = migrator.find(imageName => getImageData(imageName)["can-db-migrate"]);
+      if (!firstMigrator) {
+        console.error(`The db project was changed and affects the following images: ${migrator.join(", ")}. However, no image in the list has can-db-migrate=true in .devops/config/images.yaml.`);
+        process.exit(1);
+      }
+      console.log(firstMigrator);
       break;
     }
     default:

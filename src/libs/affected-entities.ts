@@ -50,10 +50,11 @@ export function isWorkspaceAffected(
   return isAffected(data.rootPath, opts);
 }
 
-export function findImageWithAffectedWorkspace(
+export function findImagesWithAffectedWorkspace(
   workspaceName: string,
   opts: AffectedOpts = {}
 ) {
+  const res = []
   const headSha = opts.headSha ?? "HEAD";
   const defaultBaseSha = opts.baseSha ?? "HEAD^";
   const rootPath = getWorkspace(workspaceName).rootPath;
@@ -66,7 +67,8 @@ export function findImageWithAffectedWorkspace(
       : defaultBaseSha;
 
     if (isAffected(rootPath, { baseSha, headSha })) {
-      return imageName;
+      res.push(imageName);
     }
   }
+  return res;
 }

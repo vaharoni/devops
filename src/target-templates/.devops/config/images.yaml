@@ -3,6 +3,7 @@
 # <image-name>:
 #   docker-file: <name-of-dockerfile>
 #   debug-template: <debug-template>
+#   can-db-migrate: <boolean>
 #   applications:
 #   - <application-name>
 #   - <application-name>
@@ -11,12 +12,15 @@
 # <image-name>          The name of the image. Github action should refer to this name in a hard-coded manner when invoking devops scripts.
 # <name-of-dockerfile>  Name of the dockerfile in .devops/docker-images
 # <debug-template>      Each image comes with a debug pod that can be acccessed as a console. This is the name of the template to use. Only "debug-console" is currently supported.
+# <can-db-migrate>      Whether this image can be used to run DB migrations. If set to true, the image could be used to run DB migrations if any project that uses this image depends 
+#                       on the db project and if the db project changed.
 # applications          List of applications that use this image. There is no need to specify dependencies - they will be derived as long as they are declared in package.json.
 #
 
 node-services:
   docker-file: node.Dockerfile
   debug-template: debug-console
+  can-db-migrate: true
   applications:
   - example
   - jobs
