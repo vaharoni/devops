@@ -28,7 +28,7 @@ export type PkgData = {
     cron?: string;
     /** Used by the Jobs infra */
     cronJobs?: {
-      /** The name of the cron job. Used to identify in k8s. */
+      /** The name of the cron job. Used to identify in k8s. Should be unique among all cron jobs. */
       name?: string;
       /** The cron schedule */
       cron?: string;
