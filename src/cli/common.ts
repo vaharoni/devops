@@ -2,7 +2,7 @@ import chalk from "chalk";
 import { execSync, spawn } from "child_process";
 import fs from "fs";
 import { globSync } from "glob";
-import { ALL_SUPPORTED_ENVS } from "../libs/k8s-constants";
+import { allSupportedEnvs } from "../libs/k8s-constants";
 
 type ParsedArgs = {
   args: string[];
@@ -40,7 +40,10 @@ export class CLICommandParser {
       "development";
     this.help = Boolean(parsedArgs.options["--help"]);
     this.skipEnvCheck = Boolean(parsedArgs.options["--skip-env-check"]);
-    this._validateEnv(this.env);
+    // We need to hardcode this to avoid chicken-and-egg problem (validate env depends on constants.yaml existence)
+    if (this.command !== 'init') {
+      this._validateEnv(this.env);
+    }
   }
 
   // Copies the env
@@ -84,10 +87,10 @@ export class CLICommandParser {
   }
 
   _validateEnv(env: string) {
-    if (!ALL_SUPPORTED_ENVS.includes(env)) {
+    if (!allSupportedEnvs().includes(env)) {
       console.error(
         // prettier-ignore
-        `Environment must be one of: ${ALL_SUPPORTED_ENVS.join(", ")}. Received: ${env}`
+        `Environment must be one of: ${allSupportedEnvs().join(", ")}. Received: ${env}`
       );
       process.exit(1);
     }

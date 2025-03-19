@@ -1,4 +1,4 @@
-import { getConst, type AvailableConstKeys } from "../libs/config";
+import { getConst } from "../libs/config";
 import { CLICommandParser, printUsageAndExit } from "./common";
 
 const oneLiner = "Prints to stdout a constant from constant.yaml";
@@ -17,7 +17,7 @@ EXAMPLES
 async function run(cmdObj: CLICommandParser) {
   if (cmdObj.help || cmdObj.args.length === 0) printUsageAndExit(usage);
   const [constant] = cmdObj.args;
-  console.log(getConst(constant as AvailableConstKeys));
+  console.log(getConst(constant as any));
 }
 
 export default {

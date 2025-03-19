@@ -1,7 +1,9 @@
 # These will be used when generating kubernetes entities
 project-name: glitchy
-production-domain: chatparty.io
-staging-domain: vaharoni.com
+
+domains:
+  production: chatparty.io
+  staging: vaharoni.com
 
 # Supported: hetzner or digitalocean
 infra: hetzner
@@ -11,3 +13,9 @@ image-versions-to-keep: 5
 
 registry-base-url: registry.vaharoni.com
 registry-name: glitchy
+
+# production and staging are supported by default
+extra-remote-environments: []
+
+# development and test are supported by default
+extra-local-environments: []

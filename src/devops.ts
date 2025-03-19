@@ -112,7 +112,7 @@ COMMANDS
 //       )
 //       .join(newLine)}
 
-const commandObj = new CLICommandParser(commandArgs);
+const commandObj = new CLICommandParser(commandArgs,);
 const chosenCommand = commands[commandObj.command];
 if (!chosenCommand) printUsageAndExit(GENERAL_USAGE);
 
