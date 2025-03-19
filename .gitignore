@@ -1,5 +1,6 @@
 tmp/
 config/kubeconfig
+.devops/
 
 # Logs
 logs

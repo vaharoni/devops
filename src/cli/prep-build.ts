@@ -27,8 +27,10 @@ async function run(cmdObj: CLICommandParser) {
   if (cmdObj.help || cmdObj.args.length === 0) printUsageAndExit(usage);
   const [image] = cmdObj.args;
   const imageData = getImageData(image);
-  const dockerFile = imageData["docker-file"];
+  const dockerImageName = imageData["docker-file"];
+  const dockerFile = `${dockerImageName}.Dockerfile`;
   const dockerFilePath = path.join(".devops/docker-images", dockerFile);
+  const dockerImagePayloadPath = path.join(".devops/docker-images", dockerImageName);
   if (!fs.existsSync(dockerFilePath)) {
     console.error(`The dockerfile ${dockerFilePath} does not exist`);
     process.exit(1);
@@ -43,9 +45,8 @@ async function run(cmdObj: CLICommandParser) {
   console.warn(`COPYING Dockerfile`);
   fs.copySync(dockerFilePath, path.join(destFolder, "Dockerfile"));
 
-  // Copy devops
-  console.warn(`COPYING .devops`);
-  fs.copySync(".devops", path.join(destFolder, ".devops"));
+  console.warn(`COPYING Docker image payload`);
+  fs.copySync(dockerImagePayloadPath, destFolder);
 
   // Create config directory. It should be deleted by the docker image so that it can be mounted as a volume when the pod is run
   console.warn(`CREATING config for the build process`);

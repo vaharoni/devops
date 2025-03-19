@@ -29,4 +29,4 @@ RUN devops run-many build
 RUN rm -rf config/
 
 # Pods may override this entrypoint to `node-exec.sh` using the `command` field in the pod spec.
-ENTRYPOINT [ ".devops/docker-entrypoints/node-run.sh" ]
+ENTRYPOINT [ "node-run.sh" ]
