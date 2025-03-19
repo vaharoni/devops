@@ -14,9 +14,9 @@ export type AvailableConstKeys =
   | "registry-name";
 
 const singleImageSchema = z.object({
-  "docker-file": z.string(),
   "debug-template": z.string(),
   "can-db-migrate": z.boolean().optional(),
+  "image-extra-content": z.array(z.string()).optional(),
   applications: z.array(z.string()),
 });
 const imageSchema = z.record(singleImageSchema);

@@ -27,14 +27,22 @@ async function run(cmdObj: CLICommandParser) {
   if (cmdObj.help || cmdObj.args.length === 0) printUsageAndExit(usage);
   const [image] = cmdObj.args;
   const imageData = getImageData(image);
-  const dockerImageName = imageData["docker-file"];
-  const dockerFile = `${dockerImageName}.Dockerfile`;
+  const dockerFile = `${image}.Dockerfile`;
   const dockerFilePath = path.join(".devops/docker-images", dockerFile);
-  const dockerImagePayloadPath = path.join(".devops/docker-images", dockerImageName);
+  const dockerImagePayloadPath = path.join(".devops/docker-images", image);
+  const imageExtraContent = imageData["image-extra-content"] ?? [];
+
   if (!fs.existsSync(dockerFilePath)) {
     console.error(`The dockerfile ${dockerFilePath} does not exist`);
     process.exit(1);
   }
+
+  imageExtraContent.forEach((file) => {
+    if (!fs.existsSync(file)) {
+      console.error(`The file ${file} is specified in the image-extra-content section of ${image} but does not exist`);
+      process.exit(1);
+    }
+  });
 
   const destFolder = `${os.tmpdir()}/image-${image}-${Date.now()}`;
   // Avoid clutter stdout, as the caller will want to capture the final output to cd into it
@@ -61,12 +69,12 @@ async function run(cmdObj: CLICommandParser) {
     fs.copySync(project.rootPath, path.join(destFolder, project.rootPath));
   });
 
-  // Copy all files in root
-  console.warn(`COPYING all files in root`);
-  const files = (await glob("*", { dot: true })).filter(
-    (path) => !fs.lstatSync(path).isDirectory()
-  );
-  files.forEach((file) => fs.copyFileSync(file, path.join(destFolder, file)));
+  // Copy image-extra content
+  console.warn(`COPYING files from image-extra-content`);
+  imageExtraContent.forEach((file) => {
+    fs.copySync(file, path.join(destFolder, file));
+    console.warn(`  ${file}`);
+  });
 
   console.log(destFolder);
 }

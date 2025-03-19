@@ -1,26 +1,34 @@
 # The file structure is as follows:
 #
 # <image-name>:
-#   docker-file: <name-of-dockerfile>
 #   debug-template: <debug-template>
 #   can-db-migrate: <boolean>
+#   image-extra-content:
+#     - <file-name>
+#     - <file-name>
 #   applications:
 #   - <application-name>
 #   - <application-name>
 #
 # Where:
 # <image-name>          The name of the image. Github action should refer to this name in a hard-coded manner when invoking devops scripts.
-# <name-of-dockerfile>  Name of the dockerfile in .devops/docker-images without the .Dockerfile suffix. This file as well as the folder with the same name under .devops/docker-images will be copied to the build folder.
 # <debug-template>      Each image comes with a debug pod that can be acccessed as a console. This is the name of the template to use. Only "debug-console" is currently supported.
 # <can-db-migrate>      Whether this image can be used to run DB migrations. If set to true, the image could be used to run DB migrations if any project that uses this image depends 
 #                       on the db project and if the db project changed.
+# image-extra-content   Any files to include in the image that are not part of the build context. By default, all applications and their dependencies are copied, as well as the 
+#                       content of .devops/docker-images/<image-name>. If you need to include additional files, list them here. These are typically from the root of the project.
+#                       Files and full folders are supported. Globs (wildcards) are currently not supported.
 # applications          List of applications that use this image. There is no need to specify dependencies - they will be derived as long as they are declared in package.json.
 #
 
 node-services:
-  docker-file: node
   debug-template: debug-console
   can-db-migrate: true
+  image-extra-content:
+    - .npmrc
+    - package.json
+    - tsconfig.json
+    - bun.lock
   applications:
   - example
   - jobs
