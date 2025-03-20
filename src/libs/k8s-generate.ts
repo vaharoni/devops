@@ -1,10 +1,7 @@
-import type { PkgData, ProjectData, TemplateDbMigrateObject, TemplateDebugObject, TemplateDeploymentObject, TemplateSharedContext } from "../types";
+import type { PackageData, TemplateDbMigrateObject, TemplateDebugObject, TemplateDeploymentObject, TemplateSharedContext } from "../types";
 import { BASE_SECRET_KEY } from "./k8s-namespace";
 import { containerRegistryRepoPath, dbMigrateJobName, domainNameForEnv, envToNamespace, imageDebugName, secretName } from "./k8s-constants";
 import { getWorkspaceScale } from "./k8s-image-config";
-import {
-  getImageDescendentData,
-} from "./workspace-discovery";
 import path from "path";
 import yaml from "yaml";
 import fs from 'fs';
@@ -12,6 +9,7 @@ import { globSync } from "glob";
 import _ from 'lodash';
 import Handlebars from "handlebars";
 import { getImageData } from "./config";
+import { getImageDescendentData } from "./discovery/images";
 
 const MANIFEST_FOLDER_PATH = path.join(process.cwd(), '.devops/manifests');
 const MANIFEST_INDEX_FILE_PATH = path.join(MANIFEST_FOLDER_PATH, '_index.yaml');
@@ -28,21 +26,21 @@ export function generateImageDeployments(
 ) {
   const generator = new ImageContextGenerator(monorepoEnv, image, gitSha);
   const apps = getImageDescendentData(image)
-    .filter((projectData) => projectData.data.deployment)
+    .filter((packageData) => packageData.deployment)
     .flatMap((projectData) => {
-      const context = generator.getDeployment(projectData.data);
+      const context = generator.getDeployment(projectData);
       const renderFn = (template: string) => Handlebars.compile(template)(context);
-      return generateManifestForDeployment(projectData.rootPath, projectData.data.deployment!.template, renderFn);
+      return generateManifestForDeployment(projectData.rootPath, projectData.deployment!.template, renderFn);
     });
   const debug = generateDebugDeployment(monorepoEnv, image, gitSha);
   return [debug, ...apps].join("\n---\n");
 }
 
-export function generateWorkspaceDeployment(projectData: ProjectData, monorepoEnv: string, image: string, gitSha: string) {
+export function generateWorkspaceDeployment(packageData: PackageData, monorepoEnv: string, image: string, gitSha: string) {
   const generator = new ImageContextGenerator(monorepoEnv, image, gitSha);
-  const context = generator.getDeployment(projectData.data);
+  const context = generator.getDeployment(packageData);
   const renderFn = (template: string) => Handlebars.compile(template)(context);
-  return generateManifestForDeployment(projectData.rootPath, projectData.data.deployment!.template, renderFn).join("\n---\n");
+  return generateManifestForDeployment(packageData.rootPath, packageData.deployment!.template, renderFn).join("\n---\n");
 }
 
 export function generateDebugDeployment(
@@ -165,7 +163,7 @@ export class ImageContextGenerator {
     }
   }
 
-  getDeployment(pkgData: PkgData): TemplateDeploymentObject {
+  getDeployment(pkgData: PackageData): TemplateDeploymentObject {
     if (!pkgData.deployment) {
       console.error(`The deployment key is missing for workspace ${pkgData.name}`);
       process.exit(1);

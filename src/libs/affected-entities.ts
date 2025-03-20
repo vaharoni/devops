@@ -1,11 +1,8 @@
 import { getImageNames } from "./config";
+import { getWorkspace } from "./discovery";
+import { getImageDescendentData, getWorkspaceImages } from "./discovery/images";
 import { commitExists, isAffected } from "./git-helpers";
 import { getImageVersion } from "./k8s-image-config";
-import {
-  getImageDescendentData,
-  getWorkspace,
-  getWorkspaceImages,
-} from "./workspace-discovery";
 
 type AffectedOpts = {
   baseSha?: string;

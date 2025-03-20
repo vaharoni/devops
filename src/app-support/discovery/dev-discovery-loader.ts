@@ -1,47 +1,35 @@
-import fs from "fs";
-import { globSync } from "glob";
+import { workspaces } from "../../libs/discovery";
 
-import { type PkgData } from "../../types";
+let _portLookupByServiceName: Record<string, number> | null = null;
 
-let _devDiscoveryLoader: DevDiscoveryLoader | undefined;
-
-// This must only be run in development, as in production Docker images do not necessarily have all folders in them.
-export class DevDiscoveryLoader {
-  packages: Record<string, PkgData> = {};
-
-  static instance() {
-    _devDiscoveryLoader ??= new DevDiscoveryLoader();
-    return _devDiscoveryLoader;
-  }
-
-  constructor() {
-    if (process.env["IS_KUBERNETES"] === "true")
-      throw new Error(
-        "DevDiscoveryLoader must only be used in local development"
-      );
-
-    globSync("../**/package.json").forEach((packageJsonPath) => {
-      if (packageJsonPath.includes("node_modules")) return;
-      const data = JSON.parse(
-        fs.readFileSync(packageJsonPath, "utf8")
-      ) as PkgData;
-      const serviceName = data.deployment?.service_name;
-      if (!serviceName) return;
-      this.packages[serviceName] = data;
-    });
-
-    console.debug(
-      `DevDiscoveryLoader initialized in ${process.cwd()} with applications: ${Object.keys(
-        this.packages
-      ).join(", ")}`
+function getPortLookup() {
+  if (_portLookupByServiceName) return _portLookupByServiceName;
+  if (process.env["IS_KUBERNETES"] === "true") {
+    throw new Error(
+      "getPortLookup() should only be used in local development. In production, the service name is sufficient."
     );
   }
 
-  getPkgData(serviceName: string) {
-    return this.packages[serviceName];
-  }
+  _portLookupByServiceName = {};
+  Object.values(workspaces()).forEach((workspace) => {
+    workspace.packageDataEntries.forEach((pkg) => {
+      const serviceName = pkg.deployment?.service_name;
+      const port = pkg.deployment?.port;
+      if (!serviceName || !port) return;
+      const existing = _portLookupByServiceName![serviceName];
+      if (!existing) {
+        _portLookupByServiceName![serviceName] = port;
+      } else if (existing !== port) {
+        console.error(
+          `Service name ${serviceName} has conflicting ports: ${existing} and ${port}`
+        );
+        process.exit(1);
+      }
+    });
+  });
+  return _portLookupByServiceName;
+}
 
-  getPort(serviceName: string) {
-    return this.getPkgData(serviceName)?.deployment?.port;
-  }
+export function getPortForServiceName(serviceName: string) {
+  return getPortLookup()[serviceName];
 }

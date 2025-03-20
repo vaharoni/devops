@@ -1,12 +1,12 @@
 import chalk from "chalk";
-import type { ProjectData } from "../types";
+import type { PackageData } from "../../types";
 
 export class WorkspaceDependencies {
   dependencies: Record<string, DependencyNode> = {};
   loaded = false;
-  projects: Record<string, ProjectData> = {};
+  workspaces: Record<string, PackageData> = {};
 
-  constructor(public getAllProjects: () => Record<string, ProjectData>) {}
+  constructor(public getAllProjects: () => Record<string, PackageData>) {}
 
   _getOrCreate(name: string) {
     let node = this.dependencies[name];
@@ -18,13 +18,13 @@ export class WorkspaceDependencies {
   }
 
   _buildTree() {
-    this.projects = this.getAllProjects();
+    this.workspaces = this.getAllProjects();
     this.loaded = true;
-    for (const workspace of Object.keys(this.projects)) {
+    for (const workspace of Object.keys(this.workspaces)) {
       const node = this._getOrCreate(workspace);
-      const { data } = this.projects[workspace];
-      for (const dep in data.dependencies ?? []) {
-        if (this.projects[dep]) {
+      const data = this.workspaces[workspace];
+      for (const dep of data.dependencyNames ?? []) {
+        if (this.workspaces[dep]) {
           node.dependsOn.add(dep);
         }
       }

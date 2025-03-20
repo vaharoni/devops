@@ -1,8 +1,9 @@
 import { readFileSync } from "fs";
 import yaml from "yaml";
 import path from "path";
-import { getWorkspace } from "./workspace-discovery";
 import { z } from "zod";
+import { SUPPORTED_LANGUAGES } from "../types";
+import { getWorkspace } from "./discovery";
 
 const constFileSchema = z.object({
   "project-name": z.string(),
@@ -17,6 +18,7 @@ const constFileSchema = z.object({
 type ConstFileSchema = z.infer<typeof constFileSchema>;
 
 const singleImageSchema = z.object({
+  "language": z.enum(SUPPORTED_LANGUAGES),
   "debug-template": z.string(),
   "can-db-migrate": z.boolean().optional(),
   "image-extra-content": z.array(z.string()).optional(),
@@ -104,7 +106,7 @@ function processImagesFile() {
 
     imageData.applications.forEach((project: string) => {
       const data = getWorkspace(project);
-      if (!data.data) {
+      if (!data) {
         console.error(
           `Project ${project} not found for image ${imageName} in .devops/config/images.yaml`
         );

@@ -1,7 +1,7 @@
-import { getWorkspace } from "../libs/workspace-discovery";
 import { CLICommandParser, printUsageAndExit } from "./common";
 import url from "url";
 import path from "path";
+import { getWorkspace } from "../libs/discovery";
 
 const __file__ = url.fileURLToPath(import.meta.url);
 const __src__ = path.join(path.dirname(__file__), "../..", "src");
@@ -17,8 +17,9 @@ ${oneLiner}
 GENERAL USAGE
     devops run <project-name>:<script-name> [--] [options for script]
 
-NOTE
-    Does not allow interactive mode. If you need interactivity, use devops exec instead.
+NOTES
+    - Only works for node projects. Use 'devopspy' for python projects.
+    - Does not allow interactive mode. If you need interactivity, use devops exec instead.
 
 EXAMPLES
     ${keyExamples}

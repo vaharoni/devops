@@ -1,7 +1,7 @@
 import { CommandExecutor } from "../cli/common";
+import { getWorkspace } from "./discovery";
 import { imageConfigMap } from "./k8s-constants";
 import { kubectlCommand, upsertConfigMapCommand } from "./k8s-helpers";
-import { getWorkspace } from "./workspace-discovery";
 
 //= config map
 
@@ -78,7 +78,7 @@ function setK8sScale(
   replicaCount: number
 ) {
   const workspaceData = getWorkspace(workspaceName);
-  const serviceName = workspaceData.data.deployment?.service_name;
+  const serviceName = workspaceData.packageDataEntries.find(x => x.deployment?.service_name)?.deployment?.service_name;
   if (!serviceName) {
     console.error(
       `Workspace ${workspaceName} must have a service_name defined in its deployment key in package.json. Skipping.`
@@ -102,7 +102,7 @@ export function setWorkspaceScale(
   replicaCount: number
 ) {
   const workspaceData = getWorkspace(workspaceName);
-  if (!workspaceData.data.deployment) {
+  if (!workspaceData.packageDataEntries.find(x => x.deployment)) {
     console.error(`Workspace ${workspaceName} does not have deployment data.`);
     process.exit(1);
   }

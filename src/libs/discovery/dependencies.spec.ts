@@ -4,12 +4,12 @@ import { WorkspaceDependencies } from './dependencies';
 
 describe('createDependencyResolver', () => {
   const projects = {
-    '@local/a': { rootPath: 'applications/a', data: { name: '@local/a', dependencies: { '@local/b': 'workspace:*', '@local/d': 'workspace:*', external1: "^1.0.0" } } },
-    '@local/b': { rootPath: 'applications/b', data: { name: '@local/b', dependencies: { '@local/c': 'workspace:*', external2: "^1.0.0" } } },
-    '@local/c': { rootPath: 'applications/c', data: { name: '@local/c', dependencies: { external3: "^1.0.0" } } },
-    '@local/d': { rootPath: 'applications/d', data: { name: '@local/d' } },
-    '@local/e': { rootPath: 'applications/e', data: { name: '@local/e', dependencies: { '@local/f': 'workspace:*' } } },
-    '@local/f': { rootPath: 'applications/f', data: { name: '@local/f', dependencies: { '@local/e': 'workspace:*' } } },
+    '@local/a': { language: "node" as const, rootPath: 'applications/a', name: '@local/a', dependencyNames: ['@local/b', '@local/d', 'external1'] },
+    '@local/b': { language: "node" as const, rootPath: 'applications/b', name: '@local/b', dependencyNames: ['@local/c', 'external2'] },
+    '@local/c': { language: "node" as const, rootPath: 'applications/c', name: '@local/c', dependencyNames: [ 'external3' ] },
+    '@local/d': { language: "node" as const, rootPath: 'applications/d', name: '@local/d', dependencyNames: [] },
+    '@local/e': { language: "node" as const, rootPath: 'applications/e', name: '@local/e', dependencyNames: ['@local/f'] },
+    '@local/f': { language: "node" as const, rootPath: 'applications/f', name: '@local/f', dependencyNames: ['@local/e'] } 
   };
 
   it('should return dependents of a given project', () => {

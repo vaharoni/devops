@@ -1,5 +1,5 @@
+import { workspaceDirectoryForLanguage } from "../libs/discovery";
 import { CLICommandParser, printUsageAndExit } from "./common";
-import { getWorkspace, workspaceNames } from "../libs/workspace-discovery";
 import concurrently, {
   type ConcurrentlyCommandInput,
   type ConcurrentlyOptions,
@@ -17,6 +17,9 @@ ${oneLiner}
 USAGE
     devops run-many <script-name> [--kill-others-on-fail]
 
+NOTE
+    Only works for node projects. Use 'devopspy' for python projects.
+
 EXAMPLES
     ${keyExamples}
 `;
@@ -28,12 +31,11 @@ async function run(cmdObj: CLICommandParser) {
   const remaining = parsed.args.slice(1).join(" ");
   const commands: ConcurrentlyCommandInput[] = [];
 
-  workspaceNames().forEach(async (workspace) => {
-    const projectData = getWorkspace(workspace);
-    if (projectData.data.scripts?.[script]) {
+  Object.values(workspaceDirectoryForLanguage('node')).forEach(async (packageData) => {
+    if (packageData.scripts?.[script]) {
       commands.push({
-        name: workspace,
-        command: `devops --env ${cmdObj.env} run ${workspace}:${script} ${remaining}`,
+        name: packageData.name,
+        command: `devops --env ${cmdObj.env} run ${packageData.name}:${script} ${remaining}`,
       });
     }
   });

@@ -29,3 +29,36 @@ packages = [{include = "proj_name", from = "src"}]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 ```
+
+
+```toml
+[tool.poetry.dependencies]
+pyappsupport = { path = "../../.devops/pyappsupport", develop = true }
+```
+
+
+```toml
+[tool.poetry.dependencies]
+kuku = { path = "libs/greeter-test", develop = true }
+
+[tool.poetry.scripts]
+foo = "devops_test.exec:foo"
+goo = "devops_test.exec:goo"
+
+[tool.devops.deployment]
+template = "test-template"
+app_name = "test-app"
+service_name = "test-service"
+port = 3001
+subdomain = "subdomain"
+
+[[tool.devops.deployment.cronJobs]]
+name = "test-cron-job-1"
+cron = "*/1 * * * *"
+curl = ["-X", "POST", "http://localhost:3001/test-cron-job-1"]
+
+[[tool.devops.deployment.cronJobs]]
+name = "test-cron-job-2"
+cron = "*/2 * * * *"
+curl = ["-X", "POST", "http://localhost:3001/test-cron-job-2"]
+```

@@ -1,11 +1,10 @@
 import fs from "fs-extra";
-import { glob } from "glob";
 import os from "os";
 import path from "path";
 import { CLICommandParser, printUsageAndExit } from "./common";
-import { getImageDescendentData } from "../libs/workspace-discovery";
 import { getImageData } from "../libs/config";
 import { getMonorepoSecret } from "../libs/k8s-secrets-manager";
+import { getImageDescendentData } from "../libs/discovery/images";
 
 const oneLiner =
   "Copies all dependencies of an image to a temporary folder in preparation for a Docker build";

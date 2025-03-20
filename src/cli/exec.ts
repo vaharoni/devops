@@ -1,7 +1,7 @@
-import { getWorkspace } from "../libs/workspace-discovery";
 import { CLICommandParser, CommandExecutor, printUsageAndExit } from "./common";
 import url from "url";
 import path from "path";
+import { getWorkspace } from "../libs/discovery";
 
 const __file__ = url.fileURLToPath(import.meta.url);
 const __src__ = path.join(path.dirname(__file__), "../..", "src");

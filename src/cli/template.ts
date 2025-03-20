@@ -2,8 +2,8 @@ import {
 } from "../libs/k8s-image-config";
 import { CLICommandParser, printUsageAndExit, StrongParams } from "../../src/cli/common";
 import { generateDbMigrateJob, generateDebugDeployment, generateWorkspaceDeployment, ImageContextGenerator } from "../libs/k8s-generate";
-import { getWorkspace, getWorkspaceImages } from "../libs/workspace-discovery";
 import chalk from "chalk";
+import { getWorkspace } from "../libs/discovery";
 
 const SUPPORTED_CONTEXT_TYPES = ['deployment', 'db-migrate', 'debug'];
 
@@ -13,7 +13,7 @@ const keyExamples = `
     $ devops template context debug
     $ devops template context db-migrate
     $ devops template gen     deployment www
-    $ devops template gen     debug      www
+    $ devops template gen     debug      node-services
     $ devops template gen     db-migrate
 `.trim();
 
@@ -31,16 +31,12 @@ SHOW CONTEXT OBJECT
     Prints out a context object with dummy values for the specified template type.
     For deployment, the workspace name is required.
 
-GENERATE DEPLOYMENT TEMPLATE
-    devops template gen deployment|debug <workspace>
-
-    For deployment, generates an example manifest of a workspace, including override files present under the 'manifests' folder.
-    For debug, generates a debug deployment manifest for the debug image configured for the workspace.
-
-GENERATE OTHER TEMPLATES
+GENERATE TEMPLATES
+    devops template gen deployment <workspace>
+    devops template gen debug <image>
     devops template gen db-migrate-job
 
-    Generates an example manifest file for the db migrate job.
+    For deployment, generates an example manifest of a workspace, including override files present under the 'manifests' folder.
 
 EXAMPLES
     ${keyExamples}
@@ -49,11 +45,17 @@ EXAMPLES
 const handlers = {
   context: {
     'deployment': (opts: StrongParams) => {
-      const workspaceData = getWorkspace(opts.required('workspace'))
+      const workspace = opts.required('workspaceOrImage');
+      const workspaceData = getWorkspace(workspace);
+      const packageDataWithDeployment = workspaceData.packageDataEntries.find((entry) => entry.deployment);
+      if (!packageDataWithDeployment) {
+        console.error(`No deployment found for workspace ${workspace}`);
+        process.exit(1);
+      }
       console.warn(chalk.green("\nThis is a sample context object used to render a manifest template of type deployment:\n"))
       console.log(
         JSON.stringify(
-          new ImageContextGenerator(opts.required('env'), 'dummy-image', 'dummy-sha').getDeployment(workspaceData.data),
+          new ImageContextGenerator(opts.required('env'), 'dummy-image', 'dummy-sha').getDeployment(packageDataWithDeployment),
           null,
           2
         )
@@ -82,12 +84,17 @@ const handlers = {
   },
   gen: {
     'deployment': (opts: StrongParams) => {
-      const workspace = opts.required('workspace');
-      const projectData = getWorkspace(workspace);
+      const workspace = opts.required('workspaceOrImage');
+      const workspaceData = getWorkspace(workspace);
+      const packageDataWithDeployment = workspaceData.packageDataEntries.find((entry) => entry.deployment);
+      if (!packageDataWithDeployment) {
+        console.error(`No deployment found for workspace ${workspace}`);
+        process.exit(1);
+      }
       console.warn(chalk.green(`\nThis is a sample of generated manifests for the ${workspace} workspace:\n`))
       console.log(
         generateWorkspaceDeployment(
-          projectData,
+          packageDataWithDeployment,
           opts.required('env'),
           'dummy-image',
           'dummy-sha'
@@ -105,9 +112,8 @@ const handlers = {
       )
     },
     'debug': (opts: StrongParams) => {
-      const workspace = opts.required('workspace');
-      const image = getWorkspaceImages(workspace)[0];
-      console.warn(chalk.green(`\nThis is a sample of generated manifests for the debug image ${image} of the ${workspace} workspace:\n`))
+      const image = opts.required('workspaceOrImage');
+      console.warn(chalk.green(`\nThis is a sample of generated manifests for the debug image ${image}:\n`))
       console.log(
         generateDebugDeployment(
           opts.required('env'),
@@ -138,7 +144,7 @@ function run(cmdObj: CLICommandParser) {
   const params = new StrongParams(usage, {
     env: cmdObj.env === 'development' ? 'staging' : cmdObj.env,
     contextType,
-    workspace: param
+    workspaceOrImage: param
   });
   handler(params);
 }

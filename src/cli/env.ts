@@ -11,7 +11,6 @@ import {
   dotEnvFilesForEnv,
   printUsageAndExit,
 } from "./common";
-import { getDecendentData } from "../libs/workspace-discovery";
 
 const oneLiner = "Commands to manipulate env variables";
 const keyExamples = `
@@ -20,7 +19,6 @@ $ devops env get KEY1 KEY2 --env staging
 $ devops env set KEY1=123 KEY2=345 --env staging
 $ devops env delete KEY1 KEY2 --env staging
 $ devops env validate
-$ devops env validate myproject
 `;
 
 const usage = `
@@ -30,51 +28,23 @@ COMMANDS
   get         Fetches secrets for the chosen environment and printes them to console
   set         Sets specific secrets for the chosen environment
   delete      Deletes specific secrets for the chosen environment
-  validate    Validate locally
-
-SPECIAL validate USAGE
-    If a project is not provided, verifies the existence and type of environment variables against all env.yaml files.
-    Warnings for superfluous variables are printed.
-
-    If a project is provided, verifies the existence and type of the env.yaml files of that specific project and 
-    its dependencies. Warnings for superfluous variables are not printed, as it is likely many of the variables
-    are necessary for other projects.
+  validate    Validate locally, verifying the existence and type of environment variables against all env.yaml files
 
 EXAMPLES
   ${keyExamples}
 `;
-
-function envYamlForProject(project: string) {
-  const envYamlFiles: string[] = [];
-  getDecendentData(project).forEach((node) => {
-    const fileName = `${node.rootPath}/env.yaml`;
-    if (fs.existsSync(fileName)) {
-      envYamlFiles.push(fileName);
-    }
-  });
-  return envYamlFiles;
-}
-
-function allEnvYamlFiles() {
-  return globSync("**/env.yaml");
-}
 
 function run(cmdObj: CLICommandParser) {
   if (cmdObj.help || cmdObj.args.length === 0) printUsageAndExit(usage);
   const [command, ...rest] = cmdObj.args;
   switch (command) {
     case "validate": {
-      const project = rest[0];
-      const envYamlFiles = project
-        ? envYamlForProject(project)
-        : allEnvYamlFiles();
+      const envYamlFiles = globSync("**/env.yaml");
 
       // We have to have a _validate so that we go through a CommandExecutor which injects env variables into the process
       cmdObj
         .executorFromEnv(
-          `devops env _validate ${
-            project ? "--skip-dotenv" : ""
-          } ${envYamlFiles.join(" ")}`,
+          `devops env _validate ${envYamlFiles.join(" ")}`,
           { quiet: false }
         )
         .exec();
