@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "generate": "prisma generate",
+    "generate": "prisma generate --generator js-client",
     "migrate-deploy": "prisma migrate deploy"
   },
   "dependencies": {
