@@ -1,0 +1,26 @@
+[project]
+name = "example-python"
+version = "0.1.0"
+description = ""
+authors = []
+requires-python = ">=3.12"
+
+[tool.poetry]
+packages = [{ include = "example_python", from = "src" }]
+
+[tool.poetry.scripts]
+dev = "example_python.scripts:dev"
+start = "example_python.scripts:start"
+
+[tool.poetry.dependencies]
+example-node-lib = { path = "../../libs/example-node-lib", develop = true }
+fastapi = { extras = ["standard"], version = "^0.115.11" }
+
+[tool.devops.deployment]
+template = "external-service"
+service_name = "example-python"
+port = 3002
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

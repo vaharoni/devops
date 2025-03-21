@@ -22,7 +22,7 @@
           "jobs",
           "-X",
           "POST",
-          "http://example/ping-from-jobs"
+          "http://example-node/ping-from-jobs"
         ]
       }
     ]

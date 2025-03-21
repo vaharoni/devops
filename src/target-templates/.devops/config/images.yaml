@@ -34,7 +34,7 @@ node-services:
     - tsconfig.json
     - devops
   applications:
-  - example
+  - example-node
   - jobs
 
 python-services:
@@ -45,3 +45,5 @@ python-services:
     - devopspy
     - pyproject.toml
     - poetry.lock
+  applications:
+  - example-python

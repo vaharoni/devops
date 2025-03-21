@@ -70,4 +70,6 @@ To finish the setup:
 config/kubeconfig
 tmp/**
 !tmp/**/.gitkeep
+venv/
+**/__pycache__
 `;

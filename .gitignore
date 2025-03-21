@@ -1,5 +1,11 @@
-tmp/
+**/.DS_Store
+**/.env*
 config/kubeconfig
+tmp/**
+!tmp/**/.gitkeep
+.envrc
+venv/
+**/__pycache__
 
 # Logs
 logs

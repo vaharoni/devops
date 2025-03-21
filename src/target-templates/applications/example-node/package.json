@@ -1,10 +1,10 @@
 {
-  "name": "example",
+  "name": "example-node",
   "module": "index.ts",
   "type": "module",
   "private": true,
   "deployment": {
-    "service_name": "example",
+    "service_name": "example-node",
     "port": 3001,
     "template": "external-service"
   },
@@ -13,7 +13,8 @@
     "verify": "tsc -p ./tsconfig.json --noEmit"
   },
   "dependencies": {
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "example-node-lib": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "latest",
