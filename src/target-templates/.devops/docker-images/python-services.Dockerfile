@@ -9,16 +9,17 @@ RUN apt-get update && apt-get install -y jq libpq-dev curl git parallel --fix-mi
 RUN curl -sSL https://install.python-poetry.org | python3 -
 ENV PATH="/root/.local/bin:${PATH}"
 
-# We want venv so that the github action can do caching for us
-RUN python -m venv venv
-ENV PATH="/app/venv/bin:${PATH}"
-ENV VIRTUAL_ENV="/app/venv"
+# Configure Poetry to not use virtual environments
+RUN poetry config virtualenvs.create false
 
-# Install root dependencies using poetry
-COPY poetry.lock pyproject.toml ./
-RUN poetry install
-
+# Copy project files
 COPY . .
+
+# Use the cached Poetry dependencies if available
+ENV POETRY_CACHE_DIR="/app/.poetry-cache"
+
+# Install the devopspy tool
+RUN poetry install
 
 # Install all dependencies
 RUN ./devopspy poetry install

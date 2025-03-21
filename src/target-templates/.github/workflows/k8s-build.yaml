@@ -76,11 +76,12 @@ jobs:
           image-name: python-services
           gh_pat_token: ${{ secrets.GH_PAT_TOKEN }}
           install-script: |
-            python -m venv venv
-            source venv/bin/activate
+            mkdir -p .poetry-cache
+            export POETRY_CACHE_DIR=$(pwd)/.poetry-cache
+            poetry config virtualenvs.create false
             poetry install
           cache-paths: |
-            **/venv
+            **/.poetry-cache
           hash-files: "**/poetry.lock"
 
   finalize_build:
