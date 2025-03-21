@@ -22,7 +22,7 @@ spec:
             - image: {{../image_path}}
               name: {{name}}
               command:
-                - node-exec.sh
+                - ./node-exec.sh
               args:
                 - ./devops
                 - internal-curl
