@@ -5,6 +5,12 @@ Install Poetry by following [the docs](https://python-poetry.org/docs/#installin
 curl -sSL https://install.python-poetry.org | python3 -
 ```
 
+Install GNU parallel by running `brew install parallel` and running the following to suppress the citation output:
+```shell
+mkdir ~/.parallel
+touch ~/.parallel/will-cite
+```
+
 Make sure your gitignore contains the following:
 ```text
 ```

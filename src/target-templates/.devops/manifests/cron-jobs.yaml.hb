@@ -24,7 +24,7 @@ spec:
               command:
                 - node-exec.sh
               args:
-                - devops
+                - ./devops
                 - internal-curl
                 {{#each curl}}
                 - {{this}}

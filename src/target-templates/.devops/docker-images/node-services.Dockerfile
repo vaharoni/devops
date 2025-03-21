@@ -19,14 +19,12 @@ RUN --mount=type=secret,id=GH_PAT_TOKEN \
   GH_PAT_TOKEN=$(cat /run/secrets/GH_PAT_TOKEN) && \
   bun install
 
-ENV PATH="/app/node_modules/.bin:$PATH"
-
 # For prisma client, if used
-RUN devops run-many generate
-RUN devops run-many build
+RUN ./devops run-many generate
+RUN ./devops run-many build
 
 # The config folder will be mounted when the pod starts with up-to-date env variables that are used in runtime by server-side code
 RUN rm -rf config/
 
 # Pods may override this entrypoint to `node-exec.sh` using the `command` field in the pod spec.
-ENTRYPOINT [ "node-run.sh" ]
+ENTRYPOINT [ "./node-run.sh" ]

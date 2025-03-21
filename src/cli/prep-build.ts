@@ -29,6 +29,7 @@ async function run(cmdObj: CLICommandParser) {
   const dockerFile = `${image}.Dockerfile`;
   const dockerFilePath = path.join(".devops/docker-images", dockerFile);
   const dockerImagePayloadPath = path.join(".devops/docker-images", image);
+  const dockerCommonPayloadPath = path.join(".devops/docker-images", "common");
   const imageExtraContent = imageData["image-extra-content"] ?? [];
 
   if (!fs.existsSync(dockerFilePath)) {
@@ -51,6 +52,9 @@ async function run(cmdObj: CLICommandParser) {
   // Copy Dockerfile
   console.warn(`COPYING Dockerfile`);
   fs.copySync(dockerFilePath, path.join(destFolder, "Dockerfile"));
+
+  console.warn(`COPYING Docker common`);
+  fs.copySync(dockerCommonPayloadPath, destFolder);
 
   console.warn(`COPYING Docker image payload`);
   fs.copySync(dockerImagePayloadPath, destFolder);

@@ -30,8 +30,18 @@ node-services:
   image-extra-content:
     - .npmrc
     - package.json
-    - tsconfig.json
     - bun.lock
+    - tsconfig.json
+    - devops
   applications:
   - example
   - jobs
+
+python-services:
+  language: python
+  debug-template: debug-console
+  can-db-migrate: false
+  image-extra-content:
+    - devopspy
+    - pyproject.toml
+    - poetry.lock

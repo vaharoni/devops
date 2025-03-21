@@ -40,9 +40,52 @@ jobs:
           image-name: node-services
           gh_pat_token: ${{ secrets.GH_PAT_TOKEN }}
 
+  build_python_services:
+    runs-on: ubuntu-latest
+    steps:
+      # Fetch the last 50 commits so that devops affected works
+      - name: Checkout repo and history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      - name: Setup prerequesites
+        uses: ./.github/actions/setup-prereq@v1
+        with:
+          gh_pat_token: ${{ secrets.GH_PAT_TOKEN }}
+
+      - name: Connect to infrastructure
+        uses: ./.github/actions/connect-to-infra@v1
+        with:
+          do_access_token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          do_cluster_name: ${{ secrets.DIGITALOCEAN_CLUSTER_NAME }}
+          hetzner_kubeconfig: ${{ secrets.HCLOUD_KUBECONFIG }}
+          harbor_user: ${{ secrets.HARBOR_USER }}
+          harbor_password: ${{ secrets.HARBOR_PASSWORD }}
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'           
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - uses: ./.github/actions/build-image@v1
+        with:
+          image-name: python-services
+          gh_pat_token: ${{ secrets.GH_PAT_TOKEN }}
+          install-script: |
+            python -m venv venv
+            source venv/bin/activate
+            poetry install
+          cache-paths: |
+            **/venv
+          hash-files: "**/poetry.lock"
+
   finalize_build:
     # Update to include all images built
-    needs: [build_node_services]
+    needs: [build_node_services, build_python_services]
     runs-on: ubuntu-latest
     steps:
       # Fetch the last 50 commits so that devops affected works
@@ -68,8 +111,13 @@ jobs:
       - name: Run DB Migrate
         uses: ./.github/actions/db-migrate@v1
 
-      # Repeat per image
+      # Repeat per image (it checks if the image is affected and deploys it if it is)
       - name: Deploy node services
         uses: ./.github/actions/deploy-image@v1
         with:
           image-name: node-services
+
+      - name: Deploy python services
+        uses: ./.github/actions/deploy-image@v1
+        with:
+          image-name: python-services

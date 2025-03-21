@@ -1,4 +1,3 @@
-import fs from "fs";
 import { globSync } from "glob";
 import {
   deleteMonorepoSecret,
