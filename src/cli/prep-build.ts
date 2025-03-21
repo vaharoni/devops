@@ -59,6 +59,10 @@ async function run(cmdObj: CLICommandParser) {
   console.warn(`COPYING Docker image payload`);
   fs.copySync(dockerImagePayloadPath, destFolder);
 
+  console.warn(`COPYING .devops/config`);
+  fs.mkdirSync(path.join(destFolder, ".devops"));
+  fs.copySync(".devops/config", path.join(destFolder, ".devops/config"));
+
   // Create config directory. It should be deleted by the docker image so that it can be mounted as a volume when the pod is run
   console.warn(`CREATING config for the build process`);
   fs.mkdirSync(path.join(destFolder, "config"));
