@@ -55,6 +55,7 @@ function processConstFile() {
       console.error(`Error parsing config/constants.yaml: ${parseRes.error.toString()}`);
       process.exit(1);
     }
+    constants = { valid: true, data: parseRes.data };
     return constants;
   }
 
