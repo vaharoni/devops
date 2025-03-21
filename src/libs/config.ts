@@ -38,32 +38,35 @@ export const { getImageData, getImageNames } = processImagesFile();
 // Process config/constants.yaml
 
 function processConstFile() {
-  let constants: ConstFileSchema;
+  let constants: { valid: boolean, data?: ConstFileSchema };
   function constFileData() {
     if (constants) return constants;
     try {
       const constantsYaml = readFileSync(constantsFilePath, "utf8");
       constants = yaml.parse(constantsYaml);
     } catch (e) {
-      console.error("Error reading .devops/config/constants.yaml");
-      process.exit(1);
+      // This is only a warning - the file may not exist, which is fine if getConst is called with ignoreIfInvalid
+      console.warn("Warning: cannot read .devops/config/constants.yaml");
+      return { valid: false };
     }
     const parseRes = constFileSchema.safeParse(constants);
     if (parseRes.error) {
-      console.error(
-        `Error parsing config/constants.yaml: ${parseRes.error.toString()}`
-      );
+      // This is an error - if the file exists, it must be valid
+      console.error(`Error parsing config/constants.yaml: ${parseRes.error.toString()}`);
       process.exit(1);
     }
     return constants;
   }
 
-  function getConst<T extends keyof ConstFileSchema>(key: T): ConstFileSchema[T] {
-    const value = constFileData()[key];
-    if (!value) {
-      console.error(
-        `Missing constant in .devops/config/constants.yaml: ${key}`
-      );
+  function getConst<T extends keyof ConstFileSchema>(key: T, opts: { ignoreIfInvalid?: boolean } = {}): ConstFileSchema[T] | undefined {
+    const { valid, data } = constFileData();
+    if (!valid && !opts.ignoreIfInvalid) { 
+      console.error(".devops/config/constants.yaml is invalid");
+      process.exit(1);
+    }
+    const value = data?.[key];
+    if (!value && !opts.ignoreIfInvalid) {
+      console.error(`Missing constant in .devops/config/constants.yaml: ${key}`);
       process.exit(1);
     }
     return value;

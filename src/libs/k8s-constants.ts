@@ -6,7 +6,7 @@ const DEFAULT_LOCAL_ENVS = ["development", "test"];
 let _remoteSupportedEnvs: string[];
 function remoteSupportedEnvs() {
   if (_remoteSupportedEnvs) return _remoteSupportedEnvs;
-  const extra = getConst("extra-remote-environments") ?? [];
+  const extra = getConst("extra-remote-environments", { ignoreIfInvalid: true }) ?? [];
   _remoteSupportedEnvs = [...DEFAULT_REMOTE_ENVS, ...extra];
   return _remoteSupportedEnvs;
 }
@@ -14,7 +14,7 @@ function remoteSupportedEnvs() {
 let _localSupportedEnvs: string[];
 function localSupportedEnvs() {
   if (_localSupportedEnvs) return _localSupportedEnvs;
-  const extra = getConst("extra-local-environments") ?? [];
+  const extra = getConst("extra-local-environments", { ignoreIfInvalid: true }) ?? [];
   _localSupportedEnvs = [...DEFAULT_LOCAL_ENVS, ...extra];
   return _localSupportedEnvs
 }
@@ -72,7 +72,7 @@ export function containerRegistryRepoPath(
 }
 
 export function domainNameForEnv(monorepoEnv: string) {
-  const value = getConst("domains")[monorepoEnv];
+  const value = getConst("domains")?.[monorepoEnv];
   if (!value) {
     console.error(`No domain found for environment: ${monorepoEnv}`);
     process.exit(1);
