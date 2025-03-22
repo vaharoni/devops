@@ -56,8 +56,9 @@ const deploymentSchema = z.object({
       /** The curl command to invoke. Must be an array. */
       curl: z.array(z.string()).optional(),
     })
-  ).optional()
-});
+  ).optional(),
+  /** The catchall below allows any other fields that might be in the package.json file */
+}).catchall(z.any());
 export type Deployment = z.infer<typeof deploymentSchema>;
 
 // ## Workspace Discovery: Languae-specific constructs

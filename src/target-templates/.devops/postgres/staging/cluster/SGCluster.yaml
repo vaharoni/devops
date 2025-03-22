@@ -6,9 +6,9 @@ metadata:
 spec:
   postgres:
     version: '17.4'
-    # extensions:
+    extensions:
     # - name: 'pg_repack'
-    # - name: 'pg_trgm'
+    - name: 'pg_trgm'  # required for prefect
   instances: 1
   # sgInstanceProfile: 'size-m'
   profile: 'testing'
