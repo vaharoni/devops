@@ -36,9 +36,9 @@ spec:
             - {{script_path}}
           env:
             - name: MONOREPO_ENV
-              value: {{monorepo_env}}
+              value: {{../monorepo_env}}
             - name: MONOREPO_NAMESPACE
-              value: {{namespace}}
+              value: {{../namespace}}
             - name: IS_KUBERNETES
               value: 'true'
             - name: MONOREPO_BASE_SECRET
