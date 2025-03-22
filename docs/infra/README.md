@@ -13,3 +13,4 @@ Once you are done with the basic cluster creation, continue with:
 - [Finalizing the cluster setup](FinalizeClusterSetup.md)
 - [Installing Postgres](Postgres.md)
 - [Installing Redis](Redis.md)
+- [Installing Milvus](Milvus.md)
