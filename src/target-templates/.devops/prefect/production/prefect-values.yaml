@@ -4,7 +4,7 @@ ingress:
     hostname: "prefect-production.vaharoni.com"
 server:
   uiConfig:
-    prefectUiApiUrl: "prefect-production.vaharoni.com/api"
+    prefectUiApiUrl: "https://prefect-production.vaharoni.com/api"
 
 # We use the environment's stackgres postgres instance
 postgresql:

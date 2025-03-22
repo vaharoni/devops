@@ -5,7 +5,7 @@ metadata:
   labels:
     app: {{../app_name}}
     env: {{../monorepo_env}}
-  name: {{../app_name}}
+  name: {{../app_name}}-{{flow_name}}
   namespace: {{../namespace}}
 spec:
   replicas: 1
@@ -35,6 +35,8 @@ spec:
             - python
             - {{script_path}}
           env:
+            - name: PREFECT_API_URL
+              value: http://prefect-server.prefect-{{../monorepo_env}}:4200/api
             - name: MONOREPO_ENV
               value: {{../monorepo_env}}
             - name: MONOREPO_NAMESPACE
