@@ -17,3 +17,5 @@ external-service:
   - deployment-web.yaml.hb
   - service.yaml.hb
   - ingress.yaml.hb
+prefect:
+  - prefect.yaml.hb
