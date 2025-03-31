@@ -11,10 +11,6 @@ inputs:
     description: "The path to cache inside the container"
     required: false
     default: /root/.bun/install/cache
-  hash-files:
-    description: "File to hash for cache key"
-    required: false
-    default: /home/runner/build/bun.lockb
 outputs:
   affected:
     description: "Whether the image is affected"
@@ -57,9 +53,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: cache-path
-        key: ${{ env.CACHE_PREFIX }}-${{ hashFiles(inputs.hash-files) }}
-        restore-keys: |
-          ${{ env.CACHE_PREFIX }}-
+        key: ${{ env.CACHE_PREFIX }}
 
     - name: Inject cache into docker
       if: steps.check_affected.outputs.affected == 'true'

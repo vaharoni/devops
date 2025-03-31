@@ -63,20 +63,11 @@ jobs:
           harbor_user: ${{ secrets.HARBOR_USER }}
           harbor_password: ${{ secrets.HARBOR_PASSWORD }}
 
-      - name: Install Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'           
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-
       - uses: ./.github/actions/build-image@v1
         with:
           image-name: python-services
           gh_pat_token: ${{ secrets.GH_PAT_TOKEN }}
           cache-path: /root/.cache/uv
-          hash-files: /home/runner/build/uv.lock
 
   finalize_build:
     # Update to include all images built
