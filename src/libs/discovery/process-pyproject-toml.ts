@@ -1,6 +1,5 @@
 import chalk from "chalk";
 import { globSync } from "glob";
-import path from "path";
 import { packageFilePythonSchema, type PackageData } from "../../types";
 import { PackageDataProcessor } from "./process-common";
 import TOML from '@iarna/toml';
@@ -21,8 +20,8 @@ export function pythonWorkspaces() {
 
     processor.convert((data) => {
       const deployment = data.tool?.devops?.deployment;
-      const scripts = data.tool?.poetry?.scripts;
-      const dependencyNames = Object.keys(data.tool?.poetry?.dependencies ?? []);
+      const scripts = data.tool?.devops?.scripts;
+      const dependencyNames = data.project.dependencies ?? [];
       return {
         scripts,
         deployment,

@@ -78,14 +78,12 @@ export type PackageFileNode = z.infer<typeof packageFileNodeSchema>;
 export const packageFilePythonSchema = z.object({
   project: z.object({
     name: z.string(),
+    dependencies: z.string().array().optional(),
   }),
   tool: z.object({
-    poetry: z.object({
-      dependencies: z.record(z.any()).optional(),
-      scripts: z.record(z.string()).optional(),
-    }).optional(),
     devops: z.object({
       deployment: deploymentSchema.optional(),
+      scripts: z.record(z.string()).optional(),
     }).optional(),
   }).optional(),
 })

@@ -68,21 +68,15 @@ jobs:
         with:
           python-version: '3.12'           
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - uses: ./.github/actions/build-image@v1
         with:
           image-name: python-services
           gh_pat_token: ${{ secrets.GH_PAT_TOKEN }}
-          install-script: |
-            mkdir -p .poetry-cache
-            export POETRY_CACHE_DIR=$(pwd)/.poetry-cache
-            poetry config virtualenvs.create false
-            poetry install
-          cache-paths: |
-            **/.poetry-cache
-          hash-files: "**/poetry.lock"
+          cache-path: /root/.cache/uv
+          hash-files: /home/runner/build/uv.lock
 
   finalize_build:
     # Update to include all images built

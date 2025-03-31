@@ -44,6 +44,6 @@ python-services:
   image-extra-content:
     - devopspy
     - pyproject.toml
-    - poetry.lock
+    - uv.lock
   applications:
   - example-python

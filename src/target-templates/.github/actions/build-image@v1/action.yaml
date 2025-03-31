@@ -7,21 +7,14 @@ inputs:
   gh_pat_token:
     description: "GitHub personal access token"
     required: true
-  install-script:
-    description: "Custom installation script. Runs inside the output folder of prep-build."
+  cache-path:
+    description: "The path to cache inside the container"
     required: false
-    default: |
-      bun install
-  cache-paths:
-    description: "Paths to cache, separated by newlines"
-    required: false
-    default: |
-      ~/.bun
-      **/node_modules
+    default: /root/.bun/install/cache
   hash-files:
     description: "File to hash for cache key"
     required: false
-    default: "**/bun.lockb"
+    default: /home/runner/build/bun.lockb
 outputs:
   affected:
     description: "Whether the image is affected"
@@ -55,61 +48,34 @@ runs:
       run: |
         echo "CACHE_PREFIX=v1-${{ runner.os }}-${{ env.IMAGE_NAME }}-${{ github.ref_name }}" >> $GITHUB_ENV
         echo "ECR_URL=$(devops registry repo-url ${{ env.IMAGE_NAME }} ${{ github.sha }})" >> $GITHUB_ENV
-        echo "FOLDER=$(devops prep-build ${{ env.IMAGE_NAME }})" >> $GITHUB_ENV
+        folder=$(devops prep-build ${{ env.IMAGE_NAME }})
+        mv $folder /home/runner/build
 
-    - name: Prepare cache paths
-      shell: bash
+    - name: Setup cache
       if: steps.check_affected.outputs.affected == 'true'
-      run: |
-        folder="${{ env.FOLDER }}"
-        computed_paths=""
-        while IFS= read -r line || [ -n "$line" ]; do
-          # Skip empty lines
-          [ -z "$line" ] && continue
-          # If the path is relative, prepend the folder
-          if [[ "$line" != /* && "$line" != ~* ]]; then
-            line="$folder/$line"
-          fi
-          computed_paths+="$line"$'\n'
-        done <<< "${{ inputs.cache-paths }}"
-        echo "Resolved cache paths:"
-        echo "${computed_paths}"
-
-        # Use multiline syntax for setting CACHE_PATHS
-        echo "CACHE_PATHS<<EOF" >> $GITHUB_ENV
-        echo "${computed_paths}" >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV        
-
-    - name: Restore cache
-      if: steps.check_affected.outputs.affected == 'true'
-      id: restore-cache
-      uses: actions/cache/restore@v4
+      id: setup-cache
+      uses: actions/cache@v4
       with:
-        path: ${{ env.CACHE_PATHS }}
+        path: cache-path
         key: ${{ env.CACHE_PREFIX }}-${{ hashFiles(inputs.hash-files) }}
         restore-keys: |
           ${{ env.CACHE_PREFIX }}-
 
-    - name: Install dependencies
-      shell: bash
+    - name: Inject cache into docker
       if: steps.check_affected.outputs.affected == 'true'
-      run: |
-        cd ${{ env.FOLDER }}
-        ${{ inputs.install-script }}
-
-    - name: Save cache
-      uses: actions/cache/save@v4
-      if: steps.check_affected.outputs.affected == 'true'
-      id: save-cache
+      uses: reproducible-containers/buildkit-cache-dance@v3.1.0
       with:
-        path: ${{ env.CACHE_PATHS }}
-        key: ${{ steps.restore-cache.outputs.cache-primary-key }}
+        cache-map: |
+          {
+            "cache-path": "${{ inputs.cache-path }}"
+          }
+        skip-extraction: ${{ steps.setup-cache.outputs.cache-hit }}          
 
     - name: Build and push Docker image
       if: steps.check_affected.outputs.affected == 'true'
       uses: docker/build-push-action@v6
       with:
-        context: ${{ env.FOLDER }}
+        context: /home/runner/build
         push: true
         tags: ${{ env.ECR_URL }}
         cache-from: type=gha
