@@ -1,0 +1,14 @@
+[project]
+name = "example-data-pipeline"
+version = "0.1.0"
+description = ""
+authors = []
+requires-python = ">=3.12"
+dependencies = ["prefect (>=3.2.14,<4.0.0)"]
+
+[tool.devops.deployment]
+template = "prefect"
+
+[[tool.devops.deployment.prefectFlows]]
+flow_name = "test-flow"
+script_path = "src/example_data_pipeline/main.py"

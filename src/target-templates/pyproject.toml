@@ -1,0 +1,19 @@
+[project]
+name = "devops-test"
+version = "0.1.0"
+description = ""
+authors = []
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["devops-python"]
+
+[tool.uv.workspace]
+members = [
+  "db",
+  "applications/example-data-pipeline",
+  "applications/example-python",
+  "libs/example-python-lib",
+]
+
+[tool.uv.sources]
+devops-python = { git = "https://github.com/vaharoni/devops-python.git" }

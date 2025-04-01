@@ -14,5 +14,6 @@ Monorepos support multiple apps, allowing them to reuse functionality through sh
 # Documentation
 
 - [Repo setup](./docs/RepoSetup.md)
+- [Working with Python](./docs/WorkingWithPython.md)
 - [The devops architecture](./docs/Architecture.md)
 - [Day to day work](./docs/DayToDay.md)

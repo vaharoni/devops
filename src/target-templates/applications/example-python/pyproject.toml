@@ -4,23 +4,17 @@ version = "0.1.0"
 description = ""
 authors = []
 requires-python = ">=3.12"
+dependencies = ["example-python-lib", "fastapi[standard]"]
 
-[tool.poetry]
-packages = [{ include = "example_python", from = "src" }]
+[tool.devops.scripts]
+dev = "python -c 'from src.example_python.scripts import dev; dev()'"
+start = "python -c 'from src.example_python.scripts import start; start()'"
 
-[tool.poetry.scripts]
-dev = "example_python.scripts:dev"
-start = "example_python.scripts:start"
+[tool.uv.sources]
+example-python-lib = { workspace = true }
 
-[tool.poetry.dependencies]
-example-node-lib = { path = "../../libs/example-node-lib", develop = true }
-fastapi = { extras = ["standard"], version = "^0.115.11" }
 
 [tool.devops.deployment]
 template = "external-service"
 service_name = "example-python"
 port = 3002
-
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"

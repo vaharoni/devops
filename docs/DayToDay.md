@@ -10,4 +10,3 @@ Intended topics:
 - How to use the internal cron scheduler
 - How to work with the SDK for service discovery
 - How to work with the SDK for traffic origin validation
-- How to work with python (poetry, the need for `package.json` to play nicely with `devops`)

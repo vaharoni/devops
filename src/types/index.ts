@@ -1,3 +1,4 @@
+import { a } from "vitest/dist/suite-dWqIFb_-.js";
 import { z } from "zod";
 
 export const SUPPORTED_LANGUAGES = ["python", "node"] as const;
@@ -57,6 +58,14 @@ const deploymentSchema = z.object({
       curl: z.array(z.string()).optional(),
     })
   ).optional(),
+  prefectFlows: z.array(
+    z.object({
+      /** The name of the container inside the prefect pod */
+      flow_name: z.string(),
+      /** The path to the file that runs the flow, relative to the project folder. E.g. src/data_pipeline/main.py */
+      script_path: z.string(),
+    })
+  ).optional()
   /** The catchall below allows any other fields that might be in the package.json file */
 }).catchall(z.any());
 export type Deployment = z.infer<typeof deploymentSchema>;

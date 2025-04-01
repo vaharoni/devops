@@ -1,4 +1,23 @@
-To setup the uv project, run the following in the monorepo root folder:
+# Preqreuisites
+
+Install uv by following [the docs](https://docs.astral.sh/uv/getting-started/installation/), e.g:
+```shell
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Install GNU parallel by running `brew install parallel` and running the following to suppress the citation output:
+```shell
+mkdir ~/.parallel
+touch ~/.parallel/will-cite
+```
+
+# Image configuration
+
+The `./devops/config/images.yaml` defines a list of docker images that are built as part of the deployment process. Each image entry has a `language` key. Set it to `python` for python images in order for the `./devops prep-build` command to look at the python dependency graph as it considers which libraries it needs to copy over.
+
+# Project configuration
+
+The monorepo uses uv as the python tool of choice for managing dependencies. It has features similar to bun, such as support for workspaces and scripts. After installing the tool, run the following in the monorepo root folder to setup the uv project:
 ```shell
 uv init
 ```
@@ -40,83 +59,39 @@ start = "python -c 'from src.example_python.scripts import start; start()'"
 ```
 
 This custom solution is preferred since the two alternative solutions are lacking. Putting them under `project.scripts` per the `pyproject.toml` [specs](https://packaging.python.org/en/latest/overview/) requires their project to have a build system and their name to be globally unique. On the other hand, using the uv-special script support described [here](https://docs.astral.sh/uv/guides/scripts/) does not allow them to be recognized by name to be triggered by `./devopspy run` and `./devopspy run-many`. 
-You can then invoke it by running `uv run scripts.py dev`
 
+# Usage
 
-
-
-The uv tool has a workspace approach that is similar to npm workspaces. The main `pyproject.toml` has a `tool.uv.workspace.members` key that defines the paths to all workspaces. These paths can use glob patterns. However, all folders expressed by these patterns must contain `pyproject.toml` file otherwise uv refuses to run. Since many applications and libs in the monorepo can be written in typescript, this approach doesn't work. Therefore, workspaces should be added to the `members` key using their explicit folder. This doesn't need to be done manually. After Simply run, for example, `uv init some-app-name` inside `applications` and if the root folder has a `pypr
-
-maually by using However, an interesting quirk is that if a folder 
-
-
-# Preqreuisites
-
-Install Poetry by following [the docs](https://python-poetry.org/docs/#installing-with-the-official-installer), e.g.:
+To install all workspace dependencies:
 ```shell
-curl -sSL https://install.python-poetry.org | python3 -
+uv sync --all-packages --all-extras
 ```
+The `--all-packages` flag installs the dependencies of all workspace members. The `--all-extras` flag installs the dependencies that come with packages with extras, such as "standard" in `fastapi[standard]`.
 
-Install GNU parallel by running `brew install parallel` and running the following to suppress the citation output:
-```shell
-mkdir ~/.parallel
-touch ~/.parallel/will-cite
-```
+The `./devops` tool must be aware of all python projects and their dependency graph in order to be able to perform build-related tasks such as `prep-build`. However, it is not able to run python scripts declared in `pyproject.toml` files. The `./devopspy` tool is designed for this purpose. It supports a small subset of the commands of the `./devops` tool - most importantly `exec`, `run`, and `run-many`. Run `./devopspy -h` to see all available options. Not that the tool is a bit more sensitive to flag location compared to the `./devops` tool. 
 
-Make sure your gitignore contains the following:
-```text
-```
+In python-based docker images, only `./devopspy` is available.
 
-When running `poetry new` or `poetry init`, a `pyproject.toml` file is create that looks like this:
+# Example pyproject.toml file
 
 ```toml
 [project]
-name = "proj-name"
+name = "my-project"
 version = "0.1.0"
 description = ""
-authors = [{name = "<name>",email = "<email>"}]
-readme = "README.md"
+authors = []
 requires-python = ">=3.12"
-dependencies = []
+dependencies = ["example-python-lib", "fastapi[standard]"]
 
-[tool.poetry]
-packages = [{include = "proj_name", from = "src"}]
+[tool.devops.scripts]
+dev = "python -c 'from src.example_python.scripts import dev; dev()'"
+start = "python -c 'from src.example_python.scripts import start; start()'"
 
-
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
-```
-
-
-```toml
-[tool.poetry.dependencies]
-pyappsupport = { path = "../../.devops/pyappsupport", develop = true }
-```
-
-
-```toml
-[tool.poetry.dependencies]
-kuku = { path = "libs/greeter-test", develop = true }
-
-[tool.poetry.scripts]
-foo = "devops_test.exec:foo"
-goo = "devops_test.exec:goo"
+[tool.uv.sources]
+example-python-lib = { workspace = true }
 
 [tool.devops.deployment]
-template = "test-template"
-app_name = "test-app"
-service_name = "test-service"
-port = 3001
-subdomain = "subdomain"
-
-[[tool.devops.deployment.cronJobs]]
-name = "test-cron-job-1"
-cron = "*/1 * * * *"
-curl = ["-X", "POST", "http://localhost:3001/test-cron-job-1"]
-
-[[tool.devops.deployment.cronJobs]]
-name = "test-cron-job-2"
-cron = "*/2 * * * *"
-curl = ["-X", "POST", "http://localhost:3001/test-cron-job-2"]
+template = "external-service"
+service_name = "example-python"
+port = 3002
 ```

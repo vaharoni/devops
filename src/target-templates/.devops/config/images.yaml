@@ -28,11 +28,11 @@ node-services:
   debug-template: debug-console
   can-db-migrate: true
   image-extra-content:
-    - .npmrc
-    - package.json
-    - bun.lock
-    - tsconfig.json
     - devops
+    - package.json
+    - bun.lockb
+    - tsconfig.json
+    - .npmrc
   applications:
   - example-node
   - jobs
@@ -47,3 +47,4 @@ python-services:
     - uv.lock
   applications:
   - example-python
+  - example-data-pipeline
