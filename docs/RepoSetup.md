@@ -1,4 +1,4 @@
-Note: a global install such as `bun install -g @vaharoni/devops` would have been nice, as it would have allowed to just run `devops`. Unfortunately, it doesn't work with private packages without some hacks. So whenever encountering `devops`, prefix the command with `bunx`.
+Note: a global install such as `bun install -g @vaharoni/devops` would have been nice, as it would have allowed to just run `devops`. Unfortunately, it doesn't work with private packages without some hacks. So instead of `devops`, a small wrapper script is available as `./devops` which essentially prefixes the command with `bunx`.
 
 # Prerequisites
 
@@ -77,7 +77,7 @@ First, set up you `kubeconfig` per the instructions of scenario 1.
 Install the CLI and run the `init` command. Make sure to follow the instructions that it outputs:
 ```shell
 bun install @vaharoni/devops
-bunx devops init
+./devops init
 ```
 
 Then install the dependencies:
@@ -85,7 +85,7 @@ Then install the dependencies:
 bun install
 ```
 
-If you aren't creating your own kubernetes cluster, postgres cluster, or redis cluster you can safely delete the folders `infra`, `postgres`, and `redis` under `.devops`.
+If you aren't creating your own kubernetes cluster, postgres cluster, redis cluster, prefect server, or milvus cluster you can safely delete the folders `infra`, `postgres`, `redis`, `prefect`, and `milvus` under `.devops`.
 
 Install the SDK into the root package of your repo by adding the same package to the project (in the future these may be separated to different packages):
 
@@ -97,21 +97,21 @@ To avoid versioning issues, you should not add the `@vaharoni/devops` package in
 
 ## Step 2: Create your repo-specific namespaces
 
-Updade the file `.devops/config/constants.yaml` that was created after running `devops init`.
+Updade the file `.devops/config/constants.yaml` that was created after running `./devops init`.
 
 Then create your staging and production namespaces:
 ```shell
-bunx devops k8s create env-setup --env staging
-bunx devops k8s create env-setup --env production
+./devops k8s create env-setup --env staging
+./devops k8s create env-setup --env production
 ```
 
 ## Step 3: Creating or connecting to the Postgres cluster
 
-By default, `devops init` creates a `db` project with a basic prisma configuration. In this bare minimum state, it will prevent deployments from completing successfully for two reasons:
-- it requires the `DATABASE_URL` env variable to exist. If you're reusing the existing Postgres cluster, you'll want to have the administrator create a database schema for you. You can then run something like `devops env set DATABASE_URL=<url> --env staging` to set up this env variable. If you're creating an entirely new database cluster, you will want to follow the [Postgres setup guide](./infra/Postgres.md), skipping the "Install the operator" step.
+By default, `./devops init` creates a `db` project with a basic prisma configuration. In this bare minimum state, it will prevent deployments from completing successfully for two reasons:
+- it requires the `DATABASE_URL` env variable to exist. If you're reusing the existing Postgres cluster, you'll want to have the administrator create a database schema for you. You can then run something like `./devops env set DATABASE_URL=<url> --env staging` to set up this env variable. If you're creating an entirely new database cluster, you will want to follow the [Postgres setup guide](./infra/Postgres.md), skipping the "Install the operator" step.
 - the prisma schema needs to contain some content in order for the `prisma generate` command to work without failing. You'll need to set up your first application table before proceeding.
 
-If you don't need a relational database for now, simply delete the folders `db` and `dml` (the latter depends on the former). You can always recover them back by running `devops init` again (it does not override any changes you make otherwise).
+If you don't need a relational database for now, simply delete the folders `db` and `dml` (the latter depends on the former). You can always recover them back by running `./devops init` again (it does not override any changes you make otherwise).
 
 ## Step 4: Uploading github secrets
 
