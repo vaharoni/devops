@@ -1,0 +1,54 @@
+# New service account for managing deployments in stackgres namespace
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: stackgres-deployment-manager
+  namespace: stackgres
+---
+# Role with permissions to restart deployments
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: deployment-manager
+  namespace: stackgres
+rules:
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch", "patch"]
+---
+# Bind the role to the service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: stackgres-deployment-manager-binding
+  namespace: stackgres
+subjects:
+- kind: ServiceAccount
+  name: stackgres-deployment-manager
+  namespace: stackgres
+roleRef:
+  kind: Role
+  name: deployment-manager
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: stackgres-operator-restart-all-deployments
+  namespace: stackgres
+spec:
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: stackgres-deployment-manager
+          containers:
+          - name: kubectl
+            image: bitnami/kubectl:latest
+            command:
+            - /bin/sh
+            - -c
+            # Restarts all deployments in the stackgres namespace, which include stackgres-collector, stackgres-operator, and stackgres-restapi
+            - kubectl rollout restart deployment -n stackgres
+          restartPolicy: OnFailure

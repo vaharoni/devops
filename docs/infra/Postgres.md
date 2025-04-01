@@ -114,3 +114,11 @@ Then set up the env variable accordingly (in this example for a database called 
 ```shell
 devops env set DATABASE_URL=postgresql://postgres:<password>@db-staging.db-staging:5432/glitchy --env staging
 ```
+
+## Step 5: Restart the stackgres operator daily
+
+When installing the operator, two deployments - `stackgres-collector` and `stackgres-operator` - were installed that seem to be leaking memory as aparent after a few days when running `top pods -A`. To install a cron job that periodically restart them, run the following:
+
+```shell
+kubectl apply -f .devops/postgres/DailyOperatorRestart.yaml
+```
