@@ -30,7 +30,7 @@ node-services:
   image-extra-content:
     - devops
     - package.json
-    - bun.lockb
+    - bun.lock
     - tsconfig.json
     - .npmrc
   applications:
