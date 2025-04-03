@@ -3,7 +3,7 @@ import type { PackageData, SupportedLanguages } from "../../types";
 import fs from "fs";
 import path from "path"
 
-const IGNORED_PATHS = ["node_modules/", "venv/"];
+export const IGNORED_PATHS = ["node_modules/", "venv/"];
 
 type PackageDataProcessorConfig<T> = {
   language: SupportedLanguages;

@@ -10,6 +10,7 @@ import {
   dotEnvFilesForEnv,
   printUsageAndExit,
 } from "./common";
+import { IGNORED_PATHS } from "../libs/discovery/process-common";
 
 const oneLiner = "Commands to manipulate env variables";
 const keyExamples = `
@@ -39,11 +40,14 @@ function run(cmdObj: CLICommandParser) {
   switch (command) {
     case "validate": {
       const envYamlFiles = globSync("**/env.yaml");
+      const filteredEnvYamlFiles = envYamlFiles.filter(path => 
+        !IGNORED_PATHS.some((ignoredPath) => path.includes(ignoredPath))
+      )
 
       // We have to have a _validate so that we go through a CommandExecutor which injects env variables into the process
       cmdObj
         .executorFromEnv(
-          `devops env _validate ${envYamlFiles.join(" ")}`,
+          `devops env _validate ${filteredEnvYamlFiles.join(" ")}`,
           { quiet: false }
         )
         .exec();
