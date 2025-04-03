@@ -1,5 +1,6 @@
 import fs from 'fs';
 import yaml from 'yaml';
+import { IGNORED_PATHS } from './discovery/process-common';
 
 type EnvRequirement = 'optional' | 'boolean' | 'required' | string[];
 type ParsedEnvYaml = Record<string, EnvRequirement>;
@@ -20,7 +21,9 @@ export class CombinedEnvValidator {
   warnings: string[] = [];
 
   constructor(envYamlPaths: string[], dotEnvPaths: string[] = []) {
-    this.envYamlPaths = envYamlPaths;
+    this.envYamlPaths = envYamlPaths.filter(path => 
+      !IGNORED_PATHS.some((ignoredPath) => path.includes(ignoredPath))
+    )
     this.dotEnvPaths = dotEnvPaths;
   }
 
