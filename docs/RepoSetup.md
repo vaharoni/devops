@@ -77,7 +77,7 @@ First, set up you `kubeconfig` per the instructions of scenario 1.
 Install the CLI and run the `init` command. Make sure to follow the instructions that it outputs:
 ```shell
 bun install @vaharoni/devops
-./devops init
+bunx devops init
 ```
 
 Then install the dependencies:
