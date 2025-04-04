@@ -35,12 +35,12 @@ export function upsertConfigMapCommand(monorepoEnv: string, configMapName: strin
 
 export function patchSecretKeyCommand(monorepoEnv: string, secretName: string, secretKey: string, secretValue: string) {
   const redactedCommand = kubectlCommand(
-    `patch secret ${secretName} -p='{"stringData": {"${secretKey}": "**REDACTED**"}}'`,
+    `patch secret ${secretName} -p='{"stringData": {"${secretKey}": **REDACTED**}}'`,
     { monorepoEnv }
   );
   const fullCommand = redactedCommand.replace(
     "**REDACTED**",
-    secretValue
+    JSON.stringify(secretValue)
   );
   return { fullCommand, redactedCommand };
 }

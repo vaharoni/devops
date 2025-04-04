@@ -12,7 +12,7 @@ function execUpdateSecret(
   monorepoEnv: string,
   secretValue: Record<string, string>
 ) {
-  const { fullCommand, redactedCommand } = patchSecretKeyCommand(monorepoEnv, secretName(), SECRET_FILE_NAME, JSON.stringify(JSON.stringify(secretValue)));
+  const { fullCommand, redactedCommand } = patchSecretKeyCommand(monorepoEnv, secretName(), SECRET_FILE_NAME, JSON.stringify(secretValue));
   new CommandExecutor(fullCommand, { quiet: true, redactedCommand }).exec();
 }
 
