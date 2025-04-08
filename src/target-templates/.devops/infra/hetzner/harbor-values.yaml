@@ -23,3 +23,9 @@ persistence:
       storageClass: "hcloud-volumes"
       accessMode: ReadWriteOnce
       size: 5Gi
+database:
+  internal:
+    livenessProbe:
+      timeoutSeconds: 5
+    readinessProbe:
+      timeoutSeconds: 5
