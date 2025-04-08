@@ -11,4 +11,4 @@ template = "prefect"
 
 [[tool.devops.deployment.prefectFlows]]
 flow_name = "test-flow"
-script_path = "src/example_data_pipeline/main.py"
+script_path = "src.example_data_pipeline.main"

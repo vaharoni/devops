@@ -8,3 +8,7 @@ dependencies = ["prisma (>=0.15.0,<0.16.0)"]
 
 [tool.devops.scripts]
 generate = "prisma generate --generator python-client"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

@@ -51,6 +51,17 @@ dependencies = ["lib1"]
 lib1 = { workspace = true }
 ```
 
+In order for the lib to be accessible by apps, a build-system must be declared in the `pyproject.toml` file of the lib. This is unnecssary for applications, as no other project depends on them. But for libs it is required:
+```toml
+# libs/lib1/pyproject.toml
+
+# ...
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+```
+
 To add scripts in a workspace that can be run using `./devopspy run` and `./devopspy run-many`, add them to `pyproject.toml` like so (the scripts can be any valid shell command):
 ```toml
 [tool.devops.scripts]

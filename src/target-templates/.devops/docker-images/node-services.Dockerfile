@@ -7,6 +7,10 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
+ARG MONOREPO_ENV
+ENV MONOREPO_ENV=${MONOREPO_ENV}
+RUN echo "Building for environment: $MONOREPO_ENV"
+
 RUN npm install -g bun
 
 # This assumes devops prep-build was called by the host, which creates the config/ folder with necessary env variables

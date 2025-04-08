@@ -33,6 +33,7 @@ spec:
             - --in
             - {{../app_name}}
             - python
+            - -m
             - {{script_path}}
           env:
             - name: PREFECT_API_URL

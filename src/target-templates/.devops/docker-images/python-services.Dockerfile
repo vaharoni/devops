@@ -5,6 +5,10 @@ ENV PATH="/root/.local/bin:$PATH"
 
 WORKDIR /app
 
+ARG MONOREPO_ENV
+ENV MONOREPO_ENV=${MONOREPO_ENV}
+RUN echo "Building for environment: $MONOREPO_ENV"
+
 # Install dependencies
 RUN apt-get update && apt-get install -y jq libpq-dev curl git parallel --fix-missing
 

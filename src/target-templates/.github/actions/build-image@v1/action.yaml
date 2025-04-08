@@ -46,6 +46,7 @@ runs:
         echo "ECR_URL=$(devops registry repo-url ${{ env.IMAGE_NAME }} ${{ github.sha }})" >> $GITHUB_ENV
         folder=$(devops prep-build ${{ env.IMAGE_NAME }})
         mv $folder /home/runner/build
+        echo MONOREPO_ENV=${{ env.MONOREPO_ENV }}
 
     - name: Setup cache
       if: steps.check_affected.outputs.affected == 'true'
@@ -76,6 +77,8 @@ runs:
         cache-to: type=gha,mode=max
         secrets: |
           GH_PAT_TOKEN=${{ inputs.gh_pat_token }}
+        build-args: |
+          MONOREPO_ENV=${{ env.MONOREPO_ENV }}
 
     - name: Prune registry
       if: steps.check_affected.outputs.affected == 'true'
