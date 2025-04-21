@@ -1,4 +1,4 @@
-This was not pursued yet as it reuquires a lot of resources from the cluster. 
+This was not pursued yet as it requires a lot of resources from the cluster. 
 Will be revisited when there is a need.
 
 # Milvus

@@ -20,7 +20,7 @@ Locally, generate SSH keys:
 ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_hcloud
 ```
 
-Edit the `.devops/infra/hetzner/hcloud-config.yaml` file that was generated after running `devops init` to suit your needs. The file was created by combining [these instructions][3] and this [tutorial][4].
+Edit the `.devops/infra/hetzner/hcloud-config.yaml` file that was generated after running `bunx devops init` to suit your needs. The file was created by combining [these instructions][3] and this [tutorial][4].
 
 For the `k3s_version` field, check the current avaiable k3s releases by running:
 
@@ -172,7 +172,7 @@ docker push "$REGISTRY_DOMAIN/$HARBOR_PROJECT/nginx:alpine"
 
 ## Step 6: Set up container registry secret
 
-We need to give access to all pods to pull from our registry controller. Ideally, we would apply these to in some cluster-wide fashion. Unfortunately, this can be done either at the pod level, or at a service account level which is namespace-specific. To work around this, we set a docker-registry secret (a kind of secret) in the `harbor` namespace. When you use the `devops k8s create env-setup` command, this secret is copied to the created namespace and the default service account is patched to use it.
+We need to give access to all pods to pull from our registry controller. Ideally, we would apply these to in some cluster-wide fashion. Unfortunately, this can be done either at the pod level, or at a service account level which is namespace-specific. To work around this, we set a docker-registry secret (a kind of secret) in the `harbor` namespace. When you use the `./devops namespace create` command, this secret is copied to the created namespace and the default service account is patched to use it.
 
 ```shell
 # Important: notice the single quotes around username. Robot accounts on Harbor have a $ in their name,

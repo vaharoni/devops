@@ -1,4 +1,4 @@
-# Preqreuisites
+# Prerequisites
 
 Install uv by following [the docs](https://docs.astral.sh/uv/getting-started/installation/), e.g:
 ```shell
@@ -17,7 +17,7 @@ The `./devops/config/images.yaml` defines a list of docker images that are built
 
 # Project configuration
 
-The monorepo uses uv as the python tool of choice for managing dependencies. It has features similar to bun, such as support for workspaces and scripts. After installing the tool, run the following in the monorepo root folder to setup the uv project:
+The monorepo uses `uv` as the python tool of choice for managing dependencies. It has features similar to `bun`, such as support for workspaces and scripts. After installing the tool, run the following in the monorepo root folder to setup the `uv` project:
 ```shell
 uv init
 ```

@@ -49,7 +49,7 @@ GENERAL USAGE
     Which commits are regarded for the affected calculation can be changed using:
     --base               Base of the current branch (HEAD^ by default)
     --head               Latest commit of the current branch (HEAD by default)
-    --from-live-version  Use the live version of the image/workspace as the base (see devops k8s get version)
+    --from-live-version  Use the live version of the image/workspace as the base (see devops image version get)
 
     If --from-live-version is present, --base and --head are ignored.
 

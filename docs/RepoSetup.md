@@ -1,4 +1,4 @@
-Note: a global install such as `bun install -g @vaharoni/devops` would have been nice, as it would have allowed to just run `devops`. Unfortunately, it doesn't work with private packages without some hacks. So instead of `devops`, a small wrapper script is available as `./devops` which essentially prefixes the command with `bunx`.
+Note: a global install such as `bun install -g @vaharoni/devops` would have been nice, as it would have allowed to simply run `devops` as a global command. Unfortunately, it doesn't work with private packages without some hacks. So instead of `devops`, a small wrapper script is available as `./devops` which essentially prefixes the command with `bunx`.
 
 # Prerequisites
 
@@ -66,7 +66,7 @@ direnv allow
 
 Place the `kubeconfig` file you receive from the administrator under `config/kubeconfig`. This path is set by `.envrc` to automatically use the right cluster whenever you cd into the project directory.
 
-That's it. You can now use all the power of the `devops` CLI.
+That's it. You can now use all the power of the `./devops` CLI.
 
 # Scenario 2: Creating a new repository that joins an existing cluster
 
@@ -97,21 +97,21 @@ To avoid versioning issues, you should not add the `@vaharoni/devops` package in
 
 ## Step 2: Create your repo-specific namespaces
 
-Updade the file `.devops/config/constants.yaml` that was created after running `./devops init`.
+Updade the file `.devops/config/constants.yaml` that was created after running `bunx devops init`.
 
 Then create your staging and production namespaces:
 ```shell
-./devops k8s create env-setup --env staging
-./devops k8s create env-setup --env production
+./devops namespace create --env staging
+./devops namespace create --env production
 ```
 
 ## Step 3: Creating or connecting to the Postgres cluster
 
-By default, `./devops init` creates a `db` project with a basic prisma configuration. In this bare minimum state, it will prevent deployments from completing successfully for two reasons:
+By default, `bunx devops init` creates a `db` project with a basic prisma configuration. In this bare minimum state, it will prevent deployments from completing successfully for two reasons:
 - it requires the `DATABASE_URL` env variable to exist. If you're reusing the existing Postgres cluster, you'll want to have the administrator create a database schema for you. You can then run something like `./devops env set DATABASE_URL=<url> --env staging` to set up this env variable. If you're creating an entirely new database cluster, you will want to follow the [Postgres setup guide](./infra/Postgres.md), skipping the "Install the operator" step.
 - the prisma schema needs to contain some content in order for the `prisma generate` command to work without failing. You'll need to set up your first application table before proceeding.
 
-If you don't need a relational database for now, simply delete the folders `db` and `dml` (the latter depends on the former). You can always recover them back by running `./devops init` again (it does not override any changes you make otherwise).
+If you don't need a relational database for now, simply delete the folders `db` and `dml` (the latter depends on the former). You can always recover them back by running `bunx devops init` again (it does not override changes you make).
 
 ## Step 4: Uploading github secrets
 

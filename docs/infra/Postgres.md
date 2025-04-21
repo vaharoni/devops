@@ -37,7 +37,7 @@ kubectl get secret -n stackgres stackgres-restapi-admin --template '{{ printf "u
 kubectl get secret -n stackgres stackgres-restapi-admin --template '{{ printf "password = %s\n" (.data.clearPassword | base64decode) }}'
 ```
 
-Stackgres recommends to keep the auto-generated password somewhere safe and then remove it from the secret by running the following. Note that then you won't be able to get the password by running `devops db password ui`:
+Stackgres recommends to keep the auto-generated password somewhere safe and then remove it from the secret by running the following. Note that then you won't be able to get the password by running `./devops db password ui`:
 
 ```shell
 kubectl patch secret -n stackgres stackgres-restapi-admin --type json -p '[{"op":"remove","path":"/data/clearPassword"}]'
@@ -107,17 +107,17 @@ Here is a simple example on how to do this for the staging database.
 
 First, figure out the super user password:
 ```shell
-devops db password db-staging
+./devops db password db-staging
 ```
 
 Then set up the env variable accordingly (in this example for a database called `glitchy`):
 ```shell
-devops env set DATABASE_URL=postgresql://postgres:<password>@db-staging.db-staging:5432/glitchy --env staging
+./devops env set DATABASE_URL=postgresql://postgres:<password>@db-staging.db-staging:5432/glitchy --env staging
 ```
 
 ## Step 5: Restart the stackgres operator daily
 
-When installing the operator, two deployments - `stackgres-collector` and `stackgres-operator` - were installed that seem to be leaking memory as aparent after a few days when running `top pods -A`. To install a cron job that periodically restart them, run the following:
+When installing the operator, two deployments - `stackgres-collector` and `stackgres-operator` - were installed that seem to be leaking memory as aparent after a few days when running `top pods -A`. To install a cron job that periodically restarts them, run the following:
 
 ```shell
 kubectl apply -f .devops/postgres/DailyOperatorRestart.yaml

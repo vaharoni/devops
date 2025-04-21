@@ -30,7 +30,7 @@ Then, go to SSL/TLS > Overview > Configure, and pick "Full". Do this for both st
 
 # Turning on Zero Trust on Cloudflare
 
-Zero Trust is free for up to 50 users. It can be configured to protect any subdomain that is behind the Cloudflare proxy, allowing access only to defined users, user email addresses, or token bearers (for API calls). We will use it to protect the staging domain, with the exception of the Harbor registry subdomain (if installed on Hetzner) as docker does not allow sending headers as part of push/pull requests. That exception does not need to be configured in Zero Trust per se, as the DNS records is not proxied per the Harbor setup instructions.
+Zero Trust is free for up to 50 users. It can be configured to protect any subdomain that is behind the Cloudflare proxy, allowing access only to defined users, user email addresses, or token bearers (for API calls). We will use it to protect the staging domain, with the exception of the Harbor registry subdomain (if installed on Hetzner) as docker does not allow sending headers as part of push/pull requests. That exception does not need to be configured in Zero Trust per se, as the DNS record is not proxied per the Harbor setup instructions.
 
 On Cloudflare, go to the account home (outside of any specific domain), and from there pick Zero Trust.
 
