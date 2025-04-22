@@ -16,9 +16,18 @@ Each application is backed by a single Docker image, and each Docker image could
 
 It is advised to name all libs with `@local/` prefix while keeping applications without that prefix to distinguish their pecking order, but this is not a requirement.
 
-Speaking of npm workspaces, the root `package.json` contains a list of all locations where `package.json` files are expected to reside. It contains:
+Speaking of npm workspaces, the root `package.json` should contain a list of all locations where `package.json` files are expected to reside., e.g.:
 
-- `.devops` - contains some configuration that was generated when running `bunx devops init` and then modified to adapt to the specific needs of the repo
+```json
+"workspaces": [
+  "applications/**",
+  "libs/**",
+  "db/**",
+  "dml/**"
+],
+```
+
+In the example above:
 - `applications` - each application is expected to run on the cluster in some fashion
 - `libs` - all libs to allow code reuse across applications
 - `db` - this is a special project. During deployment, all applications that depend on it will trigger the execution of a github action that runs the `migrate-deploy` script in the `db` project exactly once if its code changed since the last deployment.

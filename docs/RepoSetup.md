@@ -64,34 +64,29 @@ direnv allow
 
 # Scenario 1: Cloning an existing repository that already works with an existing cluster
 
-Place the `kubeconfig` file you receive from the administrator under `config/kubeconfig`. This path is set by `.envrc` to automatically use the right cluster whenever you cd into the project directory.
+Place the `kubeconfig` file you receive from the administrator under the `config` folder. This path is set by `.envrc` to automatically use the right cluster whenever you cd into the project directory.
 
 That's it. You can now use all the power of the `./devops` CLI.
 
 # Scenario 2: Creating a new repository that joins an existing cluster
 
-First, set up you `kubeconfig` per the instructions of scenario 1.
+First, obtain a `kubeconfig` from the administrator and place it under the `config` folder.
 
-## Step 1: Install the SDK and generate code
+## Step 1: Create a new repo and set up the devops tool
 
-Install the CLI and run the `init` command. Make sure to follow the instructions that it outputs:
+Initialize an empty bun project with `bun init`. Add the `devops` dependency and run `init`:
 ```shell
-bun install @vaharoni/devops
+bun add @vaharoni/devops
 bunx devops init
 ```
+Make sure to follow the instructions that the `devops init` command outputs.
 
-Then install the dependencies:
+Then, install dependencies:
 ```shell
 bun install
 ```
 
 If you aren't creating your own kubernetes cluster, postgres cluster, redis cluster, prefect server, or milvus cluster you can safely delete the folders `infra`, `postgres`, `redis`, `prefect`, and `milvus` under `.devops`.
-
-Install the SDK into the root package of your repo by adding the same package to the project (in the future these may be separated to different packages):
-
-```shell
-bun add @vaharoni/devops
-```
 
 To avoid versioning issues, you should not add the `@vaharoni/devops` package in the `package.json` of libs or apps inside the monorepo. They will be able to import it thanks to the repo-wide installation.
 
@@ -144,4 +139,6 @@ gh secret set DIGITALOCEAN_CLUSTER_NAME --body <cluster-name>
 
 # Scenario 3: Creating a new cluster
 
-Follow the guide [How to setup a Kubernetes cluster infrastructure](./infra/README.md).
+First, follow step 1 of scenario 2 above.
+Then, follow the guide [How to setup a Kubernetes cluster infrastructure](./infra/README.md) to create a cluster and obtain a `kubeconfig` file. 
+Place the file under the `config` folder, and follow steps 2 and 3 of scenario 2.
