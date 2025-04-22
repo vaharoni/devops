@@ -17,13 +17,9 @@ The `./devops/config/images.yaml` defines a list of docker images that are built
 
 # Project configuration
 
-The monorepo uses `uv` as the python tool of choice for managing dependencies. It has features similar to `bun`, such as support for workspaces and scripts. After installing the tool, run the following in the monorepo root folder to setup the `uv` project:
-```shell
-uv init
-```
-This creates a `pyproject.toml` file in the root folder.
+The monorepo uses `uv` as the python tool of choice for managing dependencies. It has features similar to `bun`, such as support for workspaces and scripts. After running `bunx devops init`, a `pyproject.toml` file was created under the root folder that declares a dependency on `devops-python` using a `tool.uv` directive. It also utilizes uv's workspace support and points to example workspaces that were created when running `bunx devops init`.
 
-To utilize uv's workspace support and add a workspace, run something like the following:
+To add a new workspace using `uv`, run something like the following:
 ```shell
 uv init applications/app1
 uv init libs/lib1
@@ -79,7 +75,7 @@ uv sync --all-packages --all-extras
 ```
 The `--all-packages` flag installs the dependencies of all workspace members. The `--all-extras` flag installs the dependencies that come with packages with extras, such as "standard" in `fastapi[standard]`.
 
-The `./devops` tool must be aware of all python projects and their dependency graph in order to be able to perform build-related tasks such as `prep-build`. However, it is not able to run python scripts declared in `pyproject.toml` files. The `./devopspy` tool is designed for this purpose. It supports a small subset of the commands of the `./devops` tool - most importantly `exec`, `run`, and `run-many`. Run `./devopspy -h` to see all available options. Not that the tool is a bit more sensitive to flag location compared to the `./devops` tool. 
+The `./devops` tool must be aware of all python projects and their dependency graph in order to be able to perform build-related tasks such as `prep-build`. However, it is unable to run python scripts declared in `pyproject.toml` files. The `./devopspy` tool is designed for this purpose. It supports a small subset of the commands of the `./devops` tool - most importantly `exec`, `run`, and `run-many`. Run `./devopspy -h` to see all available options. Not that the tool is a bit more sensitive to flag location compared to the `./devops` tool. 
 
 In python-based docker images, only `./devopspy` is available.
 
