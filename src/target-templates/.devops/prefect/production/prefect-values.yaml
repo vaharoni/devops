@@ -1,10 +1,10 @@
 ingress:
   enabled: true
   host:
-    hostname: "prefect-production.vaharoni.com"
+    hostname: "prefect-production.staging.com"
 server:
   uiConfig:
-    prefectUiApiUrl: "https://prefect-production.vaharoni.com/api"
+    prefectUiApiUrl: "https://prefect-production.staging.com/api"
 
 # We use the environment's stackgres postgres instance
 postgresql:

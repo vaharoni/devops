@@ -2,8 +2,8 @@
 project-name: glitchy
 
 domains:
-  production: chatparty.io
-  staging: vaharoni.com
+  production: production.com
+  staging: staging.com
 
 # Supported: hetzner or digitalocean
 infra: hetzner
@@ -11,7 +11,7 @@ infra: hetzner
 # Only relevant for Digital Ocean. Determines the number of versions to keep for each docker image.
 image-versions-to-keep: 5
 
-registry-base-url: registry.vaharoni.com
+registry-base-url: registry.staging.com
 registry-name: glitchy
 
 # production and staging are supported by default
