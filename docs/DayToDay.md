@@ -87,7 +87,7 @@ The `template` entry under the `deployment` determines which kubernetes manifest
 ./devops template gen deployment my-app
 ```
 
-You can override any of the manifests generated for a specific workspace by creating a `manifests` folder under its root. All files present under `manifests` are deep-merged with the manifests generated based on the template. The `./devops template gen deployment` command shows the resulting generation including the overrides under `manifests`.
+You can override any of the manifests generated for a specific workspace by creating a `manifests` folder under its root. All files present under `manifests` are deep-merged with the manifests generated based on the template. The deep merge occurs based on the manifest's `Kind` and `metadata.name` fields. The `./devops template gen deployment` command shows the resulting generation including the overrides under `manifests`.
 
 In order for the app to be deployed in an image, you must declare the app under the `applications` entry of one of the images in `.devops/config/images.yaml`. For example:
 ```yaml
