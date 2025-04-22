@@ -4,7 +4,7 @@
 
 All `./devops` commands work under a certain `MONOREPO_ENV`. This is typically set by running `--env`, but if the `MONOREPO_ENV` variable is present it takes precedence. Most commands affect some remote state, and thus can only work with `staging` and `production` environments. Some local commands can also work with `development` and `test` environments.
 
-To declare env variables locally, use the `config` folder. This folder can contain the following files:
+To declare env variables locally, use the `config` folder. This folder can contain the following `.env` files:
 - `.env.global` - environment variables that are applied regardless of the environment
 - `.env.<env>` - environment variables that are applied depending on which environment the command is executed under (e.g. `.env.development` and `.env.test`).
 
@@ -24,8 +24,9 @@ If you change a remote environment variable, you must restart the pods that rely
 ```shell
 kubectl get ns
 # Assuming the above found project-staging is the staging namespace
-##### TODO TODO TODO TODO TODO TODOTODO TODO TODO
-##### Show how to roll a deployment, since deleting a pod requires deleting each replica
+kubectl get deploy -n project-staging
+# Assuming the above found my-deployment deployment in the staging namespace
+kubectl rollout restart deploy my-deployment -n project-staging
 ```
 
 In order to find missing environment variables as soon as possible, each app or lib should declare its environment variable dependencies in a file called `env.yaml`. This file should be placed in the root of that app or lib, i.e. where the package file resides. All `./devops` commands inject the environment variables based on the `MONOREPO_ENV`, and then validate them based on all `env.yaml` files present.
