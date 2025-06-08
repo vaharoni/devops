@@ -15,6 +15,12 @@ helm install redis-staging oci://registry-1.docker.io/bitnamicharts/redis --name
 helm install redis-production oci://registry-1.docker.io/bitnamicharts/redis --namespace redis-production --create-namespace -f .devops/redis/production/redis-values.yaml
 ```
 
+To find out the redis password, use:
+```shell
+./devops redis password redis-staging
+./devops redis password redis-production
+```
+
 To access staging from within the cluster, use the following DNS:
 ```shell
 redis-staging-master.redis-staging.svc.cluster.local
