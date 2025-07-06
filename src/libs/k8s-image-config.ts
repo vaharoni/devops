@@ -124,8 +124,8 @@ export function setWorkspaceScale(
   return parsedScale?.[workspaceName] ?? 1;
 }
 
-export function getWorkspaceScale(monorepoEng: string, image: string): Record<string, number>;
-export function getWorkspaceScale(monorepoEng: string, image: string, workspaceName: string): number;
+export function getWorkspaceScale(monorepoEnv: string, image: string): Record<string, number>;
+export function getWorkspaceScale(monorepoEnv: string, image: string, workspaceName: string): number;
 export function getWorkspaceScale(
   monorepoEnv: string,
   image: string,

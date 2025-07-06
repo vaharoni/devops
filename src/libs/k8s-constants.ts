@@ -1,5 +1,6 @@
-import { getConst } from "./config";
+import { getConst, getImageData } from "./config";
 
+export const MISSING_DOMAIN_KEY_ERROR = "$$$MISSING_DOMAIN_KEY$$$"
 const DEFAULT_REMOTE_ENVS = ["staging", "production"];
 const DEFAULT_LOCAL_ENVS = ["development", "test"];
 
@@ -71,12 +72,9 @@ export function containerRegistryRepoPath(
   ].join("/");
 }
 
-export function domainNameForEnv(monorepoEnv: string) {
-  const value = getConst("domains")?.[monorepoEnv];
-  if (!value) {
-    console.error(`No domain found for environment: ${monorepoEnv}`);
-    process.exit(1);
-  }
+export function domainNameForEnv(image: string, monorepoEnv: string) {
+  const imageData = getImageData(image); 
+  const value = imageData["domains"]?.[monorepoEnv] ?? MISSING_DOMAIN_KEY_ERROR;
   return value;
 }
 

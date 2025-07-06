@@ -8,7 +8,7 @@ import { CLICommandParser, printUsageAndExit } from "./common";
 
 const oneLiner = "Get a shell into the debug pod of an image";
 const keyExamples = `
-$ devops console node-services
+$ devops console main-node
 `.trim();
 
 const usage = `

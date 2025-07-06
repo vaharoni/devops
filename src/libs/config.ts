@@ -1,39 +1,15 @@
 import { readFileSync } from "fs";
 import yaml from "yaml";
 import path from "path";
-import { z } from "zod";
-import { SUPPORTED_LANGUAGES } from "../types";
 import { getWorkspace } from "./discovery";
-
-const constFileSchema = z.object({
-  "project-name": z.string(),
-  "domains": z.record(z.string()),
-  "infra": z.enum(["hetzner", "digitalocean"]),
-  "image-versions-to-keep": z.number(),
-  "registry-base-url": z.string(),
-  "registry-name": z.string(),
-  "extra-remote-environments": z.array(z.string()),
-  "extra-local-environments": z.array(z.string()),
-})
-type ConstFileSchema = z.infer<typeof constFileSchema>;
-
-const singleImageSchema = z.object({
-  "language": z.enum(SUPPORTED_LANGUAGES),
-  "debug-template": z.string(),
-  "can-db-migrate": z.boolean().optional(),
-  "image-extra-content": z.array(z.string()).optional(),
-  applications: z.array(z.string()),
-});
-const imageSchema = z.record(singleImageSchema);
-export type SingleImageSchema = z.infer<typeof singleImageSchema>;
-export type ImageSchema = z.infer<typeof imageSchema>;
+import { constFileSchema, imageFileSchema, type ConstFileSchema, type ImageFileSchema, type SingleImageSchema, type SingleTemplateSchema } from "../types";
 
 const constantsFilePath = path.join(process.cwd(), ".devops/config/constants.yaml");
 const imagesFilePath = path.join(process.cwd(), ".devops/config/images.yaml");
 
 // We want these to be lazy loaded so that calling devops in a context that does not need the config files won't fail
 export const { getConst } = processConstFile();
-export const { getImageData, getImageNames } = processImagesFile();
+export const { getImageData, getImageNames, getTemplateData } = processImagesFile();
 
 // Process config/constants.yaml
 
@@ -79,7 +55,7 @@ function processConstFile() {
 // Process config/images.yaml
 
 function processImagesFile() {
-  let images: ImageSchema;
+  let images: ImageFileSchema;
   function imagesFileData() {
     if (images) return images;
     try {
@@ -89,7 +65,7 @@ function processImagesFile() {
       console.error("Error reading .devops/config/images.yaml");
       process.exit(1);
     }
-    const parseRes = imageSchema.safeParse(images);
+    const parseRes = imageFileSchema.safeParse(images);
     if (parseRes.error) {
       console.error(
         `Error parsing config/images.yaml: ${parseRes.error.toString()}`
@@ -100,7 +76,7 @@ function processImagesFile() {
   }
 
   function getImageData(imageName: string): SingleImageSchema {
-    const imageData = imagesFileData()[imageName];
+    const imageData = imagesFileData()['images'][imageName];
     if (!imageData) {
       console.error(
         `Image ${imageName} not found in .devops/config/images.yaml`
@@ -121,9 +97,21 @@ function processImagesFile() {
     return imageData;
   }
 
-  function getImageNames() {
-    return Object.keys(imagesFileData());
+  function getTemplateData(templateName: string): SingleTemplateSchema {
+    const templateData = imagesFileData()['templates'][templateName];
+    if (!templateData) {
+      console.error(
+        `Template ${templateName} not found in .devops/config/images.yaml`
+      );
+      process.exit(1);
+    }
+
+    return templateData;
   }
 
-  return { getImageData, getImageNames };
+  function getImageNames() {
+    return Object.keys(imagesFileData()["images"]);
+  }
+
+  return { getImageData, getImageNames, getTemplateData };
 }

@@ -8,8 +8,8 @@ import { dbMigrateJobName } from "../libs/k8s-constants";
 
 const oneLiner = "Creates a k8s job and waits for it to run";
 const keyExamples = `
-    $ devops job db-migrate gen    node-services <sha> --env staging
-    $ devops job db-migrate create node-services <sha> --env staging --timeout 120
+    $ devops job db-migrate gen    main-node <sha> --env staging
+    $ devops job db-migrate create main-node <sha> --env staging --timeout 120
 `.trim();
 
 const usage = `

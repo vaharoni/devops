@@ -3,6 +3,41 @@ import { z } from "zod";
 export const SUPPORTED_LANGUAGES = ["python", "node"] as const;
 export type SupportedLanguages = typeof SUPPORTED_LANGUAGES[number];
 
+// Config files
+
+export const constFileSchema = z.object({
+  "project-name": z.string(),
+  "infra": z.enum(["hetzner", "digitalocean"]),
+  "image-versions-to-keep": z.number(),
+  "registry-base-url": z.string(),
+  "registry-name": z.string(),
+  "extra-remote-environments": z.array(z.string()),
+  "extra-local-environments": z.array(z.string()),
+})
+export type ConstFileSchema = z.infer<typeof constFileSchema>;
+
+const singleTemplateSchema = z.object({
+  "copy-common": z.boolean().optional(),
+  "extra-content": z.array(z.string()).optional(),
+})
+export type SingleTemplateSchema = z.infer<typeof singleTemplateSchema>;
+
+const singleImageSchema = z.object({
+  "image-template": z.string(),
+  "language": z.enum(SUPPORTED_LANGUAGES),
+  "domains": z.record(z.string()).optional(),
+  "debug-template": z.string(),
+  "can-db-migrate": z.boolean().optional(),
+  applications: z.array(z.string()),
+});
+export type SingleImageSchema = z.infer<typeof singleImageSchema>;
+
+export const imageFileSchema = z.object({
+  templates: z.record(singleTemplateSchema),
+  images: z.record(singleImageSchema),
+})
+export type ImageFileSchema = z.infer<typeof imageFileSchema>;
+
 // # Workspace Discovery
 
 // We need a term to describe the files that contain the project data (e.g. package.json, pyproject.toml).

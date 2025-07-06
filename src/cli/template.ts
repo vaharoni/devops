@@ -4,6 +4,8 @@ import { CLICommandParser, printUsageAndExit, StrongParams } from "../../src/cli
 import { generateDbMigrateJob, generateDebugDeployment, generateWorkspaceDeployment, ImageContextGenerator } from "../libs/k8s-generate";
 import chalk from "chalk";
 import { getWorkspace } from "../libs/discovery";
+import { getWorkspaceImages } from "../libs/discovery/images";
+import { getImageData, getImageNames } from "../libs/config";
 
 const SUPPORTED_CONTEXT_TYPES = ['deployment', 'db-migrate', 'debug'];
 
@@ -13,7 +15,7 @@ const keyExamples = `
     $ devops template context debug
     $ devops template context db-migrate
     $ devops template gen     deployment www
-    $ devops template gen     debug      node-services
+    $ devops template gen     debug      main-node
     $ devops template gen     db-migrate
 `.trim();
 
@@ -52,30 +54,37 @@ const handlers = {
         console.error(`No deployment found for workspace ${workspace}`);
         process.exit(1);
       }
+      const randomImage = getWorkspaceImages(workspace)[0];
       console.warn(chalk.green("\nThis is a sample context object used to render a manifest template of type deployment:\n"))
       console.log(
         JSON.stringify(
-          new ImageContextGenerator(opts.required('env'), 'dummy-image', 'dummy-sha').getDeployment(packageDataWithDeployment),
+          new ImageContextGenerator(opts.required('env'), randomImage, 'dummy-sha').getDeployment(packageDataWithDeployment),
           null,
           2
         )
       )
     },
     'db-migrate': (opts: StrongParams) => {
+      const randomImage = getWorkspaceImages('db').filter(image => getImageData(image)['can-db-migrate'])[0];
+      if (!randomImage) {
+        console.error("No image found with can-db-migrate=true in the db workspace.");
+        process.exit(1);
+      }
       console.warn(chalk.green("\nThis is a sample context object used to render a manifest template of type db-migrate:\n"))
       console.log(
         JSON.stringify(
-          new ImageContextGenerator(opts.required('env'), 'dummy-image', 'dummy-sha').getDbMigrate(),
+          new ImageContextGenerator(opts.required('env'), randomImage, 'dummy-sha').getDbMigrate(),
           null,
           2
         )
       )
     },
     'debug': (opts: StrongParams) => {
+      const randomImage = getImageNames()[0];
       console.warn(chalk.green("\nThis is a sample context object used to render a manifest template of type debug:\n"))
       console.log(
         JSON.stringify(
-          new ImageContextGenerator(opts.required('env'), 'dummy-image', 'dummy-sha').getDebug(),
+          new ImageContextGenerator(opts.required('env'), randomImage, 'dummy-sha').getDebug(),
           null,
           2
         )
@@ -91,22 +100,28 @@ const handlers = {
         console.error(`No deployment found for workspace ${workspace}`);
         process.exit(1);
       }
+      const randomImage = getWorkspaceImages(workspace)[0];
       console.warn(chalk.green(`\nThis is a sample of generated manifests for the ${workspace} workspace:\n`))
       console.log(
         generateWorkspaceDeployment(
           packageDataWithDeployment,
           opts.required('env'),
-          'dummy-image',
+          randomImage,
           'dummy-sha'
         )
       )
     },
     'db-migrate': (opts: StrongParams) => {
+      const randomImage = getWorkspaceImages('db').filter(image => getImageData(image)['can-db-migrate'])[0];
+      if (!randomImage) {
+        console.error("No image found with can-db-migrate=true in the db workspace.");
+        process.exit(1);
+      }
       console.warn(chalk.green("\nThis is a sample of generated manifests for the db-migrate job:\n"))
       console.log(
         generateDbMigrateJob(
           opts.required('env'),
-          'dummy-image',
+          randomImage,
           'dummy-sha'
         )
       )

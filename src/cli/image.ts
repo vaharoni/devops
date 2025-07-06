@@ -5,17 +5,17 @@ import { applyHandler } from "../libs/k8s-helpers";
 
 const oneLiner = "Applies image-related manifests, retrieves or set the version deployed, and scales deployments of applications";
 const keyExamples = `
-    $ devops image deployment gen    node-services sha  --env staging
-    $ devops image deployment create node-services sha  --env staging
-    $ devops image deployment delete node-services      --env staging
-    $ devops image version    get    node-services      --env staging
-    $ devops image version    set    node-services sha  --env staging
-    $ devops image version    unset  node-services      --env staging
-    $ devops image scale      get    node-service       --env staging
-    $ devops image scale      get    node-service www   --env staging
-    $ devops image scale      set    node-service www 3 --env staging
-    $ devops image scale      unset  node-service       --env staging
-    $ devops image scale      unset  node-service www   --env staging
+    $ devops image deployment gen    main-node sha  --env staging
+    $ devops image deployment create main-node sha  --env staging
+    $ devops image deployment delete main-node      --env staging
+    $ devops image version    get    main-node      --env staging
+    $ devops image version    set    main-node sha  --env staging
+    $ devops image version    unset  main-node      --env staging
+    $ devops image scale      get    main-node       --env staging
+    $ devops image scale      get    main-node www   --env staging
+    $ devops image scale      set    main-node www 3 --env staging
+    $ devops image scale      unset  main-node       --env staging
+    $ devops image scale      unset  main-node www   --env staging
 `.trim();
 
 const usage = `

@@ -17,3 +17,24 @@ Monorepos support multiple apps, allowing them to reuse functionality through sh
 - [Working with Python](./docs/WorkingWithPython.md)
 - [Day to day work](./docs/DayToDay.md)
 - [The devops architecture](./docs/Architecture.md)
+
+# Contributing
+
+Run this in your local copy of the devops folder:
+```shell
+bun link
+```
+
+Run this in a local package using the project for testing:
+```shell
+bun link @vaharoni/devops
+bun run build
+```
+
+When done:
+```shell
+# In the local package using the project
+bun unlink @vaharoni/devops
+# In the local copy of this repo
+bun unlink
+```

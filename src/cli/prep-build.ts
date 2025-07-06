@@ -2,14 +2,14 @@ import fs from "fs-extra";
 import os from "os";
 import path from "path";
 import { CLICommandParser, printUsageAndExit } from "./common";
-import { getImageData } from "../libs/config";
+import { getImageData, getTemplateData } from "../libs/config";
 import { getMonorepoSecret } from "../libs/k8s-secrets-manager";
 import { getImageDescendentData } from "../libs/discovery/images";
 
 const oneLiner =
   "Copies all dependencies of an image to a temporary folder in preparation for a Docker build";
 const keyExamples = `
-    $ devops prep-build node-services
+    $ devops prep-build main-node
 `.trim();
 
 const usage = `
@@ -26,11 +26,14 @@ async function run(cmdObj: CLICommandParser) {
   if (cmdObj.help || cmdObj.args.length === 0) printUsageAndExit(usage);
   const [image] = cmdObj.args;
   const imageData = getImageData(image);
-  const dockerFile = `${image}.Dockerfile`;
+  const imageTemplate = imageData["image-template"];
+  const dockerFile = `${imageTemplate}.Dockerfile`;
   const dockerFilePath = path.join(".devops/docker-images", dockerFile);
-  const dockerImagePayloadPath = path.join(".devops/docker-images", image);
+  const dockerImagePayloadPath = path.join(".devops/docker-images", imageTemplate);
   const dockerCommonPayloadPath = path.join(".devops/docker-images", "common");
-  const imageExtraContent = imageData["image-extra-content"] ?? [];
+  const imageTemplateData = getTemplateData(imageTemplate);
+  const copyCommon = imageTemplateData["copy-common"] ?? false;
+  const imageExtraContent = imageTemplateData["extra-content"] ?? [];
 
   if (!fs.existsSync(dockerFilePath)) {
     console.error(`The dockerfile ${dockerFilePath} does not exist`);
@@ -39,7 +42,7 @@ async function run(cmdObj: CLICommandParser) {
 
   imageExtraContent.forEach((file) => {
     if (!fs.existsSync(file)) {
-      console.error(`The file ${file} is specified in the image-extra-content section of ${image} but does not exist`);
+      console.error(`The file ${file} is specified in the extra-content section of ${image} but does not exist`);
       process.exit(1);
     }
   });
@@ -53,8 +56,10 @@ async function run(cmdObj: CLICommandParser) {
   console.warn(`COPYING Dockerfile`);
   fs.copySync(dockerFilePath, path.join(destFolder, "Dockerfile"));
 
-  console.warn(`COPYING Docker common`);
-  fs.copySync(dockerCommonPayloadPath, destFolder);
+  if (copyCommon) {
+    console.warn(`COPYING Docker common`);
+    fs.copySync(dockerCommonPayloadPath, destFolder);
+  }
 
   console.warn(`COPYING Docker image payload`);
   fs.copySync(dockerImagePayloadPath, destFolder);

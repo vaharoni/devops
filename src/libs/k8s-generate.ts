@@ -1,12 +1,12 @@
 import type { PackageData, TemplateDbMigrateObject, TemplateDebugObject, TemplateDeploymentObject, TemplateSharedContext } from "../types";
 import { BASE_SECRET_KEY } from "./k8s-namespace";
-import { containerRegistryRepoPath, dbMigrateJobName, domainNameForEnv, envToNamespace, imageDebugName, secretName } from "./k8s-constants";
+import { containerRegistryRepoPath, dbMigrateJobName, domainNameForEnv, envToNamespace, imageDebugName, MISSING_DOMAIN_KEY_ERROR, secretName } from "./k8s-constants";
 import { getWorkspaceScale } from "./k8s-image-config";
 import path from "path";
 import yaml from "yaml";
 import fs from 'fs';
 import { globSync } from "glob";
-import _ from 'lodash';
+import _, { template } from 'lodash';
 import Handlebars from "handlebars";
 import { getImageData } from "./config";
 import { getImageDescendentData } from "./discovery/images";
@@ -33,14 +33,16 @@ export function generateImageDeployments(
       return generateManifestForDeployment(projectData.rootPath, projectData.deployment!.template, renderFn);
     });
   const debug = generateDebugDeployment(monorepoEnv, image, gitSha);
-  return [debug, ...apps].join("\n---\n");
+  const manifest = [debug, ...apps].join("\n---\n");
+  return ensureProperDomainsPresent(manifest, monorepoEnv, image);
 }
 
 export function generateWorkspaceDeployment(packageData: PackageData, monorepoEnv: string, image: string, gitSha: string) {
   const generator = new ImageContextGenerator(monorepoEnv, image, gitSha);
   const context = generator.getDeployment(packageData);
   const renderFn = (template: string) => Handlebars.compile(template)(context);
-  return generateManifestForDeployment(packageData.rootPath, packageData.deployment!.template, renderFn).join("\n---\n");
+  const manifest = generateManifestForDeployment(packageData.rootPath, packageData.deployment!.template, renderFn).join("\n---\n");
+  return ensureProperDomainsPresent(manifest, monorepoEnv, image);
 }
 
 export function generateDebugDeployment(
@@ -64,6 +66,16 @@ export function generateDbMigrateJob(
   const context = generator.getDbMigrate();
   const renderFn = (template: string) => Handlebars.compile(template)(context);
   return generateManifestsFromTemplateName(DB_MIGRATE_TEMPLATE_NAME, renderFn).map(x => yaml.stringify(x)).join("\n---\n");
+}
+
+// = Verification
+
+function ensureProperDomainsPresent(manifest: string, monorepoEnv: string, image: string) {
+  if (manifest.includes(MISSING_DOMAIN_KEY_ERROR)) {
+    console.error(`The image ${image} does not have a domain defined for the environment ${monorepoEnv}. Please add it to the .devops/config/images.yaml.`);
+    process.exit(1);
+  }
+  return manifest;
 }
 
 // = Generation logic
@@ -158,7 +170,7 @@ export class ImageContextGenerator {
       namespace: envToNamespace(monorepoEnv),
       env_secret_name: secretName(),
       env_base_secret_key: BASE_SECRET_KEY,
-      domain_name: domainNameForEnv(monorepoEnv),
+      domain_name: domainNameForEnv(image, monorepoEnv),
       image_path: containerRegistryRepoPath(image, monorepoEnv, gitSha),
     }
   }

@@ -12,7 +12,7 @@ const oneLiner =
 const keyExamples = `
     $ devops affected list-images
     $ devops affected workspace db --base <sha1> --head <sha2>
-    $ devops affected image node-services --from-live-version
+    $ devops affected image main-node --from-live-version
     $ devops affected find-migrator --from-live-version
 `;
 

@@ -1,10 +1,6 @@
 # These will be used when generating kubernetes entities
 project-name: glitchy
 
-domains:
-  production: production.com
-  staging: staging.com
-
 # Supported: hetzner or digitalocean
 infra: hetzner
 

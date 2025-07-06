@@ -1,8 +1,8 @@
 name: "Deploy image"
 description: "Deploy the specified image if it's affected and set its version"
 inputs:
-  image-name:
-    description: 'The image name'
+  image_name:
+    description: 'The image key in images.yaml'
     required: true
 runs:
   using: "composite"
@@ -10,7 +10,7 @@ runs:
     - name: Setup basic vars
       shell: bash
       run: |
-        echo "IMAGE_NAME=${{ inputs.image-name }}" >> $GITHUB_ENV
+        echo "IMAGE_NAME=${{ inputs.image_name }}" >> $GITHUB_ENV
 
     - name: Check if affected
       id: check_affected

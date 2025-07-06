@@ -1,13 +1,13 @@
 name: "Build image"
 description: "Build the specified image if it's affected"
 inputs:
-  image-name:
-    description: 'The image name'
+  image_name:
+    description: 'The image key in images.yaml'
     required: true
   gh_pat_token:
     description: "GitHub personal access token"
     required: true
-  cache-path:
+  cache_path:
     description: "The path to cache inside the container"
     required: false
     default: /root/.bun/install/cache
@@ -21,7 +21,7 @@ runs:
     - name: Setup basic vars
       shell: bash
       run: |
-        echo "IMAGE_NAME=${{ inputs.image-name }}" >> $GITHUB_ENV
+        echo "IMAGE_NAME=${{ inputs.image_name }}" >> $GITHUB_ENV
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -62,7 +62,7 @@ runs:
       with:
         cache-map: |
           {
-            "cache-path": "${{ inputs.cache-path }}"
+            "cache-path": "${{ inputs.cache_path }}"
           }
         skip-extraction: ${{ steps.setup-cache.outputs.cache-hit }}          
 
