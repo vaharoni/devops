@@ -42,6 +42,6 @@ bun unlink
 To release:
 ```shell
 npm version patch
-gh release create vX.Y.Z
 git push --tags
+gh release create vX.Y.Z
 ```
