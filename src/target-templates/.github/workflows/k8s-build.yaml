@@ -45,7 +45,7 @@ jobs:
         with:
           image_name: ${{ matrix.image_name }}
           gh_pat_token: ${{ secrets.GH_PAT_TOKEN }}
-          cache_path: ${{ matrix.cache_path }}
+          cache_path: ${{ matrix.cache_path || '/root/.bun/install/cache' }}
 
   db_migrate:
     needs: [build_images]

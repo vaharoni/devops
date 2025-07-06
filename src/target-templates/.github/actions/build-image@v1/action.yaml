@@ -9,8 +9,7 @@ inputs:
     required: true
   cache_path:
     description: "The path to cache inside the container"
-    required: false
-    default: /root/.bun/install/cache
+    required: true
 outputs:
   affected:
     description: "Whether the image is affected"
