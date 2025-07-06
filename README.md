@@ -38,3 +38,10 @@ bun unlink @vaharoni/devops
 # In the local copy of this repo
 bun unlink
 ```
+
+To release:
+```shell
+npm version patch
+gh release create vX.Y.Z
+git push --tags
+```
