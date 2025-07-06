@@ -47,7 +47,7 @@ jobs:
           gh_pat_token: ${{ secrets.GH_PAT_TOKEN }}
           cache_path: ${{ matrix.cache_path || '/root/.bun/install/cache' }}
 
-  db_migrate:
+  db_migrate_and_deploy:
     needs: [build_images]
     runs-on: ubuntu-latest
     steps:
