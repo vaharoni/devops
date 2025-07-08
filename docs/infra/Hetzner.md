@@ -109,7 +109,7 @@ On Cloudflare, go to Manage Account (sidebar) > Account API Tokens > Create toke
 Then run:
 
 ```shell
-cat .devops/infra/hetzner/abandoned/cert-manager.yaml | CLOUDFLARE_API_TOKEN=<token> EMAIL_ADDRESS=<your_email> envsubst | kubectl apply -f -
+cat .devops/infra/hetzner/cert-manager.yaml | CLOUDFLARE_API_TOKEN=<token> EMAIL_ADDRESS=<your_email> envsubst | kubectl apply -f -
 ```
 
 ## Step 5: Setup a container registry
