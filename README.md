@@ -11,12 +11,18 @@ Monorepos support multiple apps, allowing them to reuse functionality through sh
 - **a scheduler** - leverages kubernetes to execute curl commands to your endpoints at a certain cron schedule to trigger some background processes
 - **a set of instructions** - for how to install kubernetes clusters from scratch with support for multi environments, postgres, and redis
 
+`devops` currently supports node and python. The repo that contains the python CLI can be found [here](https://github.com/vaharoni/devops-python).
+
 # Documentation
 
 - [Repo setup](./docs/RepoSetup.md)
 - [Working with Python](./docs/WorkingWithPython.md)
 - [Day to day work](./docs/DayToDay.md)
 - [The devops architecture](./docs/Architecture.md)
+
+# Limitations
+
+Currently, the repo works with `bun` as the package manager for node and `uv` for python.
 
 # Contributing
 
