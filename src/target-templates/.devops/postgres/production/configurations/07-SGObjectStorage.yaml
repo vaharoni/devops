@@ -6,7 +6,7 @@ metadata:
 spec:
   type: s3Compatible
   s3Compatible:
-    bucket: glitchy-backups
+    bucket: changeme-backups
     endpoint: https://hel1.your-objectstorage.com
     awsCredentials:
       secretKeySelectors:

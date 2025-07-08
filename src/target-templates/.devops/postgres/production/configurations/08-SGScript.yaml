@@ -7,6 +7,6 @@ spec:
   managedVersions: true
   continueOnError: false
   scripts:
-  - name: create-glitchy-database
+  - name: create-database
     script: |
-      CREATE DATABASE glitchy WITH OWNER postgres;
+      CREATE DATABASE changeme WITH OWNER postgres;

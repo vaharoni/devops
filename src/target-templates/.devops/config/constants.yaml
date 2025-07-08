@@ -1,5 +1,5 @@
 # These will be used when generating kubernetes entities
-project-name: glitchy
+project-name: changeme
 
 # Supported: hetzner or digitalocean
 infra: hetzner
@@ -8,7 +8,7 @@ infra: hetzner
 image-versions-to-keep: 5
 
 registry-base-url: registry.staging.com
-registry-name: glitchy
+registry-name: changeme
 
 # production and staging are supported by default
 extra-remote-environments: []

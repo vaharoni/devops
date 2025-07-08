@@ -110,9 +110,9 @@ First, figure out the super user password:
 ./devops db password db-staging
 ```
 
-Then set up the env variable accordingly (in this example for a database called `glitchy`):
+Then set up the env variable accordingly (in this example for a database called `changeme`):
 ```shell
-./devops env set DATABASE_URL=postgresql://postgres:<password>@db-staging.db-staging:5432/glitchy --env staging
+./devops env set DATABASE_URL=postgresql://postgres:<password>@db-staging.db-staging:5432/changeme --env staging
 ```
 
 ## Step 5: Restart the stackgres operator daily

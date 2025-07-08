@@ -4,8 +4,8 @@ This approach failed. Running `hetzner-k3s create` ended with the error:
 
 ```text
 [Control plane] Generating the kubeconfig file to /root/hetzner/kubeconfig...
-error: no context exists with the name: "glitchy-master1"
-[Control plane] : error: no context exists with the name: "glitchy-master1"
+error: no context exists with the name: "changeme-master1"
+[Control plane] : error: no context exists with the name: "changeme-master1"
 ```
 
 When SSHing into the servers, the `k3s.yaml` file was not present under `/etc/rancher/k3s` like in typical successful installations.

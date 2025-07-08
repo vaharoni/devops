@@ -1,5 +1,5 @@
 ---
-cluster_name: glitchy
+cluster_name: changeme
 kubeconfig_path: "./kubeconfig"
 k3s_version: v1.32.2+k3s1
 
