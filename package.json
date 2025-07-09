@@ -21,13 +21,13 @@
     "url": "git+https://github.com/vaharoni/devops.git"
   },
   "author": "Amit Aharoni",
-  "license": "proprietary",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/vaharoni/devops/issues"
   },
   "homepage": "https://github.com/vaharoni/devops#readme",
   "publishConfig": {
-    "@vaharoni:registry": "https://npm.pkg.github.com"
+    "access": "public"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.38.3",
