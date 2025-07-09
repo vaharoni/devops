@@ -1,7 +1,7 @@
 {
   "name": "@vaharoni/devops",
   "type": "module",
-  "version": "1.0.47",
+  "version": "1.0.48",
   "description": "Devops utility",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
