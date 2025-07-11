@@ -17,7 +17,7 @@ The `./devops/config/images.yaml` defines a list of docker images that are built
 
 # Project configuration
 
-The monorepo uses `uv` as the python tool of choice for managing dependencies. It has features similar to `bun`, such as support for workspaces and scripts. After running `bunx devops init`, a `pyproject.toml` file was created under the root folder that declares a dependency on `devops-python` using a `tool.uv` directive. It also utilizes uv's workspace support and points to example workspaces that were created when running `bunx devops init`.
+The monorepo uses `uv` as the python tool of choice for managing dependencies. It has features similar to `bun`, such as support for workspaces and scripts. After running `bunx devops init`, a `pyproject.toml` file was created under the root folder that declares a dependency on `devops-runner-python`. It also utilizes uv's workspace support and points to example workspaces that were created when running `bunx devops init`.
 
 To add a new workspace using `uv`, run something like the following:
 ```shell
