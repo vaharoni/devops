@@ -1,5 +1,5 @@
 import subprocess
-from devops_python.pyproject import get_pyproject_data
+from devops_runner_python.pyproject import get_pyproject_data
 
 package_name = "example_python"
 data = get_pyproject_data()
