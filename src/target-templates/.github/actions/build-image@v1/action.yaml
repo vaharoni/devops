@@ -4,9 +4,6 @@ inputs:
   image_name:
     description: 'The image key in images.yaml'
     required: true
-  gh_pat_token:
-    description: "GitHub personal access token"
-    required: true
   cache_path:
     description: "The path to cache inside the container"
     required: true
@@ -74,8 +71,6 @@ runs:
         tags: ${{ env.ECR_URL }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
-        secrets: |
-          GH_PAT_TOKEN=${{ inputs.gh_pat_token }}
         build-args: |
           MONOREPO_ENV=${{ env.MONOREPO_ENV }}
 

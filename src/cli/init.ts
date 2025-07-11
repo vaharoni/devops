@@ -64,12 +64,17 @@ To finish the setup:
   ],
 
 2. add the following to your .gitignore:
-.envrc
-**/.DS_Store
 **/.env*
 config/kubeconfig
 tmp/**
 !tmp/**/.gitkeep
 venv/
 **/__pycache__
+
+3. optionally create an .envrc file with the following content and run direnv allow: 
+if [ -f "$PWD/config/kubeconfig" ]; then
+  export KUBECONFIG="$PWD/config/kubeconfig"
+else
+  export KUBECONFIG="$HOME/.kube/config"
+fi
 `;

@@ -18,10 +18,7 @@ RUN npm install -g bun
 COPY . .
 
 # Install dependencies using bun
-# Mount the GH_PAT_TOKEN secret and use it during bun install
-RUN --mount=type=secret,id=GH_PAT_TOKEN \
-  --mount=type=cache,target=/root/.bun/install/cache \
-  GH_PAT_TOKEN=$(cat /run/secrets/GH_PAT_TOKEN) bun install
+RUN --mount=type=cache,target=/root/.bun/install/cache bun install
 
 # For prisma client, if used
 RUN ./devops run-many generate

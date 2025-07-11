@@ -3,7 +3,6 @@
 config/kubeconfig
 tmp/**
 !tmp/**/.gitkeep
-.envrc
 venv/
 **/__pycache__
 

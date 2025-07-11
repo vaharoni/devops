@@ -1,10 +1,9 @@
-Note: a global install such as `bun install -g @vaharoni/devops` would have been nice, as it would have allowed to simply run `devops` as a global command. Unfortunately, it doesn't work with private packages without some hacks. So instead of `devops`, a small wrapper script is available as `./devops` which essentially prefixes the command with `bunx`.
+Note: instead of requiring a global install that makes `devops` available globally from the command line, a small wrapper script is available as `./devops` which essentially prefixes the command with `bunx`.
 
 # Prerequisites
 
 ## Install some software
 
-- [Install direnv](https://direnv.net/docs/installation.html) (`brew install direnv`)
 - [Install the github CLI](https://cli.github.com/) (`brew install gh`)
 - [Install bun](https://bun.sh/docs/installation) (`brew install oven-sh/bun/bun`)
 - [Install kubectl](https://kubernetes.io/docs/tasks/tools/) (`brew install kubectl`)
@@ -13,60 +12,31 @@ If you are setting up the infrastructure, you will also need:
 
 - [Install helm](https://helm.sh/docs/intro/install/) (`brew install helm`)
 
-## Obtain access to the private npm package
+## Setup direnv (recommended)
 
-Create `.npmrc` with the following content:
+Optionally, setup direnv so that when you cd into the project directory `kubectl` will point to the right cluster. If you skip this step, you'll have to remember to switch to the right kubernetes context manually before running `./devops` command.
 
-```text
-@vaharoni:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${GH_PAT_TOKEN}
-```
+[Install direnv](https://direnv.net/docs/installation.html) (`brew install direnv`).
 
-Then, follow [these instructions][1] to create a classic personal access token (PAT) on Github with `read:packages` permission.
-
-[1]: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token
-
-Push the token to github secrets:
-
-```shell
-gh secret set GH_PAT_TOKEN --body <token>
-```
-
-and store the same token in a `.envrc` file with the following content:
-
-```shell
-# Allow installing @vaharoni/devops locally by using the personal access token
-export GH_PAT_TOKEN=<token>
-
-# Switch to the right cluster automatically
+Then create an `.envrc` file with the following content: 
+```bash
 if [ -f "$PWD/config/kubeconfig" ]; then
   export KUBECONFIG="$PWD/config/kubeconfig"
 else
-  export KUBECONFIG="${HOME}/.kube/config"
+  export KUBECONFIG="$HOME/.kube/config"
 fi
 ```
 
-Make sure to add the following to your `.gitignore`:
-```text
-.envrc
-**/.DS_Store
-**/.env*
-config/kubeconfig
-tmp/**
-!tmp/**/.gitkeep
-```
-
-To execute this `.envrc` file whenever you cd into the directory run this from the repo folder:
-
-```shell
+And run:
+```bash
 direnv allow
 ```
 
 # Scenario 1: Cloning an existing repository that already works with an existing cluster
 
-Place the `kubeconfig` file you receive from the administrator under the `config` folder. This path is set by `.envrc` to automatically use the right cluster whenever you cd into the project directory.
+Place the `kubeconfig` file you receive from the administrator under the `config` folder. If you followed the "setup direnv" instructions above, this path is set by `.envrc` to automatically use the right cluster whenever you cd into the project directory. 
 
-That's it. You can now use all the power of the `./devops` CLI.
+That's it. You can now use the `./devops` CLI.
 
 # Scenario 2: Creating a new repository that joins an existing cluster
 

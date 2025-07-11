@@ -28,8 +28,6 @@ jobs:
 
       - name: Setup prerequesites
         uses: ./.github/actions/setup-prereq@v1
-        with:
-          gh_pat_token: ${{ secrets.GH_PAT_TOKEN }}
 
       - name: Connect to infrastructure
         uses: ./.github/actions/connect-to-infra@v1
@@ -44,7 +42,6 @@ jobs:
         uses: ./.github/actions/build-image@v1
         with:
           image_name: ${{ matrix.image_name }}
-          gh_pat_token: ${{ secrets.GH_PAT_TOKEN }}
           cache_path: ${{ matrix.cache_path || '/root/.bun/install/cache' }}
 
   db_migrate_and_deploy:
@@ -59,8 +56,6 @@ jobs:
 
       - name: Setup prerequesites
         uses: ./.github/actions/setup-prereq@v1
-        with:
-          gh_pat_token: ${{ secrets.GH_PAT_TOKEN }}
 
       - name: Connect to infrastructure
         uses: ./.github/actions/connect-to-infra@v1
