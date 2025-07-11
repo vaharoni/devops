@@ -47,4 +47,5 @@ To release:
 ```shell
 npm version patch
 git push --follow-tags
+gh release create vX.Y.Z
 ```
