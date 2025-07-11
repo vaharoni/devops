@@ -53,7 +53,6 @@ templates:
       - package.json
       - bun.lock
       - tsconfig.json
-      - .npmrc
 
   python-services:
     copy-common: true
