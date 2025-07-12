@@ -1,7 +1,7 @@
 # These will be used when generating kubernetes entities
 project-name: changeme
 
-# Supported: hetzner or digitalocean
+# Supported: hetzner, digitalocean, or gcloud
 infra: hetzner
 
 # Only relevant for Digital Ocean. Determines the number of versions to keep for each docker image.

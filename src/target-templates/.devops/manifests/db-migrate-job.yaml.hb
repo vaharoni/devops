@@ -37,6 +37,7 @@ spec:
           resources:
             requests:
               memory: 100Mi
+              cpu: 250m
       restartPolicy: Never
   backoffLimit: 0
   ttlSecondsAfterFinished: 3600

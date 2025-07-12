@@ -48,6 +48,7 @@ spec:
               resources:
                 requests:
                   memory: 250Mi
+                  cpu: 100m
           restartPolicy: Never
 {{#unless @last}}
 ---

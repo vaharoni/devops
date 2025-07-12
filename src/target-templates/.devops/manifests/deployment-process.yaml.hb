@@ -45,3 +45,4 @@ spec:
           resources:
             requests:
               memory: 250Mi
+              cpu: 250m
