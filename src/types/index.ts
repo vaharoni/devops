@@ -7,10 +7,10 @@ export type SupportedLanguages = typeof SUPPORTED_LANGUAGES[number];
 
 export const constFileSchema = z.object({
   "project-name": z.string(),
-  "infra": z.enum(["hetzner", "digitalocean"]),
-  "image-versions-to-keep": z.number(),
+  "infra": z.enum(["hetzner", "digitalocean", "gcloud"]),
+  "image-versions-to-keep": z.number().optional(),
   "registry-base-url": z.string(),
-  "registry-name": z.string(),
+  "registry-image-path-prefix": z.string().optional(),
   "extra-remote-environments": z.array(z.string()),
   "extra-local-environments": z.array(z.string()),
 })

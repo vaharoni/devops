@@ -51,13 +51,13 @@ export function imageConfigMap(image: string) {
   return `image-config-${image}`;
 }
 
-export function containerRegistryRepoName(image: string, monorepoEnv: string) {
+export function containerRegistryImageName(image: string, monorepoEnv: string) {
   validateEnv(monorepoEnv);
   return `${getConst("project-name")}-${monorepoEnv}-${image}`;
 }
 
 export function containerRegistryPath() {
-  return [getConst("registry-base-url"), getConst("registry-name")].join("/");
+  return [getConst("registry-base-url"), getConst("registry-image-path-prefix", { ignoreIfInvalid: true })].filter(Boolean).join("/");
 }
 
 export function containerRegistryRepoPath(
@@ -67,9 +67,9 @@ export function containerRegistryRepoPath(
 ) {
   return [
     getConst("registry-base-url"),
-    getConst("registry-name"),
-    [containerRegistryRepoName(image, monorepoEnv), gitSha].join(":"),
-  ].join("/");
+    getConst("registry-image-path-prefix", { ignoreIfInvalid: true }),
+    [containerRegistryImageName(image, monorepoEnv), gitSha].join(":"),
+  ].filter(Boolean).join("/");
 }
 
 export function domainNameForEnv(image: string, monorepoEnv: string) {

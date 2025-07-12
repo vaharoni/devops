@@ -2,7 +2,7 @@ import { getConst, getImageData } from "../libs/config";
 import { prune } from "../libs/digital-ocean/container-reg";
 import {
   containerRegistryPath,
-  containerRegistryRepoName,
+  containerRegistryImageName,
   containerRegistryRepoPath,
 } from "../libs/k8s-constants";
 import { CLICommandParser, StrongParams, printUsageAndExit } from "./common";
@@ -49,7 +49,7 @@ const handlers = {
   },
   prune: (opts: StrongParams) => {
     const regName = containerRegistryPath();
-    const repoName = containerRegistryRepoName(
+    const repoName = containerRegistryImageName(
       opts.required("image"),
       opts.required("env")
     );

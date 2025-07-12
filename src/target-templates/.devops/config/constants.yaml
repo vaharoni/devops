@@ -8,7 +8,8 @@ infra: hetzner
 image-versions-to-keep: 5
 
 registry-base-url: registry.staging.com
-registry-name: changeme
+# What comes before <image-name>:<tag>. Can be empty.
+registry-image-path-prefix: changeme
 
 # production and staging are supported by default
 extra-remote-environments: []
