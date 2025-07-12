@@ -16,6 +16,18 @@ inputs:
   harbor_password:
     description: "The password for the harbor registry"
     required: false
+  gcloud_project_id:
+    description: "Google Cloud project ID"
+    required: false
+  gcloud_zone:
+    description: "Google Cloud GKE zone (e.g., us-central1)"
+    required: false
+  gcloud_cluster_name:
+    description: "Google Cloud GKE cluster name"
+    required: false
+  service_account_key:
+    description: "Google Cloud service account key in JSON format"
+    required: false
 outputs:
   infra:
     description: "Which infrastructure is being used"
@@ -44,3 +56,12 @@ runs:
         kubeconfig: ${{ inputs.hetzner_kubeconfig }}
         harbor_user: ${{ inputs.harbor_user }}
         harbor_password: ${{ inputs.harbor_password }}
+
+    - name: Connect to Google Cloud GKE
+      if: steps.determine_infrastructure.outputs.infra == 'gcloud'
+      uses: ./.github/actions/connect-to-gke@v1
+      with:
+        project_id: ${{ inputs.gcloud_project_id }}
+        zone: ${{ inputs.gcloud_zone }}
+        cluster_name: ${{ inputs.gcloud_cluster_name }}
+        service_account_key: ${{ inputs.service_account_key }}

@@ -37,6 +37,10 @@ jobs:
           hetzner_kubeconfig: ${{ secrets.HCLOUD_KUBECONFIG }}
           harbor_user: ${{ secrets.HARBOR_USER }}
           harbor_password: ${{ secrets.HARBOR_PASSWORD }}
+          gcloud_project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+          gcloud_zone: ${{ secrets.GCLOUD_ZONE }}
+          gcloud_cluster_name: ${{ secrets.GCLOUD_CLUSTER_NAME }}
+          service_account_key: ${{ secrets.GCLOUD_SA_KEY }}
 
       - name: Build image
         uses: ./.github/actions/build-image@v1
@@ -65,6 +69,10 @@ jobs:
           hetzner_kubeconfig: ${{ secrets.HCLOUD_KUBECONFIG }}
           harbor_user: ${{ secrets.HARBOR_USER }}
           harbor_password: ${{ secrets.HARBOR_PASSWORD }}
+          gcloud_project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+          gcloud_zone: ${{ secrets.GCLOUD_ZONE }}
+          gcloud_cluster_name: ${{ secrets.GCLOUD_CLUSTER_NAME }}
+          service_account_key: ${{ secrets.GCLOUD_SA_KEY }}
 
       - name: Run DB Migrate
         uses: ./.github/actions/db-migrate@v1
