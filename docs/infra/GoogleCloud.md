@@ -2,8 +2,8 @@ This document is currently not refereced by the main documentation. It provides 
 
 # Prerequisites
 
-Install the [gcloud CLI](https://cloud.google.com/sdk/docs/install)
-Install the kubectl auth plugin (https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl#install_plugin)
+- Install the [gcloud CLI](https://cloud.google.com/sdk/docs/install)
+- Install the kubectl auth plugin (https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl#install_plugin)
 
 # Setting up a cluster on Google Cloud
 
