@@ -1,0 +1,69 @@
+# The file structure is as follows:
+#
+# Under `templates` key:
+#   <template-key>:
+#     copy-common: <boolean>
+#     extra-content:
+#       - <file-name>
+#       - <file-name>
+#
+# Where:
+# <template-key>       The identifier of the template. 
+#                      This is used to refer to the template in the images section.
+# copy-common          Whether to copy the common Docker files from .devops/docker-images/common to the image.
+# extra-content        Any files to include in the image that are not part of the build context. By default, all applications and their dependencies are copied, as well as the 
+#                      content of .devops/docker-images/<image-name>. If you need to include additional files, list them here. These are typically from the root of the project.
+#                      Files and full folders are supported. Globs (wildcards) are currently not supported.
+#
+#
+# Under `images` key:
+#   <image-key>:
+#     image-template: <image-template>
+#     language: <language>
+#     debug-template: <debug-template>
+#     can-db-migrate: <boolean>
+#     domains:
+#       production: <production-domain>
+#       staging: <staging-domain>
+#     image-extra-content:
+#       - <file-name>
+#       - <file-name>
+#     applications:
+#     - <application-name>
+#     - <application-name>
+#
+# Where:
+# <image-name>          The identifier of the image. Github action should refer to this name in a hard-coded manner when invoking devops scripts.
+#                       This is also the basis for the name of the image in the registry.
+# image-template        The build process copies .devops/docker-images/<image-template>.Dockerfile and .devops/docker-images/<image-template>/ to the image. 
+# language              The language of the image. Currently only "node" and "python" are supported.
+# debug-template        Each image comes with a debug pod that can be acccessed as a console. This is the name of the template to use. Only "debug-console" is currently supported.
+# can-db-migrate        Whether this image can be used to run DB migrations. If set to true, the image could be used to run DB migrations if any project that uses this image depends 
+#                       on the db project and if the db project changed.
+# domains               The domains for the image. This is used to generate the ingress rules. 
+#                       This can be left out if the image does not have ingress rules, such as a worker image.
+# applications          List of applications that use this image. There is no need to specify dependencies - they will be derived as long as they are declared in package.json.
+#
+
+templates: 
+  node-services:
+    copy-common: true
+    extra-content:
+      - devops
+      - package.json
+      - bun.lock
+      - tsconfig.json
+
+images:
+  main-node:
+    image-template: node-services
+    language: node
+    debug-template: debug-console
+    can-db-migrate: true
+    domains:
+      production: production.com
+      staging: staging.com
+    applications:
+    - example-node
+    - jobs
+

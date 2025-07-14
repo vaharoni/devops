@@ -1,0 +1,18 @@
+apiVersion: stackgres.io/v1beta1
+kind: SGObjectStorage
+metadata:
+  namespace: db-staging
+  name: backupconfig
+spec:
+  type: s3Compatible
+  s3Compatible:
+    bucket: $PROJECT_NAME-backups
+    endpoint: https://hel1.your-objectstorage.com
+    awsCredentials:
+      secretKeySelectors:
+        accessKeyId: 
+          name: s3-backup-bucket-secret
+          key: accessKey
+        secretAccessKey:
+          name: s3-backup-bucket-secret
+          key: secretKey

@@ -1,0 +1,67 @@
+name: "Connect to the infrastructure"
+description: "Convenience action to connect either to Digital Ocean or Hetzner based on the inputs provided"
+inputs:
+  do_access_token:
+    description: "DigitalOcean access token"
+    required: false
+  do_cluster_name:
+    description: "DigitalOcean cluster name"
+    required: false
+  hetzner_kubeconfig:
+    description: "The Hetzner kubeconfig file"
+    required: false
+  harbor_user:
+    description: "The user name for the harbor registry"
+    required: false
+  harbor_password:
+    description: "The password for the harbor registry"
+    required: false
+  gcloud_project_id:
+    description: "Google Cloud project ID"
+    required: false
+  gcloud_zone:
+    description: "Google Cloud GKE zone (e.g., us-central1)"
+    required: false
+  gcloud_cluster_name:
+    description: "Google Cloud GKE cluster name"
+    required: false
+  gcloud_service_account_key:
+    description: "Google Cloud service account key in JSON format"
+    required: false
+outputs:
+  infra:
+    description: "Which infrastructure is being used"
+    value: steps.determine_infrastructure.outputs.infra
+runs:
+  using: "composite"
+  steps:
+    - name: Determine the infrastructure
+      id: determine_infrastructure
+      shell: bash
+      run: |
+        INFRA=$(devops constant infra)
+        echo "infra=$INFRA" >> $GITHUB_OUTPUT
+
+    - name: Connect to Digital Ocean
+      if: steps.determine_infrastructure.outputs.infra == 'digitalocean'
+      uses: ./.github/actions/connect-to-digital-ocean@v1
+      with:
+        access_token: ${{ inputs.do_access_token }}
+        cluster_name: ${{ inputs.do_cluster_name }}
+
+    - name: Connect to Hetzner
+      if: steps.determine_infrastructure.outputs.infra == 'hetzner'
+      uses: ./.github/actions/connect-to-hetzner@v1
+      with:
+        kubeconfig: ${{ inputs.hetzner_kubeconfig }}
+        harbor_user: ${{ inputs.harbor_user }}
+        harbor_password: ${{ inputs.harbor_password }}
+
+    - name: Connect to Google Cloud GKE
+      if: steps.determine_infrastructure.outputs.infra == 'gcloud'
+      uses: ./.github/actions/connect-to-gke@v1
+      with:
+        project_id: ${{ inputs.gcloud_project_id }}
+        zone: ${{ inputs.gcloud_zone }}
+        cluster_name: ${{ inputs.gcloud_cluster_name }}
+        service_account_key: ${{ inputs.gcloud_service_account_key }}

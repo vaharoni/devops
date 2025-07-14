@@ -1,0 +1,15 @@
+# These will be used when generating kubernetes entities
+project-name: $PROJECT_NAME
+
+# Supported: hetzner, digitalocean, or gcloud
+infra: gcloud
+
+registry-base-url: gcr.io
+# What comes before <image-name>:<tag>. Can be empty.
+registry-image-path-prefix: $GCLOUD_PROJECT_ID
+
+# production and staging are supported by default
+extra-remote-environments: []
+
+# development and test are supported by default
+extra-local-environments: []

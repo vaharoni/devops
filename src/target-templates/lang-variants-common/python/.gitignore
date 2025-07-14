@@ -1,0 +1,6 @@
+**/.env*
+config/kubeconfig
+tmp/**
+!tmp/**/.gitkeep
+venv/
+**/__pycache__

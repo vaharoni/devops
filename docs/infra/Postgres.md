@@ -120,5 +120,5 @@ Then set up the env variable accordingly (in this example for a database called 
 When installing the operator, two deployments - `stackgres-collector` and `stackgres-operator` - were installed that seem to be leaking memory as aparent after a few days when running `top pods -A`. To install a cron job that periodically restarts them, run the following:
 
 ```shell
-kubectl apply -f .devops/postgres/DailyOperatorRestart.yaml
+kubectl apply -f .devops/postgres/daily-operator-restart.yaml
 ```
