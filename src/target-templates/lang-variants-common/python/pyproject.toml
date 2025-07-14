@@ -1,0 +1,16 @@
+[project]
+name = "$PROJECT_NAME"
+version = "0.1.0"
+description = ""
+authors = []
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["devops-runner-python"]
+
+[tool.uv.workspace]
+members = [
+  "db",
+  "applications/example-data-pipeline",
+  "applications/example-python",
+  "libs/example-python-lib",
+]

@@ -1,0 +1,75 @@
+name: "Monorepo Build and Deploy"
+
+on:
+  push:
+    branches:
+      - staging
+      - production
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  build_images:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - image_name: main-node
+          - image_name: main-python
+            cache_path: /root/.cache/uv
+    steps:
+      # Fetch the last 50 commits so that devops affected works
+      - name: Checkout repo and history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      - name: Setup prerequesites
+        uses: ./.github/actions/setup-prereq@v1
+
+      - name: Connect to infrastructure
+        uses: ./.github/actions/connect-to-infra@v1
+        with:
+          hetzner_kubeconfig: ${{ secrets.HCLOUD_KUBECONFIG }}
+          harbor_user: ${{ secrets.HARBOR_USER }}
+          harbor_password: ${{ secrets.HARBOR_PASSWORD }}
+
+      - name: Build image
+        uses: ./.github/actions/build-image@v1
+        with:
+          image_name: ${{ matrix.image_name }}
+          cache_path: ${{ matrix.cache_path || '/root/.bun/install/cache' }}
+
+  db_migrate_and_deploy:
+    needs: [build_images]
+    runs-on: ubuntu-latest
+    steps:
+      # Fetch the last 50 commits so that devops affected works
+      - name: Checkout repo and history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      - name: Setup prerequesites
+        uses: ./.github/actions/setup-prereq@v1
+
+      - name: Connect to infrastructure
+        uses: ./.github/actions/connect-to-infra@v1
+        with:
+          hetzner_kubeconfig: ${{ secrets.HCLOUD_KUBECONFIG }}
+          harbor_user: ${{ secrets.HARBOR_USER }}
+          harbor_password: ${{ secrets.HARBOR_PASSWORD }}
+
+      - name: Run DB Migrate
+        uses: ./.github/actions/db-migrate@v1
+
+      # Repeat per image (it checks if the image is affected and deploys it if it is)
+      - name: Deploy main node
+        uses: ./.github/actions/deploy-image@v1
+        with: { "image_name": "main-node" }
+
+      - name: Deploy main python
+        uses: ./.github/actions/deploy-image@v1
+        with: { "image_name": "main-python" }

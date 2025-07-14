@@ -1,0 +1,18 @@
+# These will be used when generating kubernetes entities
+project-name: $PROJECT_NAME
+
+# Supported: hetzner, digitalocean, or gcloud
+infra: digitalocean
+
+# Only relevant for Digital Ocean. Determines the number of versions to keep for each docker image.
+image-versions-to-keep: 5
+
+registry-base-url: registry.digitalocean.com
+# What comes before <image-name>:<tag>. Can be empty.
+registry-image-path-prefix: $REGISTRY_IMAGE_PATH_PREFIX
+
+# production and staging are supported by default
+extra-remote-environments: []
+
+# development and test are supported by default
+extra-local-environments: []

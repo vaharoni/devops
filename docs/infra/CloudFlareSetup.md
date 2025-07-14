@@ -15,7 +15,7 @@ To test that the ingress setup works, run the following:
 ```shell
 # Replace test.domain.com with whatever subdomain under either your production domain or staging domain.
 # It is recommended to test it once for staging and once for production.
-cat .devops/infra/test.yaml | TEST_HOST=test.domain.com envsubst | kubectl apply -f -
+cat .devops/infra/dns-test.yaml | TEST_HOST=test.domain.com envsubst | kubectl apply -f -
 ```
 
 Then visit that subdomain from your browser. If you get the "Hello from the first deployment!" message, you are good.
