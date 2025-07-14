@@ -8,6 +8,6 @@ spec:
   issuerRef:
     name: letsencrypt-dns01
     kind: ClusterIssuer
-  commonName: $REGISTRY_DOMAIN
+  commonName: $REGISTRY_BASE_URL
   dnsNames:
-  - $REGISTRY_DOMAIN
+  - $REGISTRY_BASE_URL

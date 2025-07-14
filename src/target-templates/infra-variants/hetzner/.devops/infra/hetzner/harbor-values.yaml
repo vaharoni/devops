@@ -2,12 +2,12 @@ expose:
   type: ingress
   ingress:
     hosts:
-      core: $REGISTRY_DOMAIN
+      core: $REGISTRY_BASE_URL
   tls:
     certSource: secret
     secret:
       secretName: tls-secret
-externalURL: https://$REGISTRY_DOMAIN
+externalURL: https://$REGISTRY_BASE_URL
 persistence:
   enabled: true
   persistentVolumeClaim:

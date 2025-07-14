@@ -2,7 +2,7 @@
 project-name: $PROJECT_NAME
 
 # Supported: hetzner, digitalocean, or gcloud
-infra: gcloud
+infra: hetzner
 
 # Only relevant for Digital Ocean. Determines the number of versions to keep for each docker image.
 image-versions-to-keep: 5

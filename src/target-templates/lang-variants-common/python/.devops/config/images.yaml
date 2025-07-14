@@ -68,8 +68,8 @@ images:
     debug-template: debug-console
     can-db-migrate: true
     domains:
-      production: production.com
-      staging: staging.com
+      production: $PRODUCTION_DOMAIN
+      staging: $STAGING_DOMAIN
     applications:
     - example-node
     - jobs
@@ -80,8 +80,8 @@ images:
     debug-template: debug-console
     can-db-migrate: false
     domains:
-      production: production.com
-      staging: staging.com
+      production: $PRODUCTION_DOMAIN
+      staging: $STAGING_DOMAIN
     applications:
     - example-python
     - example-data-pipeline
