@@ -5,6 +5,7 @@ tmp/**
 !tmp/**/.gitkeep
 venv/
 **/__pycache__
+!src/target-templates/lang-variants-common/typescript/.envrc
 
 # Logs
 logs
