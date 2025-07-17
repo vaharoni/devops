@@ -5,6 +5,14 @@ This document is currently not refereced by the main documentation. It provides 
 - Install the [gcloud CLI](https://cloud.google.com/sdk/docs/install)
 - Install the kubectl auth plugin (https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl#install_plugin)
 
+Install the devops tool:
+
+```bash
+bun add @vaharoni/devops
+bunx devops init
+```
+And pick Google Cloud as your infra.
+
 # Setting up a cluster on Google Cloud
 
 You can follow the first few steps of [this quickstart](https://cloud.google.com/kubernetes-engine/docs/quickstarts/create-cluster).
@@ -26,11 +34,11 @@ gcloud config set project $GKE_PROJECT
 gcloud services enable artifactregistry.googleapis.com container.googleapis.com
 
 # Create the cluster
-gcloud container clusters create $GKE_CLUSTER --project=$GKE_PROJECT --zone=$GKE_REGION
+gcloud container clusters create-auto $GKE_CLUSTER --project=$GKE_PROJECT --region=$GKE_REGION
 
-echo $KUBECONFIG
-# Make sure this points to config/kubeconfig under the current directory, otherwise the following will update your global kubeconfig
-# If you followed the basic repo setup, this should be done automatically thanks to direnv and .envrc
+# Force KUBECONFIG to point to ./config/kubeconfig, otherwise the get-credentials command will update your global kubeconfig
+mkdir -p config
+export KUBECONFIG="$PWD/config/kubeconfig"
 gcloud container clusters get-credentials $GKE_CLUSTER --region $GKE_REGION --project $GKE_PROJECT
 
 # Setup the service account
@@ -49,30 +57,15 @@ Now, setup the github secrets:
 gh secret set GCLOUD_PROJECT_ID --body $GKE_PROJECT
 gh secret set GCLOUD_ZONE --body $GKE_REGION
 gh secret set GCLOUD_SA_KEY < $SA_KEY_PATH
-gh secret set GCLOUD_CLUSTER_NAME --body GKE_CLUSTER
+gh secret set GCLOUD_CLUSTER_NAME --body $GKE_CLUSTER
 ```
 
 # Setting up the repo
 
-In `.devops/config/constants.yaml` make sure you setup the following:
-```yaml
-infra: gcloud
-
-registry-base-url: gcr.io
-registry-image-path-prefix: YOUR_PROJECT_ID
-```
-
-In `.devops/manifests/ingress.yaml.hb`, remove `ingressClassName: nginx` and add under `metadata.annotations` the value `kubernetes.io/ingress.class: "gce"`. So the file should look like so:
-```yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  # ...
-  annotations:
-    kubernetes.io/ingress.class: "gce"    
-spec:
-  # Remove ingressClassName: nginx
-  # ...
+Setup the namespaces and global resources:
+```bash
+./devops namespace create --env staging
+./devops namespace create --env production
 ```
 
 Note - this setup is incomplete, as a solution for hooking ingress to the root DNS is still being investigated.
