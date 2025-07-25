@@ -6,6 +6,7 @@ tmp/**
 venv/
 **/__pycache__
 !src/target-templates/lang-variants-common/typescript/.envrc
+!src/target-templates/lang-variants-common/typescript/config/.env*
 
 # Logs
 logs
