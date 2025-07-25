@@ -29,12 +29,12 @@ jobs:
       - name: Setup prerequesites
         uses: ./.github/actions/setup-prereq@v1
 
-      - name: Connect to infrastructure
-        uses: ./.github/actions/connect-to-infra@v1
+      - name: Connect to Hetzner
+        uses: ./.github/actions/connect-to-hetzner@v1
         with:
-          hetzner_kubeconfig: ${{ secrets.HCLOUD_KUBECONFIG }}
+          kubeconfig: ${{ secrets.HCLOUD_KUBECONFIG }}
           harbor_user: ${{ secrets.HARBOR_USER }}
-          harbor_password: ${{ secrets.HARBOR_PASSWORD }}
+          harbor_password: ${{ secrets.HARBOR_PASSWORD }}        
 
       - name: Build image
         uses: ./.github/actions/build-image@v1
@@ -55,12 +55,12 @@ jobs:
       - name: Setup prerequesites
         uses: ./.github/actions/setup-prereq@v1
 
-      - name: Connect to infrastructure
-        uses: ./.github/actions/connect-to-infra@v1
+      - name: Connect to Hetzner
+        uses: ./.github/actions/connect-to-hetzner@v1
         with:
-          hetzner_kubeconfig: ${{ secrets.HCLOUD_KUBECONFIG }}
+          kubeconfig: ${{ secrets.HCLOUD_KUBECONFIG }}
           harbor_user: ${{ secrets.HARBOR_USER }}
-          harbor_password: ${{ secrets.HARBOR_PASSWORD }}
+          harbor_password: ${{ secrets.HARBOR_PASSWORD }}        
 
       - name: Run DB Migrate
         uses: ./.github/actions/db-migrate@v1
