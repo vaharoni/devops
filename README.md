@@ -29,12 +29,12 @@ Currently, the repo works with `bun` as the package manager for node and `uv` fo
 Run this in your local copy of the devops folder:
 ```shell
 bun link
+bun run build
 ```
 
 Run this in a local package using the project for testing:
 ```shell
 bun link @vaharoni/devops
-bun run build
 ```
 
 When done:

@@ -2,14 +2,18 @@ import chalk from "chalk";
 import { globSync } from "glob";
 import { packageFilePythonSchema, type PackageData } from "../../types";
 import { PackageDataProcessor } from "./process-common";
-import TOML from '@iarna/toml';
+import TOML from "@iarna/toml";
+import path from "path";
 
+const rootPath = process.env.MONOREPO_ROOT || process.cwd();
 const _workspaces: Record<string, PackageData> = {};
 let _workspacesLoaded = false;
 
 export function pythonWorkspaces() {
   if (!_workspacesLoaded) {
-    const allPyprojectTomls = globSync("**/*/pyproject.toml");
+    const allPyprojectTomls = globSync(
+      path.join(rootPath, "**/*/pyproject.toml")
+    );
     const processor = new PackageDataProcessor({
       language: "python",
       pathList: allPyprojectTomls,
@@ -18,18 +22,20 @@ export function pythonWorkspaces() {
       nameExtractor: (data) => data.project.name,
     });
 
-    processor.convert((data) => {
-      const deployment = data.tool?.devops?.deployment;
-      const scripts = data.tool?.devops?.scripts;
-      const dependencyNames = data.project.dependencies ?? [];
-      return {
-        scripts,
-        deployment,
-        dependencyNames: processor.filterDependencies(dependencyNames)
-      }
-    }).forEach(pkgData => {
-      _workspaces[pkgData.name] = pkgData
-    })
+    processor
+      .convert((data) => {
+        const deployment = data.tool?.devops?.deployment;
+        const scripts = data.tool?.devops?.scripts;
+        const dependencyNames = data.project.dependencies ?? [];
+        return {
+          scripts,
+          deployment,
+          dependencyNames: processor.filterDependencies(dependencyNames),
+        };
+      })
+      .forEach((pkgData) => {
+        _workspaces[pkgData.name] = pkgData;
+      });
 
     console.warn(
       chalk.yellow(

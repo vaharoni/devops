@@ -11,14 +11,14 @@ export function workspaces() {
   const nodeWorkspacesData = nodeWorkspaces();
   const pythonWorkspacesData = pythonWorkspaces();
 
-  Object.values(nodeWorkspacesData).forEach(data => {
+  Object.values(nodeWorkspacesData).forEach((data) => {
     _workspaces[data.name] = {
       rootPath: data.rootPath,
-      packageDataEntries: [data]
+      packageDataEntries: [data],
     };
-  })
+  });
 
-  Object.values(pythonWorkspacesData).forEach(data => {
+  Object.values(pythonWorkspacesData).forEach((data) => {
     const existing = _workspaces[data.name];
     if (existing) {
       if (existing.rootPath !== data.rootPath) {
@@ -29,11 +29,11 @@ export function workspaces() {
     } else {
       _workspaces[data.name] = {
         rootPath: data.rootPath,
-        packageDataEntries: []
+        packageDataEntries: [],
       };
     }
     _workspaces[data.name].packageDataEntries.push(data);
-  })
+  });
   _workspacesLoaded = true;
   return _workspaces;
 }

@@ -251,7 +251,7 @@ export class CommandExecutor {
     const envPrefix = this.env ? this._envInjectorPrefix() : "";
     const fullCommand = [envPrefix, this.commandStr].join(" ").trim();
 
-    const envPrefixLog = this.env ? `MONOREPO_ENV=${this.env}` : "";
+    const envPrefixLog = this.env ? `MONOREPO_ENV=${this.env} MONOREPO_ROOT=${process.cwd()}` : "";
     const fullCommandLog = [envPrefixLog, fullCommand].join(" ").trim();
     if (this.redactedCommand) {
       console.warn(
@@ -267,7 +267,7 @@ export class CommandExecutor {
   }
 
   _getProcessEnv(envOverride = {}) {
-    return { ...process.env, MONOREPO_ENV: this.env, ...envOverride };
+    return { ...process.env, MONOREPO_ENV: this.env, MONOREPO_ROOT: process.cwd(), ...envOverride };
   }
 
   _envInjectorPrefix() {
