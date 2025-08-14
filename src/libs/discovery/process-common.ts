@@ -34,7 +34,7 @@ export class PackageDataProcessor<T> {
         console.error(`Error parsing ${packageFilePath}: ${parsedRes.error}`);
         process.exit(1);
       }
-      const rootDir = path.dirname(packageFilePath);
+      const rootDir = path.relative(process.cwd(), path.dirname(packageFilePath));
       const name = this.nameExtractor(parsedRes.data)
       this.workspaceNames.add(name);
       this.loadedFiles[rootDir] = { name, data: parsedRes.data };
