@@ -4,6 +4,10 @@ inputs:
   image_name:
     description: 'The image key in images.yaml'
     required: true
+outputs:
+  affected:
+    description: 'Whether the specified image is affected (computed before deploy)'
+    value: ${{ steps.check_affected.outputs.affected }}    
 runs:
   using: "composite"
   steps:
