@@ -3,8 +3,10 @@ import os from "os";
 import path from "path";
 import { CLICommandParser, printUsageAndExit } from "./common";
 import { getImageData, getTemplateData } from "../libs/config";
-import { getMonorepoSecret } from "../libs/k8s-secrets-manager";
+import { getMonorepoSecretStr } from "../libs/k8s-secrets-manager";
 import { getImageDescendentData } from "../libs/discovery/images";
+import { isLocalOrRemoteEnv } from "../libs/k8s-constants";
+import chalk from "chalk";
 
 const oneLiner =
   "Copies all dependencies of an image to a temporary folder in preparation for a Docker build";
@@ -16,7 +18,10 @@ const usage = `
 ${oneLiner}
 
 USAGE
-    devops prep-build <image>
+    devops prep-build <image> --env <env>
+
+    If <env> is a remote environment (e.g. staging, production), the environment variables are 
+    fetched from the cluster and injected in case they are needed during the build process.
 
 EXAMPLES
     ${keyExamples}
@@ -61,8 +66,10 @@ async function run(cmdObj: CLICommandParser) {
     fs.copySync(dockerCommonPayloadPath, destFolder);
   }
 
-  console.warn(`COPYING Docker image payload`);
-  fs.copySync(dockerImagePayloadPath, destFolder);
+  if (fs.existsSync(dockerImagePayloadPath)) {
+    console.warn(`COPYING Docker image payload`);
+    fs.copySync(dockerImagePayloadPath, destFolder);
+  }
 
   console.warn(`COPYING .devops/config`);
   fs.mkdirSync(path.join(destFolder, ".devops"));
@@ -71,8 +78,29 @@ async function run(cmdObj: CLICommandParser) {
   // Create config directory. It should be deleted by the docker image so that it can be mounted as a volume when the pod is run
   console.warn(`CREATING config for the build process`);
   fs.mkdirSync(path.join(destFolder, "config"));
-  const envFileData = getMonorepoSecret(cmdObj.env);
-  fs.writeFileSync(path.join(destFolder, `config/.env.global`), envFileData);
+  const destGlobalEnvPath = path.join(destFolder, "config/.env.global");
+  if (isLocalOrRemoteEnv(cmdObj.env) === "remote") {
+    const envFileData = getMonorepoSecretStr(cmdObj.env);
+    fs.writeFileSync(destGlobalEnvPath, envFileData);
+  } else {
+    let anyCopied = false;
+    const localGlobalEnvPath = "config/.env.global";
+    const localEnvPath = `config/.env.${cmdObj.env}`;
+    const destEnvPath = path.join(destFolder, `config/.env.${cmdObj.env}`);
+    if (fs.existsSync(localGlobalEnvPath)) {
+      console.warn(`COPYING ${localGlobalEnvPath} to ${destGlobalEnvPath}`);
+      fs.copyFileSync(localGlobalEnvPath, destGlobalEnvPath);
+      anyCopied = true;
+    }
+    if (fs.existsSync(localEnvPath)) {
+      console.warn(`COPYING ${localEnvPath} to ${destEnvPath}`);
+      fs.copyFileSync(localEnvPath, destEnvPath);
+      anyCopied = true;
+    }
+    if (!anyCopied) {
+      console.warn(chalk.red(`\nWarning: local environment ${cmdObj.env} has no .env files. Environment variables will not be injected.\n`));
+    }
+  }
 
   // Copy all dependencies
   getImageDescendentData(image).forEach((project) => {

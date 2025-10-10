@@ -4,10 +4,10 @@ import fs from "fs";
 import { globSync } from "glob";
 import { allSupportedEnvs } from "../libs/k8s-constants";
 
-type ParsedArgs = {
+type ParsedArgs<TBoolKeys extends readonly string[], TParamKeys extends readonly string[]> = {
   args: string[];
   argsStr: string;
-  options: { [key: string]: string | boolean };
+  options: Partial<Record<TBoolKeys[number], true>> & Partial<Record<TParamKeys[number], string>>;
   passthrough?: string[];
 };
 
@@ -27,8 +27,8 @@ export class CLICommandParser {
 
   constructor(cmdArray: string[]) {
     const parsedArgs = this._separateOptions(cmdArray.filter(Boolean), {
-      params: ["--env"],
-      booleans: ["--help", "--skip-env-check"],
+      params: ["--env"] as const,
+      booleans: ["--help", "--skip-env-check"] as const,
     });
     const [command, ...args] = parsedArgs.args;
     this.command = command;
@@ -67,18 +67,18 @@ export class CLICommandParser {
   //    # => { args: ['arg1'], options: { '--some-flag': true, '--in': 'workspace' } }
   //
   // Note that the global param --env is already extracted and can be accessed with cmd.env
-  parseOptions({
-    params = [],
-    booleans = [],
+  parseOptions<const TBoolKeys extends readonly string[], const TParamKeys extends readonly string[]>({
+    params,
+    booleans,
     passthroughArgs = false,
   }: {
     /** Param is used like so: --param value */
-    params?: string[];
+    params?: TParamKeys
     /** Boolean flag is used like so: --flag */
-    booleans?: string[];
+    booleans?: TBoolKeys;
     /** Pass through args are used like so: -- arg1 arg2 */
     passthroughArgs?: boolean;
-  } = {}): ParsedArgs {
+  } = {}): ParsedArgs<TBoolKeys, TParamKeys> {
     return this._separateOptions(this.args, {
       params,
       booleans,
@@ -97,46 +97,54 @@ export class CLICommandParser {
     return true;
   }
 
-  _separateOptions(
+  _separateOptions<const TBoolKeys extends readonly string[], const TParamKeys extends readonly string[]>(
     args: string[],
     {
-      params = [],
-      booleans = [],
+      params,
+      booleans,
       passthroughArgs = false,
     }: {
-      params?: string[];
-      booleans?: string[];
+      params?: TParamKeys;
+      booleans?: TBoolKeys;
       passthroughArgs?: boolean;
     } = {}
-  ): ParsedArgs {
-    const results: ParsedArgs = {
-      args: [],
-      argsStr: "",
-      options: {},
-      ...(passthroughArgs ? { passthrough: [] } : {}),
-    };
-    const paramsLookup = Object.fromEntries(params.map((x) => [x, true]));
-    const booleansLookup = Object.fromEntries(booleans.map((x) => [x, true]));
+  ): ParsedArgs<TBoolKeys, TParamKeys> {
+    const paramsLookup = new Set<TParamKeys[number]>(params ?? []);
+    const booleansLookup = new Set<TBoolKeys[number]>(booleans ?? []);
+    const isParam = (arg: string): arg is TParamKeys[number] => paramsLookup.has(arg);
+    const isBoolean = (arg: string): arg is TBoolKeys[number] => booleansLookup.has(arg);
+
     const passthroughArgsStart = passthroughArgs ? args.indexOf("--") : -1;
-    const numArgsToProcess =
-      passthroughArgsStart === -1 ? args.length : passthroughArgsStart;
+    // prettier-ignore
+    const numArgsToProcess = passthroughArgsStart === -1 ? args.length : passthroughArgsStart;
+
+    const getResPassthrough = () => {
+      if (!passthroughArgs || passthroughArgsStart < 0) return { passthrough: []};
+      return { passthrough: args.slice(passthroughArgsStart + 1) };
+    }
+
+    const resArgs: string[] = [];
+    const resParams: Partial<Record<TParamKeys[number], string>> = {};
+    const resOptions: Partial<Record<TBoolKeys[number], true>> = {};
+
     for (let i = 0; i < numArgsToProcess; ++i) {
       const curr = args[i];
-      if (paramsLookup[curr]) {
+      if (isParam(curr)) {
         const next = args[i + 1];
-        results.options[curr] = next;
+        resParams[curr] = next;
         ++i;
-      } else if (booleansLookup[curr]) {
-        results.options[curr] = true;
+      } else if (isBoolean(curr)) {
+        resOptions[curr] = true;
       } else {
-        results.args.push(curr);
+        resArgs.push(curr);
       }
     }
-    results.argsStr = results.args.join(" ");
-    if (passthroughArgs && passthroughArgsStart >= 0) {
-      results.passthrough = args.slice(passthroughArgsStart + 1);
-    }
-    return results;
+    return {
+      args: resArgs,
+      argsStr: resArgs.join(" "),
+      options: { ...resOptions, ...resParams },
+      ...getResPassthrough(),
+    };
   }
 }
 
@@ -220,10 +228,10 @@ export class CommandExecutor {
     const envToUse = this._getProcessEnv(env);
     return new Promise((resolve) => {
       try {
-        const [cmd, ...args] = fullCommand.split(" ").filter(Boolean);
-        const childProcess = spawn(cmd, args, {
+        const childProcess = spawn(fullCommand, {
           stdio: "inherit",
           env: envToUse,
+          shell: true,
         });
 
         childProcess.on("close", (code) => {

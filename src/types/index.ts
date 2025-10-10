@@ -11,6 +11,7 @@ export const constFileSchema = z.object({
   "image-versions-to-keep": z.number().optional(),
   "registry-base-url": z.string(),
   "registry-image-path-prefix": z.string().optional(),
+  "cloudrun-artifact-registry-repo-path": z.string().optional(),
   "extra-remote-environments": z.array(z.string()),
   "extra-local-environments": z.array(z.string()),
 })
@@ -26,7 +27,8 @@ const singleImageSchema = z.object({
   "image-template": z.string(),
   "language": z.enum(SUPPORTED_LANGUAGES),
   "domains": z.record(z.string()).optional(),
-  "debug-template": z.string(),
+  "debug-template": z.string().optional(),
+  "cloudrun": z.boolean().optional(),
   "can-db-migrate": z.boolean().optional(),
   applications: z.array(z.string()),
 });

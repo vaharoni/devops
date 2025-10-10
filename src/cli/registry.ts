@@ -11,20 +11,26 @@ const oneLiner = "Manage container repositories";
 const keyExamples = `
     $ devops registry server-url
     $ devops registry reg-url
-    $ devops registry repo-url my-image sha
-    $ devops registry prune    my-image
+    $ devops registry repo-url   my-image sha
+    $ devops registry image-name my-image 
+    $ devops registry prune      my-image
 `.trim();
 
 const usage = `
 ${oneLiner}
 
 USAGE
-  Get base URLs
+  Get base URLs for the container registry of the cluster:
       devops registry server-url
       devops registry reg-url
 
+      Note: for cloudrun images these URLs are not relevant. 
+
   Gets the URL of an image in the container registry:
     devops registry repo-url <image> <sha> --env <env>
+
+  Gets the image name in the container registry:
+    devops registry image-name <image> --env <env>
 
   Prunes the repository of old images to enforce the "image-versions-to-keep" constant in config/constants.yaml:
     devops registry prune <image> --env <env>
@@ -46,6 +52,9 @@ const handlers = {
         opts.required("sha")
       )
     );
+  },
+  "image-name": (opts: StrongParams) => {
+    console.log(containerRegistryImageName(opts.required("image"), opts.required("env")));
   },
   prune: (opts: StrongParams) => {
     const regName = containerRegistryPath();

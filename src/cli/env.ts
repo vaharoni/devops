@@ -1,7 +1,7 @@
 import { globSync } from "glob";
 import {
   deleteMonorepoSecret,
-  getMonorepoSecret,
+  getMonorepoSecretStr,
   setMonorepoSecret,
 } from "../libs/k8s-secrets-manager";
 import { CombinedEnvValidator } from "../libs/validate-env";
@@ -62,7 +62,7 @@ function run(cmdObj: CLICommandParser) {
     }
 
     case "get": {
-      console.log(getMonorepoSecret(cmdObj.env, rest));
+      console.log(getMonorepoSecretStr(cmdObj.env, rest));
       break;
     }
 

@@ -24,13 +24,28 @@ export function allSupportedEnvs() {
   return [...remoteSupportedEnvs(), ...localSupportedEnvs()];
 }
 
-function validateEnv(monorepoEnv?: string) {
+export function isLocalOrRemoteEnv(monorepoEnv: string): "local" | "remote" {
+  if (remoteSupportedEnvs().includes(monorepoEnv)) return "remote";
+  if (localSupportedEnvs().includes(monorepoEnv)) return "local";
+  throw new Error(`Unsupported environment: ${monorepoEnv}`);
+}
+
+function validateEnv(monorepoEnv?: string, { allowLocal = false }: { allowLocal?: boolean } = {}) {
   if (!monorepoEnv) throw new Error("MONOREPO_ENV cannot be empty");
-  if (!remoteSupportedEnvs().includes(monorepoEnv)) {
-    console.error(
-      `MONOREPO_ENV must be one of: ${remoteSupportedEnvs().join(", ")}. Can be set using --env flag.`
-    );
-    process.exit(1);
+  if (allowLocal) {
+    if (!allSupportedEnvs().includes(monorepoEnv)) {
+      console.error(
+        `MONOREPO_ENV must be one of: ${allSupportedEnvs().join(", ")}. Can be set using --env flag.`
+      );
+      process.exit(1);
+    }
+  } else {
+    if (!remoteSupportedEnvs().includes(monorepoEnv)) {
+      console.error(
+        `MONOREPO_ENV must be one of: ${remoteSupportedEnvs().join(", ")}. Can be set using --env flag.`
+      );
+      process.exit(1);
+    }
   }
 }
 
@@ -52,7 +67,7 @@ export function imageConfigMap(image: string) {
 }
 
 export function containerRegistryImageName(image: string, monorepoEnv: string) {
-  validateEnv(monorepoEnv);
+  validateEnv(monorepoEnv, { allowLocal: true });
   return `${getConst("project-name")}-${monorepoEnv}-${image}`;
 }
 
@@ -65,11 +80,20 @@ export function containerRegistryRepoPath(
   monorepoEnv: string,
   gitSha: string
 ) {
-  return [
-    getConst("registry-base-url"),
-    getConst("registry-image-path-prefix", { ignoreIfInvalid: true }),
-    [containerRegistryImageName(image, monorepoEnv), gitSha].join(":"),
-  ].filter(Boolean).join("/");
+  const imageNameAndTag = [containerRegistryImageName(image, monorepoEnv), gitSha].join(":");
+  const imageData = getImageData(image);
+  if (imageData["cloudrun"]) {
+    return [
+      getConst("cloudrun-artifact-registry-repo-path"),
+      imageNameAndTag,
+    ].join("/");
+  } else {
+    return [
+      getConst("registry-base-url"),
+      getConst("registry-image-path-prefix", { ignoreIfInvalid: true }),
+      imageNameAndTag,
+    ].filter(Boolean).join("/");
+  }
 }
 
 export function domainNameForEnv(image: string, monorepoEnv: string) {

@@ -107,7 +107,7 @@ function run(cmdObj: CLICommandParser) {
   });
   switch (parsed.args[0]) {
     case "create": {
-      const name = parsed.options["--name"] as string;
+      const name = parsed.options["--name"];
       if (!name) printUsageAndExit(usage);
       return createDml(name);
     }

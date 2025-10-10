@@ -32,7 +32,7 @@ function run(cmdObj: CLICommandParser) {
     params: ["--in"],
     booleans: ["--interactive"],
   });
-  const workspace = parsed.options["--in"] as string | undefined;
+  const workspace = parsed.options["--in"];
   let executor: CommandExecutor;
   if (workspace) {
     const rootPath = getWorkspace(workspace).rootPath;

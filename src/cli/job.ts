@@ -65,7 +65,7 @@ function run(cmdObj: CLICommandParser) {
     printUsageAndExit(usage);
   }
 
-  const timeout = parsedArgs.options["--timeout"] as string | undefined;
+  const timeout = parsedArgs.options["--timeout"];
   const params = new StrongParams(usage, {
     env: cmdObj.env,
     image,

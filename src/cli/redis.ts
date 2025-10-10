@@ -64,7 +64,7 @@ function run(cmdObj: CLICommandParser) {
   const parsed = cmdObj.parseOptions({ params: ["-p"] });
 
   const [command, namespace] = parsed.args;
-  const port = parsed.options["-p"] as string;
+  const port = parsed.options["-p"];
   // @ts-expect-error left as an exercise for the reader
   const handler = handlers[command];
   if (!handler) {

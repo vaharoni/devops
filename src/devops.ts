@@ -22,6 +22,7 @@ import namespace from "./cli/namespace";
 import image from "./cli/image";
 import template from "./cli/template";
 import job from "./cli/job";
+import cloudrun from "./cli/cloudrun";
 
 const [_node, _scriptPath, ...commandArgs] = process.argv;
 
@@ -45,11 +46,12 @@ const allImports = [
   job,
   //= Deployment
   prepBuild,
+  cloudrun,
   affected,
   constant,
   registry,
   internalCurl,
-  jwt
+  jwt,
 ];
 
 const commands: {

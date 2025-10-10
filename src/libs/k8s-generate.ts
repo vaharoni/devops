@@ -6,7 +6,7 @@ import path from "path";
 import yaml from "yaml";
 import fs from 'fs';
 import { globSync } from "glob";
-import _, { template } from 'lodash';
+import _ from 'lodash';
 import Handlebars from "handlebars";
 import { getImageData } from "./config";
 import { getImageDescendentData } from "./discovery/images";
@@ -33,7 +33,7 @@ export function generateImageDeployments(
       return generateManifestForDeployment(projectData.rootPath, projectData.deployment!.template, renderFn);
     });
   const debug = generateDebugDeployment(monorepoEnv, image, gitSha);
-  const manifest = [debug, ...apps].join("\n---\n");
+  const manifest = [debug, ...apps].filter(Boolean).join("\n---\n");
   return ensureProperDomainsPresent(manifest, monorepoEnv, image);
 }
 
@@ -54,6 +54,7 @@ export function generateDebugDeployment(
   const context = generator.getDebug();
   const renderFn = (template: string) => Handlebars.compile(template)(context);
   const debugTemplate = getImageData(image)["debug-template"];
+  if (!debugTemplate) return;
   return generateManifestsFromTemplateName(debugTemplate, renderFn).map(x => yaml.stringify(x)).join("\n---\n");
 }
 

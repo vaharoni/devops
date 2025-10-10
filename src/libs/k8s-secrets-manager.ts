@@ -16,7 +16,7 @@ function execUpdateSecret(
   new CommandExecutor(fullCommand, { quiet: true, redactedCommand }).exec();
 }
 
-function getSecret(monorepoEnv: string, keys: string[] = []) {
+export function getMonorepoSecretObject(monorepoEnv: string, keys: string[] = []) {
   // Dots in jsonpath can only be accessed with a \ prefix
   const escapedSecretFileName = SECRET_FILE_NAME.replaceAll(".", "\\.");
   // prettier-ignore
@@ -39,7 +39,7 @@ function updateSecret(monorepoEnv: string, vars: Record<string, string>) {
     );
     process.exit(1);
   }
-  const current = getSecret(monorepoEnv);
+  const current = getMonorepoSecretObject(monorepoEnv);
   const newVars = { ...current, ...vars };
   execUpdateSecret(monorepoEnv, newVars);
 }
@@ -49,15 +49,19 @@ function deleteSecretKeys(monorepoEnv: string, keys: string[] = []) {
     console.error("Keys to delete must be provided");
     process.exit(1);
   }
-  const secretValue = getSecret(monorepoEnv);
+  const secretValue = getMonorepoSecretObject(monorepoEnv);
   keys.forEach((key) => delete secretValue[key]);
   execUpdateSecret(monorepoEnv, secretValue);
 }
 
 //= Interface (L3)
 
-export function getMonorepoSecret(monorepoEnv: string, keys: string[] = []) {
-  const value = getSecret(monorepoEnv, keys);
+export function getMonorepoSecretStr(monorepoEnv: string, keys: string[] = []) {
+  const value = getMonorepoSecretObject(monorepoEnv, keys);
+  if (Object.keys(value).length === 1) {
+    return Object.values(value)[0];
+  }
+  
   return Object.entries(value)
     .map((pair) => pair.join("="))
     .join("\n");
