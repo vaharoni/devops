@@ -11,6 +11,11 @@ const imagesFilePath = path.join(process.cwd(), ".devops/config/images.yaml");
 export const { getConst } = processConstFile();
 export const { getImageData, getImageNames, getTemplateData } = processImagesFile();
 
+export function getImageType(image: string) {
+  const imageData = getImageData(image);
+  return imageData["cloudrun"] ? "cloudrun" : "k8s";
+}
+
 // Process config/constants.yaml
 
 function processConstFile() {

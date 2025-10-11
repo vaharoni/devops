@@ -58,11 +58,12 @@ const handlers = {
   },
   prune: (opts: StrongParams) => {
     const regName = containerRegistryPath();
+    const image = opts.required("image");
     const repoName = containerRegistryImageName(
-      opts.required("image"),
+      image,
       opts.required("env")
     );
-    prune(regName, repoName);
+    prune(regName, repoName, image);
   },
 };
 

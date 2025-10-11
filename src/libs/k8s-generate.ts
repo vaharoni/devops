@@ -17,6 +17,14 @@ const DB_MIGRATE_TEMPLATE_NAME = 'db-migrate';
 
 type RenderFn = (template: string) => string;
 
+function verifyNotCloudrunImage(image: string) {
+  const imageData = getImageData(image);
+  if (imageData["cloudrun"]) {
+    console.error(`Image ${image} is a cloudrun image. Cloudrun images are not supported for k8s generation`);
+    process.exit(1);
+  }
+}
+
 // = Interface
 
 export function generateImageDeployments(
@@ -24,6 +32,7 @@ export function generateImageDeployments(
   image: string,
   gitSha: string
 ) {
+  verifyNotCloudrunImage(image);
   const generator = new ImageContextGenerator(monorepoEnv, image, gitSha);
   const apps = getImageDescendentData(image)
     .filter((packageData) => packageData.deployment)
@@ -38,6 +47,7 @@ export function generateImageDeployments(
 }
 
 export function generateWorkspaceDeployment(packageData: PackageData, monorepoEnv: string, image: string, gitSha: string) {
+  verifyNotCloudrunImage(image);
   const generator = new ImageContextGenerator(monorepoEnv, image, gitSha);
   const context = generator.getDeployment(packageData);
   const renderFn = (template: string) => Handlebars.compile(template)(context);
@@ -50,6 +60,7 @@ export function generateDebugDeployment(
   image: string,
   gitSha: string
 ) {
+  verifyNotCloudrunImage(image);
   const generator = new ImageContextGenerator(monorepoEnv, image, gitSha);
   const context = generator.getDebug();
   const renderFn = (template: string) => Handlebars.compile(template)(context);
@@ -63,6 +74,7 @@ export function generateDbMigrateJob(
   image: string,
   gitSha: string
 ) {
+  verifyNotCloudrunImage(image);
   const generator = new ImageContextGenerator(monorepoEnv, image, gitSha);
   const context = generator.getDbMigrate();
   const renderFn = (template: string) => Handlebars.compile(template)(context);

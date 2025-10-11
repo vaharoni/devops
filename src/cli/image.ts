@@ -2,9 +2,11 @@ import { deleteImageVersion, getImageVersion, getWorkspaceScale, resetWorkspaceS
 import { CLICommandParser, printUsageAndExit, StrongParams } from "../../src/cli/common";
 import { generateImageDeployments } from "../libs/k8s-generate";
 import { applyHandler } from "../libs/k8s-helpers";
+import { getImageType } from "../libs/config";
 
 const oneLiner = "Applies image-related manifests, retrieves or set the version deployed, and scales deployments of applications";
 const keyExamples = `
+    $ devops image get        type   main-node
     $ devops image deployment gen    main-node sha  --env staging
     $ devops image deployment create main-node sha  --env staging
     $ devops image deployment delete main-node      --env staging
@@ -20,6 +22,11 @@ const keyExamples = `
 
 const usage = `
 ${oneLiner}
+
+GET IMAGE TYPE
+    devops image get type <image-name>
+
+    Returns "k8s" or "cloudrun" depending on the image type.
 
 GENERATING DEPLOYMENT MANIFESTS
     devops image deployment gen|create|delete <image-name> <sha>
@@ -49,6 +56,11 @@ EXAMPLES
 `;
 
 const handlers = {
+  get: {
+    type: (opts: StrongParams) => {
+      console.log(getImageType(opts.required("image")));
+    },
+  },
   deployment: {
     gen: (opts: StrongParams) => {
       console.log(
@@ -176,7 +188,9 @@ function run(cmdObj: CLICommandParser) {
   }
 
   function getExtraParams() {
-    if (command === 'scale') {
+    if (command === 'get') {
+      return {};
+    } else if (command === 'scale') {
       return subcommand === 'set' ? { workspace: param1, replicas: param2 } : { workspace: param1 };
     } else {
       return { sha: param1 };

@@ -1,6 +1,6 @@
 import { CommandExecutor } from "../../cli/common";
 import { z } from "zod";
-import { getConst } from "../config";
+import { getConst, getImageData } from "../config";
 
 const repoTagMetadataSchema = z.object({
   // What we rely on
@@ -60,12 +60,20 @@ export function prune(
   /** To keep the image-related constants simple, this accepts the full URL including the prefix registry.digitalocean.com */
   registryFullName: string,
   /** The name of the repository inside the registry */
-  repoName: string
+  repoName: string,
+  image: string
 ) {
   const infra = getConst("infra");
   if (infra !== "digitalocean") {
     console.warn(
       "Pruning is only supported for the DigitalOcean container registry"
+    );
+    return;
+  }
+  const imageData = getImageData(image);
+  if (imageData["cloudrun"]) {
+    console.warn(
+      "Pruning is skipped for cloudrun images"
     );
     return;
   }
