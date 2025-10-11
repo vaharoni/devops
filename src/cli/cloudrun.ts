@@ -4,7 +4,7 @@ import { buildDev, deploy } from "../libs/cloudrun-helpers";
 const oneLiner =
   "Supports cloudrun images";
 const keyExamples = `
-    $ devops cloudrun deploy cloudrun-image SHA --env staging --region us-central1 [--forward-env ENV1,ENV2 --allow-unauthenticated]
+    $ devops cloudrun deploy cloudrun-image SHA --env staging --region us-east1 [--forward-env ENV1,ENV2 --allow-unauthenticated]
     $ devops cloudrun build-dev cloudrun-image
 `.trim();
 

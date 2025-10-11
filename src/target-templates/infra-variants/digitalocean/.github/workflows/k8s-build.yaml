@@ -9,6 +9,8 @@ on:
 permissions:
   contents: read
   packages: read
+  # For deploying images to Cloud Run
+  # id-token: write
 
 jobs:
   build_images:
@@ -35,6 +37,14 @@ jobs:
           access_token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           cluster_name: ${{ secrets.DIGITALOCEAN_CLUSTER_NAME }}
 
+      # For deploying images to Cloud Run
+      # - name: Connect to Cloud Run
+      #   uses: ./.github/actions/connect-to-cloud-run@v1
+      #   with:
+      #     project_id: ${{ vars.GCP_PROJECT_ID }}
+      #     project_number: ${{ vars.GCP_PROJECT_NUMBER }}
+      #     region: ${{ vars.GCP_ARTIFACT_REGISTRY_REGION }}
+
       - name: Build image
         uses: ./.github/actions/build-image@v1
         with:
@@ -59,15 +69,23 @@ jobs:
         with:
           access_token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           cluster_name: ${{ secrets.DIGITALOCEAN_CLUSTER_NAME }}
-          
+
+      # For deploying images to Cloud Run
+      # - name: Connect to Cloud Run
+      #   uses: ./.github/actions/connect-to-cloud-run@v1
+      #   with:
+      #     project_id: ${{ vars.GCP_PROJECT_ID }}
+      #     project_number: ${{ vars.GCP_PROJECT_NUMBER }}
+      #     region: ${{ vars.GCP_ARTIFACT_REGISTRY_REGION }}
+
       - name: Run DB Migrate
         uses: ./.github/actions/db-migrate@v1
 
       # Repeat per image (it checks if the image is affected and deploys it if it is)
       - name: Deploy main node
-        uses: ./.github/actions/deploy-image@v1
+        uses: ./.github/actions/deploy-image-k8s@v1
         with: { "image_name": "main-node" }
 
       - name: Deploy main python
-        uses: ./.github/actions/deploy-image@v1
+        uses: ./.github/actions/deploy-image-k8s@v1
         with: { "image_name": "main-python" }

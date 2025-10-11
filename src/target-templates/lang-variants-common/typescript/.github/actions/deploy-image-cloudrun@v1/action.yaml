@@ -1,0 +1,71 @@
+name: "Deploy image"
+description: "Deploy the specified image if it's affected and set its version"
+inputs:
+  project_id: 
+    description: 'The GCP project ID of the Cloud Run service'
+    required: true
+  image_name:
+    description: 'The image key in images.yaml'
+    required: true
+  region:
+    description: 'The region of the Cloud Run service'
+    required: true
+  sa_id:
+    description: 'The name of the service account used to run the Cloud Run service'
+    required: true
+  forward_env:
+    description: 'The environment variables to forward to the Cloud Run service (comma separated, e.g. ENV1,ENV2)'
+    required: false
+  allow_unauthenticated:
+    description: 'Whether to allow unauthenticated access to the Cloud Run service. Send "true" to allow unauthenticated access.'
+    required: false
+outputs:
+  affected:
+    description: 'Whether the specified image is affected (computed before deploy)'
+    value: ${{ steps.check_affected.outputs.affected }}
+runs:
+  using: "composite"
+  steps:
+    - name: Setup basic vars
+      shell: bash
+      run: |
+        echo "IMAGE_NAME=${{ inputs.image_name }}" >> $GITHUB_ENV
+
+    - name: Check if affected
+      id: check_affected
+      shell: bash
+      run: |
+        AFFECTED=$(devops affected image $IMAGE_NAME --from-live-version)
+        echo "affected=$AFFECTED" >> $GITHUB_OUTPUT
+        echo "affected=$AFFECTED"
+        if [[ "$AFFECTED" == "true" ]]; then
+          echo "${{ env.IMAGE_NAME }} is affected. Proceeding with deployment."
+        else
+          echo "${{ env.IMAGE_NAME }} is not affected. Skipping."
+        fi
+
+    - name: Deploy
+      shell: bash
+      if: steps.check_affected.outputs.affected == 'true'
+      run: |
+        RUNTIME_SA="${{ inputs.sa_id }}@${{ inputs.project_id }}.iam.gserviceaccount.com"
+
+        if [[ -z "${{ inputs.forward_env }}" ]]; then
+          FORWARD_ENV=""
+        else
+          FORWARD_ENV="--forward-env ${{ inputs.forward_env }}"
+        fi
+
+        if [[ "${{ inputs.allow_unauthenticated }}" == "true" ]]; then
+          ALLOW_UNAUTHENTICATED="--allow-unauthenticated"
+        else
+          ALLOW_UNAUTHENTICATED="--no-allow-unauthenticated"
+        fi
+
+        devops cloudrun deploy ${{ env.IMAGE_NAME }} ${{ github.sha }} \
+          --region ${{ inputs.region }} \
+          --service-account ${RUNTIME_SA} \
+          ${FORWARD_ENV} \
+          ${ALLOW_UNAUTHENTICATED}
+
+        devops image version set ${{ env.IMAGE_NAME }} ${{ github.sha }}
