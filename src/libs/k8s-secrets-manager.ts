@@ -45,7 +45,7 @@ function updateSecret(monorepoEnv: string, vars: Record<string, string>) {
 }
 
 function deleteSecretKeys(monorepoEnv: string, keys: string[] = []) {
-  if (!keys || keys.length === 0) {
+  if (!keys?.length) {
     console.error("Keys to delete must be provided");
     process.exit(1);
   }
@@ -58,7 +58,7 @@ function deleteSecretKeys(monorepoEnv: string, keys: string[] = []) {
 
 export function getMonorepoSecretStr(monorepoEnv: string, keys: string[] = []) {
   const value = getMonorepoSecretObject(monorepoEnv, keys);
-  if (Object.keys(value).length === 1) {
+  if (keys.length === 1) {
     return Object.values(value)[0];
   }
   
