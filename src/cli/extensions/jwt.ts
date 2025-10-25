@@ -1,5 +1,5 @@
-import { InternalToken } from "../app-support/crypto";
-import { CLICommandParser, printUsageAndExit } from "./common";
+import { InternalToken } from "../../app-support/crypto";
+import { CLICommandParser, printUsageAndExit } from "../common";
 
 const oneLiner =
   "Returns a JWT-like token to allow verifying internal communication within the namespace";
@@ -27,6 +27,4 @@ async function run(cmdObj: CLICommandParser) {
   console.log(new InternalToken(subject).generate());
 }
 
-export default {
-  jwt: { oneLiner, keyExamples, run },
-};
+export const jwt = { oneLiner, keyExamples, run };

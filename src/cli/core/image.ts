@@ -1,8 +1,8 @@
-import { deleteImageVersion, getImageVersion, getWorkspaceScale, resetWorkspaceScale, setImageVersion, setWorkspaceScale } from "../libs/k8s-image-config";
-import { CLICommandParser, printUsageAndExit, StrongParams } from "../../src/cli/common";
-import { generateImageDeployments } from "../libs/k8s-generate";
-import { applyHandler } from "../libs/k8s-helpers";
-import { getImageType } from "../libs/config";
+import { deleteImageVersion, getImageVersion, getWorkspaceScale, resetWorkspaceScale, setImageVersion, setWorkspaceScale } from "../../libs/k8s-image-config";
+import { CLICommandParser, printUsageAndExit, StrongParams } from "../../../src/cli/common";
+import { generateImageDeployments } from "../../libs/k8s-generate";
+import { applyHandler } from "../../libs/k8s-helpers";
+import { getImageType } from "../../libs/config";
 
 const oneLiner = "Applies image-related manifests, retrieves or set the version deployed, and scales deployments of applications";
 const keyExamples = `
@@ -206,6 +206,4 @@ function run(cmdObj: CLICommandParser) {
   handler(params);
 }
 
-export default {
-  image: { oneLiner, keyExamples, run },
-};
+export const image = { oneLiner, keyExamples, run };

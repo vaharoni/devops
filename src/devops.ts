@@ -1,76 +1,90 @@
 #!/usr/bin/env bun
 // This file behaves as a façade for various devops scripts
+import { globSync } from "glob";
 import { CLICommandParser, printUsageAndExit } from "./cli/common";
-import affected from "./cli/affected";
-import constant from "./cli/constant";
-import console from "./cli/console";
-import db from "./cli/db";
-import dml from "./cli/dml";
-import registry from "./cli/registry";
-import env from "./cli/env";
-import exec from "./cli/exec";
-import prepBuild from "./cli/prep-build";
-import prisma from "./cli/prisma";
-import run from "./cli/run";
-import runMany from "./cli/run-many";
-import test from "./cli/test";
-import init from "./cli/init";
-import redis from "./cli/redis";
-import internalCurl from "./cli/internal-curl";
-import jwt from "./cli/jwt";
-import namespace from "./cli/namespace";
-import image from "./cli/image";
-import template from "./cli/template";
-import job from "./cli/job";
-import cloudrun from "./cli/cloudrun";
+import * as coreImports from "./cli/core";
+import * as extensionImports from "./cli/extensions";
+import { getConst } from "./libs/config";
+import { existsSync, readdirSync } from "fs";
+import path from "path";
 
 const [_node, _scriptPath, ...commandArgs] = process.argv;
 
-const allImports = [
-  // day-to-day
-  init,
-  run,
-  runMany,
-  exec,
-  env,
-  prisma,
-  dml,
-  db,
-  redis,
-  console,
-  test,
-  //= Infra
-  namespace,
-  image,
-  template,
-  job,
-  //= Deployment
-  prepBuild,
-  cloudrun,
-  affected,
-  constant,
-  registry,
-  internalCurl,
-  jwt,
-];
-
-const commands: {
+// Types
+type CommandMap = {
   [key: string]: {
     oneLiner: string;
     keyExamples: string;
     run: CallableFunction;
     key: string;
   };
-} = {};
-allImports.forEach((imported) => {
-  Object.entries(imported).forEach(([key, object]) => {
-    const { oneLiner, keyExamples, run } = object;
-    commands[key] = { oneLiner, keyExamples, run, key };
-  });
-});
+}
 
-const keyLength = Math.max(...Object.keys(commands).map((x) => x.length)) + 10;
+// Presentation
 const newLine = "\n    ";
+function maxKeyLength(commands: CommandMap) {
+  return Math.max(...Object.keys(commands).map((x) => x.length)) + 10;
+}
+
+// Core commands
+const coreCommands: CommandMap = {};
+Object.entries(coreImports).forEach(([constKey, imported]) => {
+  const { oneLiner, keyExamples, run } = imported;
+  const key = 'command' in imported ? imported.command : constKey;
+  coreCommands[key] = { oneLiner, keyExamples, run, key };
+});
+const coreCommandsKeyLength = maxKeyLength(coreCommands);
+
+// Extensions
+const extensionCommands: CommandMap = {};
+const activeExtensions = getConst('extensions', { ignoreIfInvalid: true });
+if (activeExtensions?.length) {
+  const availableExtensionsLookup = Object.fromEntries(
+    Object.entries(extensionImports).map(([constKey, value]) => {
+      const { oneLiner, keyExamples, run } = value;
+      const keyInYaml = 'name' in value ? value.name : constKey;
+      const key = 'command' in value ? value.command : constKey;
+      return [keyInYaml, { oneLiner, keyExamples, run, key }];
+    })
+  );
+  for (const extension of activeExtensions) {
+    const extensionData = availableExtensionsLookup[extension];
+    if (!extensionData) { 
+      console.error(`\nExtension "${extension}" referenced in constants.yaml is not supported\n\n`);
+      process.exit(1);
+    }
+    extensionCommands[extensionData.key] = extensionData;
+  }
+}
+const extensionCommandsKeyLength = maxKeyLength(extensionCommands);
+
+// Plugins
+const pluginCommands: CommandMap = {};
+if (existsSync('.devops/plugins')) {
+  const pluginsDir = path.join(process.cwd(), '.devops/plugins');
+  const pluginFiles = globSync(path.join(pluginsDir, '*.ts'));
+  for (const pluginFile of pluginFiles) {
+    const plugin = await import(pluginFile);
+    const keys = Object.keys(plugin);
+    if (keys.length !== 1) {
+      console.error(`Plugin ${pluginFile} must export exactly one command`);
+      process.exit(1);
+    }
+    const constKey = keys[0];
+    const { oneLiner, keyExamples, run, command } = plugin[constKey];
+    const key = command ?? constKey;
+    if (!oneLiner || !keyExamples || !run) {
+      console.error(`Plugin ${pluginFile} must export oneLiner, keyExamples, and run`);
+      process.exit(1);
+    }
+    if (typeof run !== 'function') {
+      console.error(`Plugin ${pluginFile} must export a run function`);
+      process.exit(1);
+    }
+    pluginCommands[key] = { oneLiner, keyExamples, run, key };
+  }
+}
+const pluginCommandsKeyLength = maxKeyLength(pluginCommands);
 
 const GENERAL_USAGE = `
 Devops utilities for the monorepo.
@@ -95,13 +109,35 @@ CHOOSING ENV with <env-options>
     To skip this check, use --skip-env-check.
 
 
-COMMANDS
-    ${Object.values(commands)
+CORE COMMANDS
+    ${Object.values(coreCommands)
       .map((cmd) =>
-        [cmd.key, " ".repeat(keyLength - cmd.key.length), cmd.oneLiner].join("")
+        [cmd.key, " ".repeat(coreCommandsKeyLength - cmd.key.length), cmd.oneLiner].join("")
       )
       .join(newLine)}
 `;
+
+const EXTENSION_USAGE = Object.keys(extensionCommands).length ? `
+ACTIVE EXTENSIONS
+    ${Object.values(extensionCommands)
+      .map((cmd) =>
+        [cmd.key, " ".repeat(extensionCommandsKeyLength - cmd.key.length), cmd.oneLiner].join("")
+      )
+      .join(newLine)}
+` : '';
+
+const PLUGIN_USAGE = Object.keys(pluginCommands).length ? `
+ACTIVE PLUGINS
+    ${Object.values(pluginCommands)
+      .map((cmd) =>
+        [cmd.key, " ".repeat(pluginCommandsKeyLength - cmd.key.length), cmd.oneLiner].join("")
+      )
+      .join(newLine)}
+` : '';
+
+const ALL_USAGE = [GENERAL_USAGE, EXTENSION_USAGE, PLUGIN_USAGE].filter(Boolean).join("");
+
+const allCommands = { ...coreCommands, ...extensionCommands, ...pluginCommands };
 
 // EXAMPLES
 //     ${Object.values(commands)
@@ -115,7 +151,7 @@ COMMANDS
 //       .join(newLine)}
 
 const commandObj = new CLICommandParser(commandArgs,);
-const chosenCommand = commands[commandObj.command];
-if (!chosenCommand) printUsageAndExit(GENERAL_USAGE);
+const chosenCommand = allCommands[commandObj.command];
+if (!chosenCommand) printUsageAndExit(ALL_USAGE);
 
 chosenCommand.run(commandObj);

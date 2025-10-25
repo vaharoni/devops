@@ -1,5 +1,5 @@
 import fs from "fs";
-import { CLICommandParser, printUsageAndExit } from "./common";
+import { CLICommandParser, printUsageAndExit } from "../common";
 
 const oneLiner = "Utilities to manage and run DML scripts in the db project";
 const keyExamples = `
@@ -121,6 +121,4 @@ function run(cmdObj: CLICommandParser) {
   }
 }
 
-export default {
-  dml: { oneLiner, keyExamples, run },
-};
+export const dml = { oneLiner, keyExamples, run };

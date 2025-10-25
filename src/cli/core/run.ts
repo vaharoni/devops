@@ -1,11 +1,11 @@
-import { CLICommandParser, printUsageAndExit } from "./common";
+import { CLICommandParser, printUsageAndExit } from "../common";
 import url from "url";
 import path from "path";
-import { getWorkspace } from "../libs/discovery";
+import { getWorkspace } from "../../libs/discovery";
 
 const __file__ = url.fileURLToPath(import.meta.url);
-const __src__ = path.join(path.dirname(__file__), "../..", "src");
-const execShPath = path.join(__src__, "cli/exec.sh");
+const __cli__ = path.join(path.dirname(__file__), "../..", "cli");
+const execShPath = path.join(__cli__, "exec.sh");
 
 const oneLiner =
   "Runs a script defined in package.json after injecting env variables";
@@ -25,7 +25,7 @@ EXAMPLES
     ${keyExamples}
 `;
 
-async function run(cmdObj: CLICommandParser) {
+async function runFn(cmdObj: CLICommandParser) {
   if (cmdObj.help || cmdObj.args.length === 0) printUsageAndExit(usage);
   const [workspace, script] = cmdObj.args[0].split(":");
   if (!workspace || !script) printUsageAndExit(usage);
@@ -41,6 +41,4 @@ async function run(cmdObj: CLICommandParser) {
     .spawn();
 }
 
-export default {
-  run: { oneLiner, keyExamples, run },
-};
+export const run = { oneLiner, keyExamples, run: runFn };

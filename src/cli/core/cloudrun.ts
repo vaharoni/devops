@@ -1,5 +1,5 @@
-import { CLICommandParser, printUsageAndExit, StrongParams } from "./common";
-import { buildDev, deploy } from "../libs/cloudrun-helpers";
+import { CLICommandParser, printUsageAndExit, StrongParams } from "../common";
+import { buildDev, deploy } from "../../libs/cloudrun-helpers";
 
 const oneLiner =
   "Supports cloudrun images";
@@ -128,6 +128,4 @@ async function run(cmdObj: CLICommandParser) {
   handler(params);
 }
 
-export default {
-  cloudrun: { oneLiner, keyExamples, run },
-};
+export const cloudrun = { oneLiner, keyExamples, run };

@@ -1,11 +1,11 @@
-import { getConst, getImageData } from "../libs/config";
-import { prune } from "../libs/digital-ocean/container-reg";
+import { getConst } from "../../libs/config";
+import { prune } from "../../libs/digital-ocean/container-reg";
 import {
   containerRegistryPath,
   containerRegistryImageName,
   containerRegistryRepoPath,
-} from "../libs/k8s-constants";
-import { CLICommandParser, StrongParams, printUsageAndExit } from "./common";
+} from "../../libs/k8s-constants";
+import { CLICommandParser, StrongParams, printUsageAndExit } from "../common";
 
 const oneLiner = "Manage container repositories";
 const keyExamples = `
@@ -81,6 +81,4 @@ function run(cmdObj: CLICommandParser) {
   handler(params);
 }
 
-export default {
-  registry: { oneLiner, keyExamples, run },
-};
+export const registry = { oneLiner, keyExamples, run };

@@ -1,10 +1,10 @@
-import { getConst } from "../libs/config";
+import { getConst } from "../../libs/config";
 import {
   envToNamespace,
   imageDebugName,
-} from "../libs/k8s-constants";
-import { kubectlCommand } from "../libs/k8s-helpers";
-import { CLICommandParser, printUsageAndExit } from "./common";
+} from "../../libs/k8s-constants";
+import { kubectlCommand } from "../../libs/k8s-helpers";
+import { CLICommandParser, printUsageAndExit } from "../common";
 
 const oneLiner = "Get a shell into the debug pod of an image";
 const keyExamples = `
@@ -41,6 +41,4 @@ function run(cmdObj: CLICommandParser) {
     .spawn();
 }
 
-export default {
-  console: { oneLiner, keyExamples, run },
-};
+export const console = { oneLiner, keyExamples, run };

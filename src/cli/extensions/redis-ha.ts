@@ -1,12 +1,10 @@
-import chalk from "chalk";
-import { establishRedisTunnel, getRedisList, getRedisPassword } from "../libs/k8s-redis";
-import { CLICommandParser, printUsageAndExit, StrongParams } from "./common";
+import { CLICommandParser, printUsageAndExit, StrongParams } from "../common";
+import { establishRedisTunnel, getRedisList } from "../../libs/k8s-redis-ha";
 
 const oneLiner =
-  "Utilities to help accessing production and staging redis";
+  "Utilities to help accessing production and staging redis installation from redis-ha";
 const keyExamples = `
     $ devops redis list
-    $ devops redis password  redis-staging
     $ devops redis tunnel    redis-staging
 `.trim();
 
@@ -15,7 +13,6 @@ ${oneLiner}
 
 COMMANDS
     list                                  Lists the available redis installations
-    password <namespace>                  Shows the password for the Redis instance
     tunnel   <namespace> [-p <port>]      Sets up a tunnel to the remote Redis instance so you can access the DB from your local machine on port 9379 by default
 
 NOTES
@@ -31,30 +28,9 @@ const handlers = {
     const res = getRedisList();
     console.log(res);
   },
-  password: (opts: StrongParams) => {
-    const namespace = opts.required("namespace");
-    const res = getRedisPassword(namespace);
-    if (!res) {
-      console.error("Failed to get the secret");
-      process.exit(1);
-    } else {
-      console.log();
-      console.log(res.password);
-      console.log();
-    }
-  },
   tunnel: (opts: StrongParams) => {
     const namespace = opts.required("namespace");
     const port = opts.optional("port") ?? '9379';
-    const res = getRedisPassword(namespace);
-    console.log(
-      chalk.blue('\nAfter the tunnel is established, connect to Redis by running:\n\t') + 
-      chalk.green.bold(`redis-cli -p ${port} --askpass`)
-    );
-    if (res) {
-      console.log(chalk.blue('\tPassword: ') + chalk.green.bold(res.password))
-      console.log();
-    } 
     establishRedisTunnel(namespace, port);
   },
 };
@@ -78,6 +54,4 @@ function run(cmdObj: CLICommandParser) {
   handler(params);
 }
 
-export default {
-  redis: { oneLiner, keyExamples, run },
-};
+export const redisHa = { name: 'redis-ha', command: 'redis', oneLiner, keyExamples, run };

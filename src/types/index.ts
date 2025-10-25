@@ -14,6 +14,7 @@ export const constFileSchema = z.object({
   "cloudrun-artifact-registry-repo-path": z.string().optional(),
   "extra-remote-environments": z.array(z.string()),
   "extra-local-environments": z.array(z.string()),
+  "extensions": z.array(z.string()).optional(),
 })
 export type ConstFileSchema = z.infer<typeof constFileSchema>;
 

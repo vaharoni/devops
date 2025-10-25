@@ -1,10 +1,10 @@
 import {
-} from "../libs/k8s-image-config";
-import { CLICommandParser, printUsageAndExit, StrongParams } from "../../src/cli/common";
-import { generateDbMigrateJob } from "../libs/k8s-generate";
-import { applyHandler } from "../libs/k8s-helpers";
-import { k8sJobWaiter, printJobStatuses } from "../libs/k8s-job-waiter";
-import { dbMigrateJobName } from "../libs/k8s-constants";
+} from "../../libs/k8s-image-config";
+import { CLICommandParser, printUsageAndExit, StrongParams } from "../common";
+import { generateDbMigrateJob } from "../../libs/k8s-generate";
+import { applyHandler } from "../../libs/k8s-helpers";
+import { k8sJobWaiter, printJobStatuses } from "../../libs/k8s-job-waiter";
+import { dbMigrateJobName } from "../../libs/k8s-constants";
 
 const oneLiner = "Creates a k8s job and waits for it to run";
 const keyExamples = `
@@ -75,6 +75,4 @@ function run(cmdObj: CLICommandParser) {
   handler(params);
 }
 
-export default {
-  job: { oneLiner, keyExamples, run },
-};
+export const job = { oneLiner, keyExamples, run };

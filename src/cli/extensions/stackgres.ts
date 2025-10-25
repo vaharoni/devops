@@ -6,8 +6,8 @@ import {
   getDbBackups,
   getDbList,
   getDbPasswords,
-} from "../libs/k8s-db";
-import { CLICommandParser, printUsageAndExit, StrongParams } from "./common";
+} from "../../libs/k8s-db";
+import { CLICommandParser, printUsageAndExit, StrongParams } from "../common";
 
 const oneLiner =
   "Utilities to help day to day operations of production and staging databases";
@@ -128,6 +128,4 @@ function run(cmdObj: CLICommandParser) {
   handler(params);
 }
 
-export default {
-  db: { oneLiner, keyExamples, run },
-};
+export const stackgres = { command: 'db', oneLiner, keyExamples, run };

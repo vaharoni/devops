@@ -1,11 +1,9 @@
-import {
-} from "../libs/k8s-image-config";
-import { CLICommandParser, printUsageAndExit, StrongParams } from "../../src/cli/common";
+import { CLICommandParser, printUsageAndExit, StrongParams } from "../../../src/cli/common";
 import {
   copySecretHarborToNamespace,
   patchServiceAccountImagePullSecret,
-} from "../../src/libs/hetzner/reg-secret";
-import { checkEnvSetup, createEmptyEnvSecret, createNamespace, deleteNamespace, patchBaseSecret } from "../libs/k8s-namespace";
+} from "../../../src/libs/hetzner/reg-secret";
+import { checkEnvSetup, createEmptyEnvSecret, createNamespace, deleteNamespace, patchBaseSecret } from "../../libs/k8s-namespace";
 
 const oneLiner = "Creates the basic prerequisites for a monorepo";
 const keyExamples = `
@@ -73,6 +71,4 @@ function run(cmdObj: CLICommandParser) {
   handler(params);
 }
 
-export default {
-  namespace: { oneLiner, keyExamples, run },
-};
+export const namespace = { oneLiner, keyExamples, run };

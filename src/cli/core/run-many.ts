@@ -1,5 +1,5 @@
-import { workspaceDirectoryForLanguage } from "../libs/discovery";
-import { CLICommandParser, printUsageAndExit } from "./common";
+import { workspaceDirectoryForLanguage } from "../../libs/discovery";
+import { CLICommandParser, printUsageAndExit } from "../common";
 import concurrently, {
   type ConcurrentlyCommandInput,
   type ConcurrentlyOptions,
@@ -56,6 +56,4 @@ async function run(cmdObj: CLICommandParser) {
     });
 }
 
-export default {
-  "run-many": { oneLiner, keyExamples, run },
-};
+export const runMany = { command: 'run-many', oneLiner, keyExamples, run };

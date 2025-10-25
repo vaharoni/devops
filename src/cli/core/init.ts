@@ -1,9 +1,9 @@
 import inquirer from "inquirer";
-import { InitGenerator, type InitGeneratorFileInfo } from "../libs/init-generator";
-import { CLICommandParser, printUsageAndExit } from "./common";
+import { InitGenerator, type InitGeneratorFileInfo } from "../../libs/init-generator";
+import { CLICommandParser, printUsageAndExit } from "../common";
 import chalk from "chalk";
 import fs from 'fs-extra';
-import type { ConstFileSchema } from "../types";
+import type { ConstFileSchema } from "../../types";
 
 const oneLiner =
   "Initializes the devops utility by copying template files to the current folder";
@@ -24,9 +24,7 @@ async function run(cmdObj: CLICommandParser) {
   createFiles();
 }
 
-export default {
-  init: { oneLiner, keyExamples, run },
-};
+export const init = { oneLiner, keyExamples, run };
 
 async function createFiles() {
   const tc = new InitGenerator();

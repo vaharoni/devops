@@ -1,11 +1,11 @@
 import {
-} from "../libs/k8s-image-config";
-import { CLICommandParser, printUsageAndExit, StrongParams } from "../../src/cli/common";
-import { generateDbMigrateJob, generateDebugDeployment, generateWorkspaceDeployment, ImageContextGenerator } from "../libs/k8s-generate";
+} from "../../libs/k8s-image-config";
+import { CLICommandParser, printUsageAndExit, StrongParams } from "../common";
+import { generateDbMigrateJob, generateDebugDeployment, generateWorkspaceDeployment, ImageContextGenerator } from "../../libs/k8s-generate";
 import chalk from "chalk";
-import { getWorkspace } from "../libs/discovery";
-import { getWorkspaceImages } from "../libs/discovery/images";
-import { getImageData, getImageNames } from "../libs/config";
+import { getWorkspace } from "../../libs/discovery";
+import { getWorkspaceImages } from "../../libs/discovery/images";
+import { getImageData, getImageNames } from "../../libs/config";
 
 const SUPPORTED_CONTEXT_TYPES = ['deployment', 'db-migrate', 'debug'];
 
@@ -164,6 +164,4 @@ function run(cmdObj: CLICommandParser) {
   handler(params);
 }
 
-export default {
-  template: { oneLiner, keyExamples, run },
-};
+export const template = { oneLiner, keyExamples, run };

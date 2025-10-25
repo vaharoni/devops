@@ -3,9 +3,9 @@ import {
   findImagesWithAffectedWorkspace,
   isImageAffected,
   isWorkspaceAffected,
-} from "../libs/affected-entities";
-import { getImageData } from "../libs/config";
-import { CLICommandParser, printUsageAndExit, StrongParams } from "./common";
+} from "../../libs/affected-entities";
+import { getImageData } from "../../libs/config";
+import { CLICommandParser, printUsageAndExit, StrongParams } from "../common";
 
 const oneLiner =
   "Command to check whether an image or a workspace is affected by certain commit(s)";
@@ -111,6 +111,4 @@ async function run(cmdObj: CLICommandParser) {
   }
 }
 
-export default {
-  affected: { oneLiner, keyExamples, run },
-};
+export const affected = { oneLiner, keyExamples, run };

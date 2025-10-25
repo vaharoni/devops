@@ -1,4 +1,4 @@
-import { CLICommandParser, CommandExecutor, printUsageAndExit } from "./common";
+import { CLICommandParser, CommandExecutor, printUsageAndExit } from "../common";
 
 const oneLiner = "Runs tests in all projects or one specific project";
 const keyExamples = `
@@ -25,6 +25,4 @@ function run(cmdObj: CLICommandParser) {
   }
 }
 
-export default {
-  test: { oneLiner, keyExamples, run },
-};
+export const test = { oneLiner, keyExamples, run };

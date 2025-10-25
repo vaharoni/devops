@@ -1,11 +1,11 @@
 import fs from "fs-extra";
 import os from "os";
 import path from "path";
-import { CLICommandParser, printUsageAndExit } from "./common";
-import { getImageData, getTemplateData } from "../libs/config";
-import { getMonorepoSecretStr } from "../libs/k8s-secrets-manager";
-import { getImageDescendentData } from "../libs/discovery/images";
-import { isLocalOrRemoteEnv } from "../libs/k8s-constants";
+import { CLICommandParser, printUsageAndExit } from "../common";
+import { getImageData, getTemplateData } from "../../libs/config";
+import { getMonorepoSecretStr } from "../../libs/k8s-secrets-manager";
+import { getImageDescendentData } from "../../libs/discovery/images";
+import { isLocalOrRemoteEnv } from "../../libs/k8s-constants";
 import chalk from "chalk";
 
 const oneLiner =
@@ -119,6 +119,4 @@ async function run(cmdObj: CLICommandParser) {
   console.log(destFolder);
 }
 
-export default {
-  "prep-build": { oneLiner, keyExamples, run },
-};
+export const prepBuild = { command: 'prep-build', oneLiner, keyExamples, run };

@@ -3,13 +3,13 @@ import {
   deleteMonorepoSecret,
   getMonorepoSecretStr,
   setMonorepoSecret,
-} from "../libs/k8s-secrets-manager";
-import { CombinedEnvValidator } from "../libs/validate-env";
+} from "../../libs/k8s-secrets-manager";
+import { CombinedEnvValidator } from "../../libs/validate-env";
 import {
   CLICommandParser,
   dotEnvFilesForEnv,
   printUsageAndExit,
-} from "./common";
+} from "../common";
 
 const oneLiner = "Commands to manipulate env variables";
 const keyExamples = `
@@ -82,6 +82,4 @@ function run(cmdObj: CLICommandParser) {
   }
 }
 
-export default {
-  env: { oneLiner, keyExamples, run },
-};
+export const env = { oneLiner, keyExamples, run };

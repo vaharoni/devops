@@ -1,5 +1,5 @@
-import { getConst } from "../libs/config";
-import { CLICommandParser, printUsageAndExit } from "./common";
+import { getConst } from "../../libs/config";
+import { CLICommandParser, printUsageAndExit } from "../common";
 
 const oneLiner = "Prints to stdout a constant from constant.yaml";
 const keyExamples = `$ devops constant infra`;
@@ -20,6 +20,4 @@ async function run(cmdObj: CLICommandParser) {
   console.log(getConst(constant as any));
 }
 
-export default {
-  constant: { oneLiner, keyExamples, run },
-};
+export const constant = { oneLiner, keyExamples, run };

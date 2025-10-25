@@ -12,8 +12,18 @@
   "bin": {
     "devops": "dist/devops.js"
   },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./plugins": {
+      "types": "./dist/plugins.d.ts",
+      "default": "./dist/plugins.js"
+    }
+  },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp src/cli/exec.sh dist/cli/exec.sh",
     "test": "vitest run"
   },
   "repository": {

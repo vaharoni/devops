@@ -1,5 +1,5 @@
-import { InternalToken } from "../app-support/crypto";
-import { CLICommandParser, printUsageAndExit } from "./common";
+import { InternalToken } from "../../app-support/crypto";
+import { CLICommandParser, printUsageAndExit } from "../common";
 
 const oneLiner =
   "Runs a curl command bearing an internal jwt-like token to allow verifying internal communication within the namespace";
@@ -43,6 +43,4 @@ async function run(cmdObj: CLICommandParser) {
   cmdObj.executorFromEnv(`curl -H "Authorization: Bearer ${token}" ${rest.join(" ")}`).exec();
 }
 
-export default {
-  'internal-curl': { oneLiner, keyExamples, run },
-};
+export const internalCurl = { command: 'internal-curl', oneLiner, keyExamples, run };

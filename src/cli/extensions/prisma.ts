@@ -1,10 +1,10 @@
-import { CLICommandParser, printUsageAndExit } from "./common";
+import { CLICommandParser } from "../common";
 import url from "url";
 import path from "path";
 
 const __file__ = url.fileURLToPath(import.meta.url);
-const __src__ = path.join(path.dirname(__file__), "../..", "src");
-const execShPath = path.join(__src__, "cli/exec.sh");
+const __cli__ = path.join(path.dirname(__file__), "../..", "cli");
+const execShPath = path.join(__cli__, "exec.sh");
 
 const oneLiner = "Runs prisma commands in the db project after injecting the environment variables";
 const keyExamples = `$ devops prisma migrate dev`;
@@ -28,6 +28,4 @@ async function run(cmdObj: CLICommandParser) {
   ).spawn()
 }
 
-export default {
-  prisma: { oneLiner, keyExamples, run },
-};
+export const prisma = { oneLiner, keyExamples, run };

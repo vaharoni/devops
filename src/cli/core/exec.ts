@@ -1,11 +1,11 @@
-import { CLICommandParser, CommandExecutor, printUsageAndExit } from "./common";
+import { CLICommandParser, CommandExecutor, printUsageAndExit } from "../common";
 import url from "url";
 import path from "path";
-import { getWorkspace } from "../libs/discovery";
+import { getWorkspace } from "../../libs/discovery";
 
 const __file__ = url.fileURLToPath(import.meta.url);
-const __src__ = path.join(path.dirname(__file__), "../..", "src");
-const execShPath = path.join(__src__, "cli/exec.sh");
+const __cli__ = path.join(path.dirname(__file__), "../..", "cli");
+const execShPath = path.join(__cli__, "exec.sh");
 
 const oneLiner =
   "Executes a command after injecting env variables, either globally or in a workspace";
@@ -52,6 +52,4 @@ function run(cmdObj: CLICommandParser) {
   }
 }
 
-export default {
-  exec: { oneLiner, keyExamples, run },
-};
+export const exec = { oneLiner, keyExamples, run };
