@@ -1,7 +1,7 @@
 import {
 } from "../../libs/k8s-image-config";
 import { CLICommandParser, printUsageAndExit, StrongParams } from "../common";
-import { generateDbMigrateJob, generateDebugDeployment, generateWorkspaceDeployment, ImageContextGenerator } from "../../libs/k8s-generate";
+import { generateDbMigrateJob, generateDebugPod, generateWorkspaceDeployment, ImageContextGenerator } from "../../libs/k8s-generate";
 import chalk from "chalk";
 import { getWorkspace } from "../../libs/discovery";
 import { getWorkspaceImages } from "../../libs/discovery/images";
@@ -130,7 +130,7 @@ const handlers = {
       const image = opts.required('workspaceOrImage');
       console.warn(chalk.green(`\nThis is a sample of generated manifests for the debug image ${image}:\n`))
       console.log(
-        generateDebugDeployment(
+        generateDebugPod(
           opts.required('env'),
           image,
           'dummy-sha'

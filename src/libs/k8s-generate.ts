@@ -41,8 +41,7 @@ export function generateImageDeployments(
       const renderFn = (template: string) => Handlebars.compile(template)(context);
       return generateManifestForDeployment(projectData.rootPath, projectData.deployment!.template, renderFn);
     });
-  const debug = generateDebugDeployment(monorepoEnv, image, gitSha);
-  const manifest = [debug, ...apps].filter(Boolean).join("\n---\n");
+  const manifest = apps.filter(Boolean).join("\n---\n");
   return ensureProperDomainsPresent(manifest, monorepoEnv, image);
 }
 
@@ -55,7 +54,7 @@ export function generateWorkspaceDeployment(packageData: PackageData, monorepoEn
   return ensureProperDomainsPresent(manifest, monorepoEnv, image);
 }
 
-export function generateDebugDeployment(
+export function generateDebugPod(
   monorepoEnv: string,
   image: string,
   gitSha: string
@@ -66,7 +65,7 @@ export function generateDebugDeployment(
   const renderFn = (template: string) => Handlebars.compile(template)(context);
   const debugTemplate = getImageData(image)["debug-template"];
   if (!debugTemplate) return;
-  return generateManifestsFromTemplateName(debugTemplate, renderFn).map(x => yaml.stringify(x)).join("\n---\n");
+  return generateManifestsFromTemplateName(debugTemplate, renderFn, { validate: false }).map(x => yaml.stringify(x)).join("\n---\n");
 }
 
 export function generateDbMigrateJob(
@@ -107,13 +106,13 @@ function generateManifestForDeployment(rootPath: string, templateName: string, r
 
 // L2 generation
 
-function generateManifestsFromTemplateName(templateName: string, renderFn: RenderFn): object[] {
+function generateManifestsFromTemplateName(templateName: string, renderFn: RenderFn, options: { validate: boolean } = { validate: true }): object[] {
   const entries = manifestFilesForTemplate(templateName);
   if (!entries) {
     console.error(`No entries found for ${templateName} in ${MANIFEST_INDEX_FILE_PATH}`);
     process.exit(1);
   }
-  return generateManifestsFromFileList(entries.map(entry => path.join(MANIFEST_FOLDER_PATH, entry)), renderFn);  
+  return generateManifestsFromFileList(entries.map(entry => path.join(MANIFEST_FOLDER_PATH, entry)), renderFn, options);  
 }
 
 // L2 generation
@@ -129,19 +128,21 @@ function generateManifestFromFilesInFolder(folderPath: string, renderFn: RenderF
 
 // L3 generation
 
-function generateManifestsFromFileList(filesList: string[], renderFn: RenderFn): object[] {
+function generateManifestsFromFileList(filesList: string[], renderFn: RenderFn, options: { validate: boolean } = { validate: true }): object[] {
   return filesList.flatMap((filePath) => {
     try {
       const manifestFileStr = fs.readFileSync(filePath, 'utf8');
       const renderedStr = renderFn(manifestFileStr);
       const res = yaml.parseAllDocuments(renderedStr);
-      res.forEach((doc) => {
-        if (!doc.get("kind") || !doc.getIn(["metadata", "name"])) {
-          console.error(`Invalid manifest file ${filePath}: kind and metadata.name must be present`);
-          console.error(doc.toString())
-          process.exit(1);
-        }          
-      })
+      if (options.validate) {
+        res.forEach((doc) => {
+          if (!doc.get("kind") || !doc.getIn(["metadata", "name"])) {
+            console.error(`Invalid manifest file ${filePath}: kind and metadata.name must be present`);
+            console.error(doc.toString())
+            process.exit(1);
+          }          
+        })
+      }
       return res.map(x => x.toJSON());
     } catch (e) {
       if (e instanceof Error) {
