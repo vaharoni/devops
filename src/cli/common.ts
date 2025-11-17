@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { execSync, spawn } from "child_process";
+import { execSync, spawn, type StdioOptions } from "child_process";
 import fs from "fs";
 import { globSync } from "glob";
 import { allSupportedEnvs } from "../libs/k8s-constants";
@@ -222,17 +222,22 @@ export class CommandExecutor {
   }
 
   /** Should be used for CLI commands intended to be used locally. Provides interactivity. Unlike exec(), stdout is not returned. */
-  spawn({ env = {} } = {}) {
+  spawn({ env, pipeStdoutTo }: { env?: object; pipeStdoutTo?: "stderr" } = {}) {
     this._checkEnvYamlFiles();
     const fullCommand = this._prepareFullCommand();
     const envToUse = this._getProcessEnv(env);
+    const stdio: StdioOptions = pipeStdoutTo === "stderr" ? ["inherit", "pipe", "inherit"] : "inherit";
     return new Promise((resolve) => {
       try {
         const childProcess = spawn(fullCommand, {
-          stdio: "inherit",
+          stdio,
           env: envToUse,
           shell: true,
         });
+
+        if (pipeStdoutTo === "stderr") {
+          childProcess.stdout?.pipe(process.stderr);
+        }
 
         childProcess.on("close", (code) => {
           if (code !== 0) {

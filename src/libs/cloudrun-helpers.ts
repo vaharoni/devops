@@ -46,7 +46,8 @@ export async function buildDev(image: string) {
   const sha = randomBytes(12).toString("hex");
 
   const buildDir = new CommandExecutor(`devops prep-build ${image}`, {
-    env,
+    env, 
+    quiet: true
   }).exec().trim();
 
   const tag = containerRegistryRepoPath(image, env, sha);
@@ -55,17 +56,17 @@ export async function buildDev(image: string) {
   await new CommandExecutor(
     `docker build --platform linux/amd64 -t ${tag} ${buildDir} --build-arg MONOREPO_ENV=${env}`,
     { env }
-  ).spawn();
+  ).spawn({ pipeStdoutTo: "stderr" });
 
   console.warn(`Pushing ${tag}`);
-  await new CommandExecutor(`docker push ${tag}`, { env }).spawn();
+  await new CommandExecutor(`docker push ${tag}`, { env }).spawn({ pipeStdoutTo: "stderr" });
 
   console.warn(`\n✅ Built and pushed ${tag}\n`);
   console.warn('Run "devops cloudrun deploy" next. For example:')
-  console.warn(chalk.blue(`./devops cloudrun deploy ${image} ${sha} --env ${env} --allow-unauthenticated --region us-east1 --forward-env ENV1,ENV2 --service-account RUNTIME_SA`));
+  console.warn(chalk.blue(`./devops cloudrun deploy ${image} ${sha} --env ${env} --allow-unauthenticated --region us-east1 --forward-env ENV1,ENV2 -- --service-account RUNTIME_SA`));
   console.warn(chalk.yellow(`\n\nRUNTIME_SA is the name of the service account used to run the Cloud Run service.`));
   console.warn(chalk.yellow(`Find it with "gcloud iam service-accounts list"\n`));
-  console.log(tag);
+  console.log(sha);
 }
 
 export async function deploy({
