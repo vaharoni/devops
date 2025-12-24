@@ -23,7 +23,7 @@ EXAMPLES
 
 async function run(cmdObj: CLICommandParser) {
   cmdObj.executorFromEnv(
-    `${execShPath} db prisma ${cmdObj.args.join(" ")}`,
+    `${execShPath} db bunx prisma ${cmdObj.args.join(" ")}`,
     { checkEnvYaml: false }
   ).spawn()
 }
