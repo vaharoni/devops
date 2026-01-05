@@ -1,7 +1,11 @@
 import chalk from "chalk";
+import { globSync } from "glob";
+import path from "path";
 import { nodeWorkspaces } from "./process-package-json";
 import { pythonWorkspaces } from "./process-pyproject-toml";
 import type { SupportedLanguages, WorkspaceIndex } from "../../types";
+
+const rootPath = process.env.MONOREPO_ROOT || process.cwd();
 
 const _workspaces: WorkspaceIndex = {};
 let _workspacesLoaded = false;
@@ -57,4 +61,14 @@ export function getWorkspace(workspaceName: string) {
     process.exit(13);
   }
   return workspace;
+}
+
+export function globEnvYamlFiles(): string[] {
+  const allWorkspaces = workspaces();
+  const workspacePaths = [
+    ...new Set(Object.values(allWorkspaces).map((w) => w.rootPath)),
+  ];
+  return workspacePaths.flatMap((wsPath) =>
+    globSync(path.join(rootPath, wsPath, "**/env.yaml"))
+  );
 }

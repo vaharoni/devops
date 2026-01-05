@@ -1,8 +1,8 @@
 import chalk from "chalk";
 import { execSync, spawn, type StdioOptions } from "child_process";
 import fs from "fs";
-import { globSync } from "glob";
 import { allSupportedEnvs } from "../libs/k8s-constants";
+import { globEnvYamlFiles } from "../libs/discovery";
 
 type ParsedArgs<TBoolKeys extends readonly string[], TParamKeys extends readonly string[]> = {
   args: string[];
@@ -294,7 +294,7 @@ export class CommandExecutor {
 
   _checkEnvYamlFiles() {
     if (!this.checkEnvYaml) return;
-    const envYamlFiles = globSync("**/env.yaml");
+    const envYamlFiles = globEnvYamlFiles();
     const checkEnvCmd = new CommandExecutor(
       `devops env _validate ${envYamlFiles.join(" ")}`,
       { env: this.env, quiet: true, checkEnvYaml: false }

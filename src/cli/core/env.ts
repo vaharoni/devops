@@ -1,10 +1,10 @@
-import { globSync } from "glob";
 import {
   deleteMonorepoSecret,
   getMonorepoSecretStr,
   setMonorepoSecret,
 } from "../../libs/k8s-secrets-manager";
 import { CombinedEnvValidator } from "../../libs/validate-env";
+import { globEnvYamlFiles } from "../../libs/discovery";
 import {
   CLICommandParser,
   dotEnvFilesForEnv,
@@ -38,7 +38,7 @@ function run(cmdObj: CLICommandParser) {
   const [command, ...rest] = cmdObj.args;
   switch (command) {
     case "validate": {
-      const envYamlFiles = globSync("**/env.yaml");
+      const envYamlFiles = globEnvYamlFiles();
 
       // We have to have a _validate so that we go through a CommandExecutor which injects env variables into the process
       cmdObj
