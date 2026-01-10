@@ -56,9 +56,9 @@ export async function POST(request: Request) {
 
 ## Testing a secure endpoint in local development
 
-Make sure your `config/.env.global` has something like:
+Make sure your `config/.env.global` has something like the following. This represents hex of 32 bytes. When creating a namespace, devops properly set these for you in a k8s secret. Locally, something like this suffices.
 ```text
-MONOREPO_BASE_SECRET=123456789abcdef
+MONOREPO_BASE_SECRET=0000111122223333444455556666777788889999aaaabbbbccccddddeeeeffff
 ```
 
 Then run:
