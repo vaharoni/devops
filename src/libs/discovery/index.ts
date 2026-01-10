@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { globSync } from "glob";
+import fs from "fs";
 import path from "path";
 import { nodeWorkspaces } from "./process-package-json";
 import { pythonWorkspaces } from "./process-pyproject-toml";
@@ -68,7 +68,7 @@ export function globEnvYamlFiles(): string[] {
   const workspacePaths = [
     ...new Set(Object.values(allWorkspaces).map((w) => w.rootPath)),
   ];
-  return workspacePaths.flatMap((wsPath) =>
-    globSync(path.join(rootPath, wsPath, "**/env.yaml"))
-  );
+  return workspacePaths
+    .map((wsPath) => path.join(rootPath, wsPath, "env.yaml"))
+    .filter((p) => fs.existsSync(p));
 }
