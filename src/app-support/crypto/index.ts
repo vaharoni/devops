@@ -1,5 +1,5 @@
 import { generateInternalAuthToken, parseInternalAuthTokenOrThrow } from "./internal-token";
-export { encryptAes256Gcm as encrypt, decryptAes256Gcm as decrypt } from "./aes";
+export { encryptAes256Gcm, decryptAes256Gcm } from "./aes";
 
 /** 
  * A simple token generation/verification class that relies on the subject field of an internal JWT-like token. It can:
