@@ -107,9 +107,11 @@ export const prismaClientSingleton = () => {
   return client as unknown as ExtendedTransactionClient | FlatTransactionClient;
 };
 
+// Use the same global singleton key as db-client.ts (prismaGlobal)
+// This ensures all code importing from "db" uses the same transactional client
 declare global {
   // eslint-disable-next-line no-var
-  var prismaTestGlobal:
+  var prismaGlobal:
     | ExtendedTransactionClient
     | FlatTransactionClient
     | undefined;
@@ -125,9 +127,9 @@ export type FlatTransactionClient = Prisma.TransactionClient & {
 };
 
 const prisma: ExtendedTransactionClient | FlatTransactionClient =
-  globalThis.prismaTestGlobal ?? prismaClientSingleton();
+  globalThis.prismaGlobal ?? prismaClientSingleton();
 
-globalThis.prismaTestGlobal = prisma;
+globalThis.prismaGlobal = prisma;
 
 export { prisma };
 
