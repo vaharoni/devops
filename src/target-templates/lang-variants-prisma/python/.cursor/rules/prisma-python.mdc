@@ -1,0 +1,55 @@
+---
+globs: *.prisma,*.sql
+alwaysApply: false
+---
+
+# Prisma (Python)
+
+Assume all existing prisma migrations are applied, hence never change existing migrations.
+
+NEVER reset the development database without permission.
+
+As you know, Prisma is not good at renaming, so after creating migrations automatically from schema changes always go over the migrations and make sure it captured the user intent.
+
+## Commands
+
+All prisma commands should be executed via the devopspy CLI:
+
+```bash
+./devopspy prisma <some command>
+./devopspy prisma migrate dev
+```
+
+To generate the Prisma client after schema changes:
+
+```bash
+./devopspy run db:generate
+```
+
+## DB Package
+
+The prisma schema resides in `db/prisma/schema.prisma`. To use the Prisma client from any application, add `db` as a workspace dependency in your `pyproject.toml`:
+
+```toml
+[tool.uv.sources]
+db = { workspace = true }
+```
+
+Then import as usual:
+
+```python
+from db import prisma
+```
+
+## Schema Conventions
+
+When editing Prisma schemas:
+
+- Define new models with singular PascalCase names and map them to plural snake_case table names via `@@map`.
+- All table columns should remain in snake_case using `@map` on each field when needed.
+- Default primary keys should be `String @id @default(cuid())` unless there is an explicit reason to use another strategy.
+- Add `@default(now())` + `@map("created_at")` for creation timestamps and `@default(now()) @updatedAt @map("updated_at")` for update timestamps.
+- Always create an index (`@@index`) for every relational field to keep lookups performant.
+- Prefer Prisma's default column type mapping; use `@db.*` annotations only when you truly need a non-default database type.
+- Prefer lowercase values for enums we fully control (e.g., `pending`, `completed` instead of `PENDING`, `COMPLETED`).
+- Prefer strings rather than enums for data-driven closed-lists unless the user requests otherwise.

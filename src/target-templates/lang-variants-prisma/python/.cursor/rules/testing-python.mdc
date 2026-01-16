@@ -1,0 +1,89 @@
+---
+alwaysApply: true
+---
+
+# Testing
+
+## Running Tests
+
+**IMPORTANT**: Always use `./devopspy test` to run tests:
+
+```bash
+# Run all tests
+./devopspy test
+
+# Run tests for a specific package
+./devopspy test <project-name>
+./devopspy test my-service
+```
+
+This command:
+
+- Sets `MONOREPO_ENV=test` to use the test database (separate from development)
+- Loads the correct environment variables from `config/.env.test`
+- Ensures test isolation
+
+**Never run tests directly with `pytest`** - this will use the development database and might pollute it with test data.
+
+## Prisma Transactional Testing
+
+We use a transactional testing pattern where each test runs inside a database transaction that is automatically rolled back after the test completes. This ensures:
+
+- Complete test isolation - tests don't affect each other
+- No cleanup code needed - the rollback handles it
+- Fast tests - no need to truncate tables between tests
+
+### Setting Up Tests for a New Package
+
+1. Create a `tests/conftest.py` in your package that imports the test fixtures:
+
+```python
+from db.db_client_test import *
+```
+
+2. Ensure `db` is in your workspace dependencies in `pyproject.toml`:
+
+```toml
+[project]
+dependencies = ["db"]
+
+[tool.uv.sources]
+db = { workspace = true }
+```
+
+### Writing Tests
+
+Tests receive a `db_connection` fixture that provides a transactional database connection:
+
+```python
+import pytest
+
+@pytest.mark.asyncio
+async def test_creates_record(db_connection):
+    # This record will be rolled back after the test
+    record = await db_connection.mymodel.create(
+        data={"name": "test"}
+    )
+    
+    assert record.id is not None
+
+@pytest.mark.asyncio
+async def test_can_use_same_data(db_connection):
+    # This test gets a clean slate - the previous test's data was rolled back
+    record = await db_connection.mymodel.create(
+        data={"name": "test"}  # same name works!
+    )
+    
+    assert record.id is not None
+```
+
+### How It Works
+
+The `db_connection` fixture in `db/db_client_test.py`:
+
+- Creates a new Prisma client and connects to the database
+- Starts a transaction and yields a `TransactionProxy` to the test
+- Raises `RollbackTransaction` after the test completes to rollback all changes
+- Disconnects from the database
+
+This means each test receives an isolated transaction that is automatically rolled back.

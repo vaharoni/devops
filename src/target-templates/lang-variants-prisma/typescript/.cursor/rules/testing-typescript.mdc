@@ -1,0 +1,103 @@
+---
+alwaysApply: true
+---
+
+# Testing
+
+## Running Tests
+
+**IMPORTANT**: Always use `./devops test` to run tests:
+
+```bash
+# Run all tests
+./devops test
+
+# Run tests for a specific package
+./devops test <project-name>
+./devops test @local/my-service
+```
+
+This command:
+
+- Sets `MONOREPO_ENV=test` to use the test database (separate from development)
+- Loads the correct environment variables from `config/.env.test`
+- Ensures test isolation
+
+**Never run tests directly with `bun test` or `vitest`** - this will use the development database and might pollute it with test data if the transactional testing (see below) is not properly configured.
+
+## Prisma Transactional Testing
+
+We use a transactional testing pattern where each test runs inside a database transaction that is automatically rolled back after the test completes. This ensures:
+
+- Complete test isolation - tests don't affect each other
+- No cleanup code needed - the rollback handles it
+- Fast tests - no need to truncate tables between tests
+
+### Setting Up Tests for a New Package
+
+1. Add vitest as a dev dependency and a test script to your `package.json`:
+
+```json
+{
+  "devDependencies": {
+    "vitest": "^3.0.9"
+  },
+  "scripts": {
+    "test": "vitest"
+  }
+}
+```
+
+2. Create a `vitest.config.ts` in your package root:
+
+```typescript
+import { defineConfig } from "vitest/config";
+
+export default defineConfig({
+  test: {
+    setupFiles: ["../../db/prisma-setup-vitest.ts"], // adjust path based on package location
+  },
+});
+```
+
+3. Ensure `"db": "workspace:*"` is in your dependencies if you use Prisma.
+
+### Writing Tests
+
+Tests can create database records freely - they will be rolled back automatically:
+
+```typescript
+import { describe, it, expect } from "vitest";
+import { prisma } from "db";
+
+describe("MyFeature", () => {
+  it("creates a record", async () => {
+    // This record will be rolled back after the test
+    const record = await prisma.myModel.create({
+      data: { name: "test" },
+    });
+
+    expect(record.id).toBeDefined();
+  });
+
+  it("can use the same data", async () => {
+    // This test gets a clean slate - the previous test's data was rolled back
+    const record = await prisma.myModel.create({
+      data: { name: "test" }, // same name works!
+    });
+
+    expect(record.id).toBeDefined();
+  });
+});
+```
+
+### How It Works
+
+The setup in `db/prisma-setup-vitest.ts` and `db/db-client-test.ts`:
+
+- Creates a transactional Prisma client with `$begin()` and `$rollback()` methods
+- Stores it in `globalThis.prismaGlobal` (same singleton used by `db/db-client.ts`)
+- Mocks the `"db"` module so all imports get the transactional client
+- Wraps each test in `beforeEach`/`afterEach` hooks that start and rollback transactions
+
+This means all code importing `prisma` from `"db"` - including services being tested - uses the same transactional client.

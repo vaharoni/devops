@@ -1,0 +1,51 @@
+---
+alwaysApply: true
+---
+
+# Monorepo Structure
+
+We have a monorepo setup configured through a global package.json. There is a `./devops` script to execute commands inside typescript packages.
+
+## Structure
+
+Packages under `applications` depend on packages under `libs` using `workspace:*` notation from package.json. It makes sense to extract code to packages under `libs` when it is used in more than one application. Applications never rely on other applications.
+
+Applications are encouraged to extract private concerns to "local libs" modules. A typical use-case are persistence-related operations (getters and mutations).
+
+All web services found under `applications` should respond to a `GET healthz` with status 200.
+
+## Using the devops CLI
+
+We use `bun` as our package manager. The `./devops` script is able to run package.json scripts inside a workspace, run a shell process inside a workspace, and execute the tests in a project:
+
+```bash
+# Most important commands
+./devops run <project-name>:<script-name>
+./devops exec --in <project-name> <command>
+./devops test
+./devops test <project-name>
+
+# Examples
+./devops run my-api:dev
+./devops exec --in my-api bun add some-package
+./devops test my-service
+
+# To install dependencies on all workspaces in the monorepo, use bun normally
+bun install
+```
+
+`./devops` automatically loads the right env variables, so don't use dotenv.
+
+There is no need to `cd` into package directories. Prefer to use `./devops run` and `./devops exec`.
+
+## Testing
+
+Use vitest.
+
+**Always run tests with `./devops test`** to ensure the test environment is used.
+
+## Inter-service Communication
+
+This repo runs in kubernetes and localhost contexts, which means the endpoint URLs will be different depending on the context. To communicate between services, the package `@vaharoni/devops` exports `function getServiceEndpoint(serviceName: string): string`. This function does not return a trailing slash. The `serviceName` can be found in the `deployment.service_name` custom key of the `package.json` of the application you wish to send requests to. If this key does not exist, halt and alert the user.
+
+However, in general, importing a shared lib is preferred over crossing the wire.

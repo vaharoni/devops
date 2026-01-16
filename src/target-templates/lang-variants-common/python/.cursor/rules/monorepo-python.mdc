@@ -1,0 +1,56 @@
+---
+alwaysApply: true
+---
+
+# Python Monorepo
+
+This project includes a Python workspace alongside the TypeScript workspace.
+
+- **`./devops`** is for TypeScript/Node packages (package.json tree)
+- **`./devopspy`** is for Python packages (pyproject.toml tree)
+
+The Python workspace is configured through a root `pyproject.toml` using uv workspaces.
+
+## Structure
+
+Packages under `applications` depend on packages under `libs` using workspace dependencies. It makes sense to extract code to packages under `libs` when it is used in more than one application. Applications never rely on other applications.
+
+All web services found under `applications` should respond to a `GET healthz` with status 200.
+
+## Using the devopspy CLI (Python only)
+
+We use `uv` as our package manager. The `./devopspy` script is able to run scripts defined in pyproject.toml inside a workspace, run a shell process inside a workspace, and execute the tests in a project:
+
+```bash
+# Most important commands
+./devopspy run <project-name>:<script-name>
+./devopspy exec --in <project-name> <command>
+./devopspy test
+./devopspy test <project-name>
+
+# Examples
+./devopspy run my-api:dev
+./devopspy exec --in my-api uv add some-package
+./devopspy test my-service
+
+# To sync dependencies on all workspaces in the monorepo, use uv normally
+uv sync
+```
+
+Scripts are defined in pyproject.toml under `[tool.devops.scripts]`:
+
+```toml
+[tool.devops.scripts]
+dev = "python -c 'from src.my_package.scripts import dev; dev()'"
+start = "python -c 'from src.my_package.scripts import start; start()'"
+```
+
+`./devopspy` automatically loads the right env variables, so don't use python-dotenv.
+
+There is no need to `cd` into package directories. Prefer to use `./devopspy run` and `./devopspy exec`.
+
+## Testing
+
+Use pytest.
+
+**Always run tests with `./devopspy test`** to ensure the test environment is used.
