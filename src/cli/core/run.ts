@@ -1,11 +1,9 @@
 import { CLICommandParser, printUsageAndExit } from "../common";
-import url from "url";
 import path from "path";
 import { getWorkspace } from "../../libs/discovery";
+import { pkgRoot } from "../../pkg-root";
 
-const __file__ = url.fileURLToPath(import.meta.url);
-const __cli__ = path.join(path.dirname(__file__), "../..", "cli");
-const execShPath = path.join(__cli__, "exec.sh");
+const execShPath = path.join(pkgRoot, "cli/exec.sh");
 
 const oneLiner =
   "Runs a script defined in package.json after injecting env variables";

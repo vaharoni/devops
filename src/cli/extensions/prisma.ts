@@ -1,10 +1,8 @@
 import { CLICommandParser } from "../common";
-import url from "url";
 import path from "path";
+import { pkgRoot } from "../../pkg-root";
 
-const __file__ = url.fileURLToPath(import.meta.url);
-const __cli__ = path.join(path.dirname(__file__), "../..", "cli");
-const execShPath = path.join(__cli__, "exec.sh");
+const execShPath = path.join(pkgRoot, "cli/exec.sh");
 
 const oneLiner = "Runs prisma commands in the db project after injecting the environment variables";
 const keyExamples = `$ devops prisma migrate dev`;

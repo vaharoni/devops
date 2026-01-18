@@ -1,12 +1,10 @@
-import url from "url";
 import path from "path";
 import fs from "fs-extra";
 import chalk from "chalk";
 import fg from 'fast-glob';
+import { pkgRoot } from "../pkg-root";
 
-const __file__ = url.fileURLToPath(import.meta.url);
-const __root__ = path.join(path.dirname(__file__), "../..");
-const templatesDir = path.join(__root__, "src/target-templates");
+const templatesDir = path.join(pkgRoot, "src/target-templates");
 const targetDir = process.cwd(); // User's current working directory
 
 type MessageGeneratorFn = (targetExists: boolean, fileInfo: InitGeneratorFileInfo) => string | null | undefined;
