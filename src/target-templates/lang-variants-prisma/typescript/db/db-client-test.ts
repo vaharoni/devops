@@ -107,16 +107,6 @@ export const prismaClientSingleton = () => {
   return client as unknown as ExtendedTransactionClient | FlatTransactionClient;
 };
 
-// Use the same global singleton key as db-client.ts (prismaGlobal)
-// This ensures all code importing from "db" uses the same transactional client
-declare global {
-  // eslint-disable-next-line no-var
-  var prismaGlobal:
-    | ExtendedTransactionClient
-    | FlatTransactionClient
-    | undefined;
-}
-
 export type ExtendedTransactionClient = Prisma.TransactionClient & {
   $begin: () => Promise<FlatTransactionClient>;
 };
@@ -126,10 +116,16 @@ export type FlatTransactionClient = Prisma.TransactionClient & {
   $rollback: () => Promise<void>;
 };
 
-const prisma: ExtendedTransactionClient | FlatTransactionClient =
-  globalThis.prismaGlobal ?? prismaClientSingleton();
+// Use the same global singleton key as db-client.ts (prismaGlobal)
+// This ensures all code importing from "db" uses the same transactional client
+// Note: We don't redeclare the global type here to avoid conflicts with db-client.ts
+// when the IDE loads both files. We use type assertions instead.
+type TestPrismaGlobal = ExtendedTransactionClient | FlatTransactionClient | undefined;
 
-globalThis.prismaGlobal = prisma;
+const prisma: ExtendedTransactionClient | FlatTransactionClient =
+  (globalThis.prismaGlobal as TestPrismaGlobal) ?? prismaClientSingleton();
+
+(globalThis as { prismaGlobal: TestPrismaGlobal }).prismaGlobal = prisma;
 
 export { prisma };
 
