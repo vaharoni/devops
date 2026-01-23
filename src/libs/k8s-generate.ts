@@ -9,6 +9,9 @@ import { globSync } from "glob";
 import _ from 'lodash';
 import Handlebars from "handlebars";
 import { getImageData } from "./config";
+
+// Register Handlebars helpers
+Handlebars.registerHelper('eq', (a, b) => a === b);
 import { getImageDescendentData } from "./discovery/images";
 
 const MANIFEST_FOLDER_PATH = path.join(process.cwd(), '.devops/manifests');
