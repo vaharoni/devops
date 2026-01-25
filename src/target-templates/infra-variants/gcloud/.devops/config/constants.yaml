@@ -1,8 +1,8 @@
 # These will be used when generating kubernetes entities
 project-name: $PROJECT_NAME
 
-# Supported: hetzner, digitalocean, or gcloud
-infra: gcloud
+# Registry infrastructure: digitalocean, gcp, or harbor
+registry-infra: gcp
 
 registry-base-url: gcr.io
 # What comes before <image-name>:<tag>. Can be empty.

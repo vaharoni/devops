@@ -63,8 +63,8 @@ export function prune(
   repoName: string,
   image: string
 ) {
-  const infra = getConst("infra");
-  if (infra !== "digitalocean") {
+  const registryInfra = getConst("registry-infra");
+  if (registryInfra !== "digitalocean") {
     console.warn(
       "Pruning is only supported for the DigitalOcean container registry"
     );

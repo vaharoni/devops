@@ -4,8 +4,8 @@ import { envToNamespace } from "../k8s-constants";
 import { kubectlCommand } from "../k8s-helpers";
 
 function isApplicable() {
-  const infra = getConst("infra");
-  if (infra !== "hetzner") {
+  const registryInfra = getConst("registry-infra");
+  if (registryInfra !== "harbor") {
     console.warn(
       "Setting up registry permissions is only needed for Harbor in a Hetzner setup"
     );

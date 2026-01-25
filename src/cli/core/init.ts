@@ -3,7 +3,6 @@ import { InitGenerator, type InitGeneratorFileInfo } from "../../libs/init-gener
 import { CLICommandParser, printUsageAndExit } from "../common";
 import chalk from "chalk";
 import fs from 'fs-extra';
-import type { ConstFileSchema } from "../../types";
 
 const oneLiner =
   "Initializes the devops utility by copying template files to the current folder";
@@ -40,14 +39,14 @@ async function createFiles() {
   tc.setMessageGenerator(".envrc", envrcMessage);
 
   // gitignore
-  const gitIgnore = gitIgnoreContent(userChoices.infraVariant, userChoices.usePython)
+  const gitIgnore = gitIgnoreContent(userChoices.infraPreset, userChoices.usePython)
   tc.addGeneratedFile(".gitignore", gitIgnore);
   tc.setMessageGenerator(".gitignore", gitignoreMessageGen(gitIgnore));
 
   // Infra variants
-  tc.addCopiedFolder(`infra-variants/${userChoices.infraVariant}`, ".");
+  tc.addCopiedFolder(`infra-variants/${userChoices.infraPreset}`, ".");
   tc.enableSubtitution(".devops/config/constants.yaml");
-  if (userChoices.infraVariant === "hetzner") {
+  if (userChoices.infraPreset === "hetzner") {
     tc.enableSubtitution(".devops/infra/hetzner/harbor-cert.yaml");
     tc.enableSubtitution(".devops/infra/hetzner/harbor-values.yaml");
     tc.enableSubtitution(".devops/infra/hetzner/hcloud-config.yaml");
@@ -119,13 +118,13 @@ function packageJsonMessage(usePrisma: boolean) {
   ],`)}`
 }
 
-function gitIgnoreContent(infraVariant: UserChoices["infraVariant"], usePython: boolean) {
+function gitIgnoreContent(infraPreset: InfraPreset, usePython: boolean) {
   const common = `**/.env*
 config/kubeconfig
 tmp/**
 !tmp/**/.gitkeep`;
 
-  const gcloud = infraVariant === 'gcloud' 
+  const gcloud = infraPreset === 'gcloud'
     ? 'config/gke_gcloud_auth_plugin_cache'
     : null;
 
@@ -156,11 +155,13 @@ ${chalk.yellow(content)}`;
   }
 }
 
+type InfraPreset = "gcloud" | "digitalocean" | "hetzner";
+
 type UserChoices = {
   projectName: string;
   stagingDomain: string;
   productionDomain: string;
-  infraVariant: ConstFileSchema["infra"];
+  infraPreset: InfraPreset;
   gcloudProjectId?: string;
   registryImagePathPrefix?: string;
   registryBaseUrl?: string;
@@ -193,12 +194,12 @@ function getUserChoices(projectName: string | undefined): Promise<UserChoices> {
     },
     {
       type: "list",
-      name: "infraVariant",
-      message: "Where does your cluster run?",
+      name: "infraPreset",
+      message: "Select your infrastructure preset:",
       choices: [
-        { name: "Google Cloud", value: "gcloud" },
-        { name: "Digital Ocean", value: "digitalocean" },
-        { name: "Hetzner", value: "hetzner" },
+        { name: "Google Cloud (GKE + GCP Registry)", value: "gcloud" },
+        { name: "Digital Ocean (DO K8s + DO Registry)", value: "digitalocean" },
+        { name: "Hetzner (Hetzner K8s + Harbor)", value: "hetzner" },
       ],
     },
     {
@@ -206,21 +207,21 @@ function getUserChoices(projectName: string | undefined): Promise<UserChoices> {
       name: "gcloudProjectId",
       message: "Enter the GCP project ID (default: 'changeme')",
       default: "changeme",
-      when: (answers) => answers.infraVariant === "gcloud",
+      when: (answers) => answers.infraPreset === "gcloud",
     },
     {
       type: "input",
       name: "registryImagePathPrefix",
       message: (answers) => `Enter your Digital Ocean container registry name (default: '${answers.projectName}')`,
       default: (answers) => answers.projectName,
-      when: (answers) => answers.infraVariant === "digitalocean",
+      when: (answers) => answers.infraPreset === "digitalocean",
     },
     {
       type: "input",
       name: "registryBaseUrl",
       message: (answers) => `Enter your registry base URL (default: 'registry.${answers.stagingDomain}')`,
       default: (answers) => `registry.${answers.stagingDomain}`,
-      when: (answers) => answers.infraVariant === "hetzner",
+      when: (answers) => answers.infraPreset === "hetzner",
     },
     {
       type: "confirm",

@@ -35,7 +35,7 @@ USAGE
   Prunes the repository of old images to enforce the "image-versions-to-keep" constant in config/constants.yaml:
     devops registry prune <image> --env <env>
 
-    This is only relevant when the "infra" constant is set to "digitalocean".
+    This is only relevant when the "registry-infra" constant is set to "digitalocean".
 
 EXAMPLES
     ${keyExamples}

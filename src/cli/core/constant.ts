@@ -2,7 +2,7 @@ import { getConst } from "../../libs/config";
 import { CLICommandParser, printUsageAndExit } from "../common";
 
 const oneLiner = "Prints to stdout a constant from constant.yaml";
-const keyExamples = `$ devops constant infra`;
+const keyExamples = `$ devops constant registry-infra`;
 
 const usage = `
 ${oneLiner}
