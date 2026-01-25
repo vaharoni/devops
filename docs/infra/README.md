@@ -12,6 +12,12 @@ Then, you'll need to create a cluster on a hosting provider. Refer to the provid
 
 For container registry configuration, see [Registry Setup](RegistrySetup.md). If you're self-hosting a registry, see [Harbor](Harbor.md).
 
+## Cloud Run
+
+For endpoints that must be always available (e.g., webhook handlers), you can deploy to Google Cloud Run alongside your Kubernetes cluster. See [Cloud Run Setup](CloudRun.md) for instructions.
+
+## Kubernetes Provider Comparison
+
 As evident by the length of the instructions, Digital Ocean is much easier to setup. But Hetzner is much cheaper. For example, as of this writing, a cluster with 1 master node and 2 worker nodes using shared CX32 instance type on Hetzner (4 vCPUs, 8GB RAM, 80GB SSD per instance) cost about 20 EUR/month. On Digital Ocean, the control plane (master node) is free, but 2 equivalent worker nodes (though with double the storage) cost about 100 USD/month. Moreover, the k3s setup of Hetzner cluster is relatively lean compared to Digital Ocean's cluster setup, saving about 300MB of RAM overhead per worker node just for basic cluster operations (1GB overhead on Digital Ocean vs. 700MB on Hetzner). True, one master node is not high availability as Digital Ocean's control plane. But this can be addressed on Hetzner for relatitvely cheap (additional 14 EUR/month for 2 extra master nodes). The variable cost difference of worker nodes will translate to savings as your projects scale, so it may be worth taking the time to invest in such a setup early on.
 
 Once you are done with the basic cluster creation, continue with:

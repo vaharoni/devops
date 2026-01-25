@@ -1,5 +1,5 @@
-name: "Connect to Artifact Registry"
-description: "Authenticates to Google Artifact Registry"
+name: "Connect to Artifact Registry with Service Account"
+description: "Authenticates to Google Artifact Registry using a service account JSON key"
 inputs:
   service_account_key:
     description: "Google Cloud service account key in JSON format"

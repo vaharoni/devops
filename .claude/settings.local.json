@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(bun run build:*)",
-      "Bash(bunx tsc:*)"
+      "Bash(bunx tsc:*)",
+      "Bash(chmod:*)"
     ]
   }
 }

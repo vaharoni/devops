@@ -9,7 +9,7 @@ on:
 permissions:
   contents: read
   packages: read
-  # For deploying images to Cloud Run
+  # For OIDC authentication to GCP
   # id-token: write
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
           fetch-depth: 50
 
       - name: Setup prerequesites
-        uses: ./.github/actions/setup-prereq@v1
+        uses: ./.github/actions/common/setup-prereq@v1
 
       - name: Connect to DigitalOcean K8s
         uses: ./.github/actions/k8s/connect-to-digitalocean-k8s@v1
@@ -42,16 +42,16 @@ jobs:
         with:
           access_token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-      # For deploying images to Cloud Run
-      # - name: Connect to Cloud Run
-      #   uses: ./.github/actions/connect-to-cloud-run@v1
+      # For GCP Artifact Registry with OIDC (alternative to DOCR)
+      # - name: Connect to Artifact Registry with OIDC
+      #   uses: ./.github/actions/registry/connect-to-artifact-registry-with-oidc@v1
       #   with:
       #     project_id: ${{ vars.GCP_PROJECT_ID }}
       #     project_number: ${{ vars.GCP_PROJECT_NUMBER }}
       #     region: ${{ vars.GCP_ARTIFACT_REGISTRY_REGION }}
 
       - name: Build image
-        uses: ./.github/actions/build-image@v1
+        uses: ./.github/actions/common/build-image@v1
         with:
           image_name: ${{ matrix.image_name }}
           cache_path: ${{ matrix.cache_path || '/root/.bun/install/cache' }}
@@ -67,7 +67,7 @@ jobs:
           fetch-depth: 50
 
       - name: Setup prerequesites
-        uses: ./.github/actions/setup-prereq@v1
+        uses: ./.github/actions/common/setup-prereq@v1
 
       - name: Connect to DigitalOcean K8s
         uses: ./.github/actions/k8s/connect-to-digitalocean-k8s@v1
@@ -80,22 +80,22 @@ jobs:
         with:
           access_token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-      # For deploying images to Cloud Run
-      # - name: Connect to Cloud Run
-      #   uses: ./.github/actions/connect-to-cloud-run@v1
+      # For GCP Artifact Registry with OIDC (alternative to DOCR)
+      # - name: Connect to Artifact Registry with OIDC
+      #   uses: ./.github/actions/registry/connect-to-artifact-registry-with-oidc@v1
       #   with:
       #     project_id: ${{ vars.GCP_PROJECT_ID }}
       #     project_number: ${{ vars.GCP_PROJECT_NUMBER }}
       #     region: ${{ vars.GCP_ARTIFACT_REGISTRY_REGION }}
 
       - name: Run DB Migrate
-        uses: ./.github/actions/db-migrate@v1
+        uses: ./.github/actions/common/db-migrate@v1
 
       # Repeat per image (it checks if the image is affected and deploys it if it is)
       - name: Deploy main node
-        uses: ./.github/actions/deploy-image-k8s@v1
+        uses: ./.github/actions/common/deploy-image-k8s@v1
         with: { "image_name": "main-node" }
 
       - name: Deploy main python
-        uses: ./.github/actions/deploy-image-k8s@v1
+        uses: ./.github/actions/common/deploy-image-k8s@v1
         with: { "image_name": "main-python" }

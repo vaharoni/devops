@@ -1,5 +1,5 @@
-name: "Connect to Cloud Run"
-description: "Sets up authentication to GCP to deploy to Cloud Run"
+name: "Connect to Artifact Registry with OIDC"
+description: "Authenticates to Google Artifact Registry using Workload Identity Federation (OIDC)"
 inputs:
   project_id:
     description: "Google Cloud project ID"
