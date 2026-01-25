@@ -3,7 +3,11 @@
     "allow": [
       "Bash(bun run build:*)",
       "Bash(bunx tsc:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(bunx tsup:*)",
+      "Bash(./node_modules/.bin/tsup:*)",
+      "Bash(bun install:*)",
+      "Bash(bunx @vaharoni/devops:*)"
     ]
   }
 }

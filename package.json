@@ -24,7 +24,8 @@
   },
   "scripts": {
     "build": "tsup",
-    "test": "vitest run"
+    "test": "vitest run",
+    "verify": "tsc --noEmit"
   },
   "repository": {
     "type": "git",
