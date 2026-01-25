@@ -5,7 +5,13 @@
 1. Create a project
 2. Create a cluster in the project with the desired nodes
 3. Follow the instructions to configure `kubectl` to point to the newly created cluster
-4. Sign up to a container registry plan with at least 2 repositories (one for staging, one for production) and follow up with the setup instructions to allow the cluster to access it
+4. Sign up to a container registry plan with at least 2 repositories (one for staging, one for production)
+5. Integrate your registry with your cluster via the control panel or by running:
+   ```shell
+   doctl kubernetes cluster registry add <cluster-name>
+   ```
+
+For more details on registry configuration, see [Registry Setup](RegistrySetup.md).
 
 ## Step 2: Set up the cluster's Ingress Controller
 

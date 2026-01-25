@@ -1,0 +1,29 @@
+name: "Connect to Cloud Run"
+description: "Sets up authentication to GCP to deploy to Cloud Run"
+inputs:
+  project_id:
+    description: "Google Cloud project ID"
+    required: true
+  project_number:
+    description: "Google Cloud project number"
+    required: true
+  region:
+    description: "Google Cloud region where the Artifact Registry is located"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Auth to GCP via OIDC
+      uses: google-github-actions/auth@v2
+      with:
+        workload_identity_provider: projects/${{ inputs.project_number }}/locations/global/workloadIdentityPools/github/providers/github-oidc
+        service_account: gha-deployer@${{ inputs.project_id }}.iam.gserviceaccount.com
+        project_id: ${{ inputs.project_id }}
+
+    - name: Setup gcloud
+      uses: google-github-actions/setup-gcloud@v2
+
+    - name: Configure docker to use Artifact Registry
+      shell: bash
+      run: gcloud auth configure-docker ${{ inputs.region }}-docker.pkg.dev --quiet
+    

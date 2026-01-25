@@ -88,104 +88,13 @@ kubectl apply -f .devops/infra/hetzner/ingress-nginx-configmap.yaml
 
 Follow [these instructions](CloudFlareSetup.md) before proceeding to the next step.
 
-## Step 4: Setup Let's encrypt cert manager
+## Step 4: Setup the container registry
 
-It would be nice if we could put the registry behind the cloudflare proxy to hide the IP of the Ingress controller. While it was eventually possible to make it work technically by switching Cloudflare TLS encryption mode to "full", unfortunately docker may push large layers than what Cloudflare's free version allows.
+For Hetzner clusters, we recommend using Harbor as a self-hosted container registry. Follow the [Harbor setup guide](Harbor.md) to install and configure it.
 
-Hence, we need to exclude the registry from being served behind a proxy. We also need to have it issue its own certificate, which is what this section is about. Harbor requires a certificate to work well with github actions, and it causes many issues if it not signed by a trusted source.
+Once Harbor is set up, see [Registry Setup](RegistrySetup.md) for instructions on configuring your cluster to pull images from it.
 
-```shell
-helm repo add jetstack https://charts.jetstack.io
-helm repo update
-helm upgrade --install \
---namespace cert-manager \
---create-namespace \
---set crds.enabled=true \
-cert-manager jetstack/cert-manager
-```
-
-On Cloudflare, go to Manage Account (sidebar) > Account API Tokens > Create token > Edit Zone DNS (use template) > All zones from an account.
-
-Then run:
-
-```shell
-cat .devops/infra/hetzner/cert-manager.yaml | CLOUDFLARE_API_TOKEN=<token> EMAIL_ADDRESS=<your_email> envsubst | kubectl apply -f -
-```
-
-## Step 5: Setup a container registry
-
-```shell
-helm repo add harbor https://helm.goharbor.io
-helm repo update
-```
-
-To see the full list of customizable values by harbor, you can run:
-
-```shell
-helm show values harbor/harbor > tmp/harbor-values.yaml
-```
-
-But in general this is unnecessary as a satisfactory `.devops/infra/hetzner/harbor-values.yaml` file is already provided.
-
-Issue a certificate from Lets Encrypt:
-
-```shell
-kubectl create ns harbor
-
-# Replace REGISTRY_DOMAIN with the subdomain where you want the registry to be hosted.
-# E.g., the `registry` subdomain under your staging domain.
-cat .devops/infra/hetzner/harbor-cert.yaml | REGISTRY_DOMAIN=registry.domain.com envsubst | kubectl apply -f -
-
-# Verify it is ready
-kubectl -n harbor get certificates
-```
-
-Run the following:
-
-```shell
-export REGISTRY_DOMAIN=registry.domain.com
-cat .devops/infra/hetzner/harbor-values.yaml | envsubst | helm install harbor harbor/harbor --namespace harbor --create-namespace -f -
-```
-
-On Cloudflare, add a manual DNS entry to your subdomain, e.g. `registry.domain.com` which points to the same IP of the Ingress controller. For that entry, turn off the proxy setting.
-
-After a few moments:
-
-1. visit your domain with user `admin` and password `Harbor12345`
-2. change the admin password in the interface (top right)
-3. delete the public project and create a new private one
-4. in the project, add a robot account with the name `github` and Pull & Push Repository permissions. Keep the user name and password somewhere that is git-ignored. You will upload this as a github secret later on.
-5. in the same project, add a robot account with the name `cluster` and Pull Repository permissions. Keep the user name and password somewhere that is git-ignored. You will upload this as a cluster secret later on.
-
-To test that everything works, run the following:
-
-```shell
-# Replace with your value
-export REGISTRY_DOMAIN=registry.domain.com
-export HARBOR_PROJECT=myproj
-
-docker login $REGISTRY_DOMAIN
-docker pull nginx:alpine
-docker tag nginx:alpine "$REGISTRY_DOMAIN/$HARBOR_PROJECT/nginx:alpine"
-docker push "$REGISTRY_DOMAIN/$HARBOR_PROJECT/nginx:alpine"
-```
-
-## Step 6: Set up container registry secret
-
-We need to give access to all pods to pull from our registry controller. Ideally, we would apply these to in some cluster-wide fashion. Unfortunately, this can be done either at the pod level, or at a service account level which is namespace-specific. To work around this, we set a docker-registry secret (a kind of secret) in the `harbor` namespace. When you use the `./devops namespace create` command, this secret is copied to the created namespace and the default service account is patched to use it.
-
-```shell
-# Important: notice the single quotes around username. Robot accounts on Harbor have a $ in their name,
-# which can confuse the shell if we are not careful.
-kubectl create secret docker-registry harbor-registry-secret \
-  --docker-server=$REGISTRY_DOMAIN \
-  --docker-username='<cluster username>' \
-  --docker-password=<password> \
-  --docker-email=<your-email> \
-  --namespace=harbor
-```
-
-## Step 7: Create a storage class with Retain reclaim policy
+## Step 5: Create a storage class with Retain reclaim policy
 
 When installing a Hetzner cluster using `hetzner-k3s`, the Hetzner CSI (Container Storage Interface) driver gets installed. By default, it installs a storage class with `Delete` reclaim policy called `hcloud-volumes` which is the cluster's default. When installing Postgres, we should have a storage class with `Retain` reclaim policy to prevent accidental data loss.
 
@@ -195,7 +104,7 @@ Create the storage class `hcloud-volumes-retain` by running the following:
 kubectl apply -f .devops/infra/hetzner/retain-storage-class.yaml
 ```
 
-## Step 8: Set up github secrets
+## Step 6: Set up github secrets
 
 To be able to deploy to your cluster using github actions, set the github secret `HCLOUD_KUBECONFIG` to contain the `config/kubeconfig` file:
 

@@ -60,6 +60,19 @@ gh secret set GCLOUD_SA_KEY < $SA_KEY_PATH
 gh secret set GCLOUD_CLUSTER_NAME --body $GKE_CLUSTER
 ```
 
+# Setting up registry access
+
+GKE nodes using the default Compute Engine service account can pull images from Artifact Registry in the same project (the default `storage-ro` scope is sufficient). If you need to configure access explicitly (e.g., for cross-project access or custom service accounts), grant the service account read access:
+
+```bash
+gcloud artifacts repositories add-iam-policy-binding <repository-name> \
+  --location=$GKE_REGION \
+  --member="serviceAccount:$(gcloud projects describe $GKE_PROJECT --format='value(projectNumber)')-compute@developer.gserviceaccount.com" \
+  --role="roles/artifactregistry.reader"
+```
+
+For more details on registry configuration, see [Registry Setup](RegistrySetup.md).
+
 # Setting up the repo
 
 Setup the namespaces and global resources:

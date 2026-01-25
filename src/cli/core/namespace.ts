@@ -1,8 +1,8 @@
 import { CLICommandParser, printUsageAndExit, StrongParams } from "../../../src/cli/common";
 import {
-  copySecretHarborToNamespace,
+  copyRegistrySecretToNamespace,
   patchServiceAccountImagePullSecret,
-} from "../../../src/libs/hetzner/reg-secret";
+} from "../../../src/libs/registry/image-pull-secret";
 import { checkEnvSetup, createEmptyEnvSecret, createNamespace, deleteNamespace, patchBaseSecret } from "../../libs/k8s-namespace";
 
 const oneLiner = "Creates the basic prerequisites for a monorepo";
@@ -20,8 +20,8 @@ GENERAL USAGE
 
     'create' does the following:
       1. Creates the namepace
-      2. Creates a secret to hold environment variables (used by devops env) and the base cryptographic secret 
-      3. On Hetzner, copies the Harbor secret to the namespace and patches the default service account to use it
+      2. Creates a secret to hold environment variables (used by devops env) and the base cryptographic secret
+      3. If use-image-pull-secret is true, copies the external-registry-secret to the namespace and patches the default service account to use it
 
     'delete' removes the namespace in kubernetes, which deletes all entities within it.
 
@@ -37,7 +37,7 @@ const handlers = {
     createNamespace(env);
     createEmptyEnvSecret(env);
     patchBaseSecret(env);
-    copySecretHarborToNamespace(env);
+    copyRegistrySecretToNamespace(env);
     patchServiceAccountImagePullSecret(env);
   },
   delete (opts: StrongParams) {

@@ -3,23 +3,23 @@ import { getConst } from "../config";
 import { envToNamespace } from "../k8s-constants";
 import { kubectlCommand } from "../k8s-helpers";
 
+const SECRET_NAME = "external-registry-secret";
+const SOURCE_NAMESPACE = "default";
+
 function isApplicable() {
-  const registryInfra = getConst("registry-infra");
-  if (registryInfra !== "harbor") {
-    console.warn(
-      "Setting up registry permissions is only needed for Harbor in a Hetzner setup"
-    );
+  const useImagePullSecret = getConst("use-image-pull-secret");
+  if (!useImagePullSecret) {
     return false;
   }
   return true;
 }
 
-export function copySecretHarborToNamespace(monorepoEnv: string) {
+export function copyRegistrySecretToNamespace(monorepoEnv: string) {
   if (!isApplicable()) return;
 
-  const cmd = kubectlCommand("get secret harbor-registry-secret -o json", {
+  const cmd = kubectlCommand(`get secret ${SECRET_NAME} -o json`, {
     monorepoEnv,
-    namespace: "harbor",
+    namespace: SOURCE_NAMESPACE,
   });
   const secretStr = new CommandExecutor(cmd, { quiet: true }).exec();
   const secretJson = JSON.parse(secretStr);
@@ -47,7 +47,7 @@ export function patchServiceAccountImagePullSecret(monorepoEnv: string) {
   if (!isApplicable()) return;
 
   const cmd = kubectlCommand(
-    `patch serviceaccount default -p '{"imagePullSecrets": [{"name": "harbor-registry-secret"}]}'`,
+    `patch serviceaccount default -p '{"imagePullSecrets": [{"name": "${SECRET_NAME}"}]}'`,
     { monorepoEnv }
   );
   new CommandExecutor(cmd, { quiet: true }).exec();
