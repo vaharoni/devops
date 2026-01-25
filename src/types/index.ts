@@ -8,7 +8,7 @@ export type SupportedLanguages = typeof SUPPORTED_LANGUAGES[number];
 export const constFileSchema = z.object({
   "project-name": z.string(),
   "registry-infra": z.enum(["digitalocean", "gcp", "harbor"]),
-  "use-image-pull-secret": z.boolean().optional(),
+  "image-pull-secret-name": z.string().optional(),
   "image-versions-to-keep": z.number().optional(),
   "registry-base-url": z.string(),
   "registry-image-path-prefix": z.string().optional(),

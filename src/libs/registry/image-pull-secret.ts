@@ -3,21 +3,18 @@ import { getConst } from "../config";
 import { envToNamespace } from "../k8s-constants";
 import { kubectlCommand } from "../k8s-helpers";
 
-const SECRET_NAME = "external-registry-secret";
 const SOURCE_NAMESPACE = "default";
 
-function isApplicable() {
-  const useImagePullSecret = getConst("use-image-pull-secret");
-  if (!useImagePullSecret) {
-    return false;
-  }
-  return true;
+function getSecretName(): string | null {
+  const secretName = getConst("image-pull-secret-name");
+  return secretName || null;
 }
 
 export function copyRegistrySecretToNamespace(monorepoEnv: string) {
-  if (!isApplicable()) return;
+  const secretName = getSecretName();
+  if (!secretName) return;
 
-  const cmd = kubectlCommand(`get secret ${SECRET_NAME} -o json`, {
+  const cmd = kubectlCommand(`get secret ${secretName} -o json`, {
     monorepoEnv,
     namespace: SOURCE_NAMESPACE,
   });
@@ -44,10 +41,11 @@ export function copyRegistrySecretToNamespace(monorepoEnv: string) {
 }
 
 export function patchServiceAccountImagePullSecret(monorepoEnv: string) {
-  if (!isApplicable()) return;
+  const secretName = getSecretName();
+  if (!secretName) return;
 
   const cmd = kubectlCommand(
-    `patch serviceaccount default -p '{"imagePullSecrets": [{"name": "${SECRET_NAME}"}]}'`,
+    `patch serviceaccount default -p '{"imagePullSecrets": [{"name": "${secretName}"}]}'`,
     { monorepoEnv }
   );
   new CommandExecutor(cmd, { quiet: true }).exec();

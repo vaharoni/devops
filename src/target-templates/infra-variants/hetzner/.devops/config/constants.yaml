@@ -4,9 +4,9 @@ project-name: $PROJECT_NAME
 # Registry infrastructure: digitalocean, gcp, or harbor
 registry-infra: harbor
 
-# When true, devops namespace create will copy external-registry-secret from default namespace
+# When set, devops namespace create will copy this secret from default namespace
 # and patch the default service account to use it. See docs/infra/RegistrySetup.md for details.
-use-image-pull-secret: true
+image-pull-secret-name: $PROJECT_NAME-registry-secret
 
 # Only relevant for Digital Ocean. Determines the number of versions to keep for each docker image.
 image-versions-to-keep: 5
