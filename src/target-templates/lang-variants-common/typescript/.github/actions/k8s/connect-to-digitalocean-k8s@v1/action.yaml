@@ -1,5 +1,5 @@
-name: "Connect to Digital Ocean"
-description: "Sets up kubernetes connection to Digital Ocean and ensures connection"
+name: "Connect to DigitalOcean K8s"
+description: "Sets up kubernetes connection to DigitalOcean cluster"
 inputs:
   access_token:
     description: "DigitalOcean access token"
@@ -15,15 +15,11 @@ runs:
       with:
         token: ${{ inputs.access_token }}
 
-    - name: Log in to DigitalOcean Container Registry with short-lived credentials
-      run: doctl registry login --expiry-seconds 1200
-      shell: bash
-
     - name: Save DigitalOcean kubeconfig with short-lived credentials
-      run: | 
+      run: |
         doctl kubernetes cluster kubeconfig save --expiry-seconds 1200 ${{ inputs.cluster_name }}
       shell: bash
 
-    - name: verify namepsace exists
+    - name: Verify namespace exists
       run: devops namespace check --env ${{ github.ref_name }}
       shell: bash

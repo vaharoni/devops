@@ -1,5 +1,5 @@
-name: "Connect to Google Cloud GKE"
-description: "Sets up kubernetes connection to Google Cloud and ensures connection"
+name: "Connect to GKE"
+description: "Sets up kubernetes connection to Google Kubernetes Engine cluster"
 inputs:
   project_id:
     description: "Google Cloud project ID"
@@ -25,19 +25,15 @@ runs:
     - name: Install gcloud
       uses: google-github-actions/setup-gcloud@v2
       with:
-        project_id: ${{ inputs.project_id }}        
-
-    - name: Configure Docker auth
-      shell: bash
-      run: gcloud --quiet auth configure-docker 
+        project_id: ${{ inputs.project_id }}
 
     - name: Fetch GKE credentials
       uses: google-github-actions/get-gke-credentials@v2
       with:
         cluster_name: ${{ inputs.cluster_name }}
         location: ${{ inputs.zone }}
-        project_id: ${{ inputs.project_id }}      
+        project_id: ${{ inputs.project_id }}
 
-    - name: verify namepsace exists
+    - name: Verify namespace exists
       run: devops namespace check --env ${{ github.ref_name }}
       shell: bash

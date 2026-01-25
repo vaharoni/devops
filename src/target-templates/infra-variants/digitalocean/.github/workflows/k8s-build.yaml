@@ -31,11 +31,16 @@ jobs:
       - name: Setup prerequesites
         uses: ./.github/actions/setup-prereq@v1
 
-      - name: Connect to Digital Ocean
-        uses: ./.github/actions/connect-to-digital-ocean@v1
+      - name: Connect to DigitalOcean K8s
+        uses: ./.github/actions/k8s/connect-to-digitalocean-k8s@v1
         with:
           access_token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           cluster_name: ${{ secrets.DIGITALOCEAN_CLUSTER_NAME }}
+
+      - name: Connect to DOCR
+        uses: ./.github/actions/registry/connect-to-docr@v1
+        with:
+          access_token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
       # For deploying images to Cloud Run
       # - name: Connect to Cloud Run
@@ -64,11 +69,16 @@ jobs:
       - name: Setup prerequesites
         uses: ./.github/actions/setup-prereq@v1
 
-      - name: Connect to Digital Ocean
-        uses: ./.github/actions/connect-to-digital-ocean@v1
+      - name: Connect to DigitalOcean K8s
+        uses: ./.github/actions/k8s/connect-to-digitalocean-k8s@v1
         with:
           access_token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           cluster_name: ${{ secrets.DIGITALOCEAN_CLUSTER_NAME }}
+
+      - name: Connect to DOCR
+        uses: ./.github/actions/registry/connect-to-docr@v1
+        with:
+          access_token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
       # For deploying images to Cloud Run
       # - name: Connect to Cloud Run

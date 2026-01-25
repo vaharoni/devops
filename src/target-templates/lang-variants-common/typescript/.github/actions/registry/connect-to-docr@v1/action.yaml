@@ -1,0 +1,17 @@
+name: "Connect to DOCR"
+description: "Authenticates to DigitalOcean Container Registry"
+inputs:
+  access_token:
+    description: "DigitalOcean access token"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ inputs.access_token }}
+
+    - name: Log in to DigitalOcean Container Registry with short-lived credentials
+      run: doctl registry login --expiry-seconds 1200
+      shell: bash

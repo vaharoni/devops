@@ -1,0 +1,24 @@
+name: "Connect to Harbor Registry"
+description: "Authenticates to Harbor container registry"
+inputs:
+  harbor_user:
+    description: "The user name for the harbor registry"
+    required: true
+  harbor_password:
+    description: "The password for the harbor registry"
+    required: true
+  harbor_url:
+    description: "The harbor registry URL (optional, uses devops registry server-url if not provided)"
+    required: false
+runs:
+  using: "composite"
+  steps:
+    - name: Connect to the registry
+      run: |
+        if [ -n "${{ inputs.harbor_url }}" ]; then
+          server_url="${{ inputs.harbor_url }}"
+        else
+          server_url=$(devops registry server-url)
+        fi
+        docker login $server_url -u '${{ inputs.harbor_user }}' -p ${{ inputs.harbor_password }}
+      shell: bash

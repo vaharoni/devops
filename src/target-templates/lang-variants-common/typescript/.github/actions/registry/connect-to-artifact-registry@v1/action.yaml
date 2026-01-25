@@ -1,0 +1,29 @@
+name: "Connect to Artifact Registry"
+description: "Authenticates to Google Artifact Registry"
+inputs:
+  service_account_key:
+    description: "Google Cloud service account key in JSON format"
+    required: true
+  project_id:
+    description: "Google Cloud project ID"
+    required: true
+  region:
+    description: "Google Cloud Artifact Registry region (e.g., us-central1)"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        project_id: ${{ inputs.project_id }}
+        credentials_json: ${{ inputs.service_account_key }}
+
+    - name: Install gcloud
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ inputs.project_id }}
+
+    - name: Configure Docker auth for Artifact Registry
+      shell: bash
+      run: gcloud --quiet auth configure-docker ${{ inputs.region }}-docker.pkg.dev

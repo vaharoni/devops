@@ -1,0 +1,19 @@
+name: "Connect to Hetzner K8s"
+description: "Sets up kubernetes connection to Hetzner cluster"
+inputs:
+  kubeconfig:
+    description: "The Hetzner kubeconfig file"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Create a kubeconfig file
+      run: |
+        mkdir -p ~/.kube
+        echo "${{ inputs.kubeconfig }}" > ~/.kube/config
+        chmod 600 ~/.kube/config
+      shell: bash
+
+    - name: Verify cluster connection and that namespace exists
+      run: devops namespace check --env ${{ github.ref_name }}
+      shell: bash
