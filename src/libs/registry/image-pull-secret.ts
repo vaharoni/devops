@@ -35,9 +35,15 @@ export function copyRegistrySecretToNamespace(monorepoEnv: string) {
     metadata: { name, namespace: envToNamespace(monorepoEnv) },
     type,
   };
+  const redactedParts = {
+    ...relevantParts,
+    data: "**REDACTED**",
+  };
   // prettier-ignore
   const copyCmd = `echo '${JSON.stringify(relevantParts)}' | kubectl apply -f -`;
-  new CommandExecutor(copyCmd, { quiet: true }).exec();
+  // prettier-ignore
+  const redactedCommand = `echo '${JSON.stringify(redactedParts)}' | kubectl apply -f -`;
+  new CommandExecutor(copyCmd, { quiet: true, redactedCommand }).exec();
 }
 
 export function patchServiceAccountImagePullSecret(monorepoEnv: string) {
