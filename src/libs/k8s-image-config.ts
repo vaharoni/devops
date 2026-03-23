@@ -77,21 +77,12 @@ function setK8sScale(
   workspaceName: string,
   replicaCount: number
 ) {
-  const workspaceData = getWorkspace(workspaceName);
-  const serviceName = workspaceData.packageDataEntries.find(x => x.deployment?.service_name)?.deployment?.service_name;
-  if (!serviceName) {
-    console.error(
-      `Workspace ${workspaceName} must have a service_name defined in its deployment key in package.json. Skipping.`
-    );
-    return false;
-  }
   new CommandExecutor(
     kubectlCommand(
       `scale deployment ${workspaceName} --replicas=${replicaCount}`,
       { monorepoEnv }
     )
   ).exec();
-  return true;
 }
 
 // Returns the old version prior to setting
@@ -112,8 +103,7 @@ export function setWorkspaceScale(
   }
   const { scale: _scale, ...rest } = getImageConfigMap(monorepoEnv, image);
   const parsedScale = deserializeImageConfigMapKey<number>(monorepoEnv, image, "scale");
-  const isApplicable = setK8sScale(monorepoEnv, workspaceName, replicaCount);
-  if (!isApplicable) return;
+  setK8sScale(monorepoEnv, workspaceName, replicaCount);
   updateImageConfigMap(monorepoEnv, image, {
     ...rest,
     scale: JSON.stringify({
