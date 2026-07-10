@@ -1,5 +1,5 @@
 import { CommandExecutor } from "../cli/common";
-import { kubectlCommand } from "./k8s-helpers";
+import { kubectlCommand, establishResilientPortForward } from "./k8s-helpers";
 
 export function getDbList() {
   const cmd = kubectlCommand(`get sgcluster -A`);
@@ -79,5 +79,5 @@ export function establishTunnel(namespace: string, port: string) {
   const cmd = kubectlCommand(`port-forward pod/${namespace}-0 ${port}:5432`, {
     namespace,
   });
-  new CommandExecutor(cmd).spawn();
+  establishResilientPortForward(cmd);
 }

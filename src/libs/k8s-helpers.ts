@@ -1,3 +1,5 @@
+import { spawn } from "child_process";
+import chalk from "chalk";
 import { CommandExecutor } from "../cli/common";
 import { envToNamespace } from "./k8s-constants";
 import fs from "fs";
@@ -43,6 +45,51 @@ export function patchSecretKeyCommand(monorepoEnv: string, secretName: string, s
     JSON.stringify(secretValue)
   );
   return { fullCommand, redactedCommand };
+}
+
+/**
+ * Runs a kubectl port-forward command and automatically restarts it when it
+ * drops. kubectl terminates the whole forward whenever any single forwarded
+ * connection errors (e.g. the remote end resets a connection), so a bare
+ * port-forward disconnects constantly under real use. Ctrl-C stops the loop
+ * (SIGINT reaches both this process and the child).
+ *
+ * If the forward exits immediately several times in a row (bad namespace,
+ * no cluster access), it gives up instead of spamming retries.
+ */
+export function establishResilientPortForward(cmd: string) {
+  const restartDelayMs = 1000;
+  const rapidExitThresholdMs = 3000;
+  const maxConsecutiveRapidExits = 3;
+  let consecutiveRapidExits = 0;
+  console.log(cmd);
+  const run = () => {
+    const startedAt = Date.now();
+    const child = spawn(cmd, { stdio: "inherit", shell: true });
+    child.on("error", (error) => {
+      console.error(chalk.red(`Error: ${error.message}`));
+      process.exit(1);
+    });
+    child.on("close", (code) => {
+      const rapidExit = Date.now() - startedAt < rapidExitThresholdMs;
+      consecutiveRapidExits = rapidExit ? consecutiveRapidExits + 1 : 0;
+      if (consecutiveRapidExits >= maxConsecutiveRapidExits) {
+        console.error(
+          chalk.red(
+            `Port-forward keeps exiting immediately (last code ${code}); giving up.`
+          )
+        );
+        process.exit(code ?? 1);
+      }
+      console.error(
+        chalk.yellow(
+          `Port-forward exited (code ${code}); restarting in ${restartDelayMs / 1000}s — Ctrl-C to stop.`
+        )
+      );
+      setTimeout(run, restartDelayMs);
+    });
+  };
+  run();
 }
 
 export function applyHandler(
