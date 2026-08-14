@@ -6,7 +6,7 @@ import { kubectlCommand } from "../k8s-helpers";
 const SOURCE_NAMESPACE = "default";
 
 function getSecretName(): string | null {
-  const secretName = getConst("image-pull-secret-name");
+  const secretName = getConst("image-pull-secret-name", { ignoreIfInvalid: true });
   return secretName || null;
 }
 
