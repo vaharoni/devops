@@ -26,6 +26,8 @@ RUN ./devops run-many build
 FROM gcr.io/distroless/nodejs24-debian12 AS runner
 WORKDIR /app
 ENV NODE_ENV=production
+ARG MONOREPO_ENV
+ENV MONOREPO_ENV=${MONOREPO_ENV}
 COPY --from=builder /app/dist ./dist
 EXPOSE 8080
 CMD ["dist/index.js"]
