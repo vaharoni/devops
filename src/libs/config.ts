@@ -11,6 +11,50 @@ const imagesFilePath = path.join(process.cwd(), ".devops/config/images.yaml");
 export const { getConst } = processConstFile();
 export const { getImageData, getImageNames, getTemplateData } = processImagesFile();
 
+/** Exits with the list of available images if the image is not declared in images.yaml */
+export function assertImageExists(imageName: string) {
+  if (getImageNames().includes(imageName)) return imageName;
+  console.error(`Image "${imageName}" not found in .devops/config/images.yaml.\n`);
+  console.error(availableImagesMessage());
+  process.exit(1);
+}
+
+/** Lists image names, one per line. With full, each image is followed by its indented applications. */
+export function formatImageList(opts: { full?: boolean; indent?: string } = {}) {
+  const indent = opts.indent ?? "";
+  const lines: string[] = [];
+  for (const name of getImageNames()) {
+    lines.push(`${indent}${name}`);
+    if (opts.full) getImageData(name).applications.forEach((app) => lines.push(`${indent}    ${app}`));
+  }
+  return lines.join("\n");
+}
+
+/** Used in error messages and usage text when an image name is missing or wrong */
+export function availableImagesMessage() {
+  const names = peekImageNames();
+  if (names.length === 0) return "No images found in .devops/config/images.yaml";
+  return `Available images:\n${names.map((name) => `    ${name}`).join("\n")}`;
+}
+
+/**
+ * The image names in images.yaml, for use in usage text. Never fails, since usage text is built
+ * even when the config files are missing or invalid (e.g. before `devops init`).
+ */
+export function peekImageNames(): string[] {
+  try {
+    const images = yaml.parse(readFileSync(imagesFilePath, "utf8"))?.images;
+    return Object.keys(images ?? {});
+  } catch {
+    return [];
+  }
+}
+
+/** The first image in images.yaml, for use in usage examples */
+export function exampleImageName() {
+  return peekImageNames()[0] ?? "main-node";
+}
+
 export function getImageType(image: string) {
   const imageData = getImageData(image);
   return imageData["cloudrun"] ? "cloudrun" : "k8s";
@@ -82,12 +126,7 @@ function processImagesFile() {
 
   function getImageData(imageName: string): SingleImageSchema {
     const imageData = imagesFileData()['images'][imageName];
-    if (!imageData) {
-      console.error(
-        `Image ${imageName} not found in .devops/config/images.yaml`
-      );
-      process.exit(1);
-    }
+    if (!imageData) assertImageExists(imageName);
 
     imageData.applications.forEach((project: string) => {
       const data = getWorkspace(project);

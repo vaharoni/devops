@@ -4,7 +4,7 @@ import { globSync } from "glob";
 import { CLICommandParser, printUsageAndExit } from "./cli/common";
 import * as coreImports from "./cli/core";
 import * as extensionImports from "./cli/extensions";
-import { getConst } from "./libs/config";
+import { getConst, peekImageNames } from "./libs/config";
 import { existsSync, readdirSync } from "fs";
 import path from "path";
 
@@ -135,7 +135,15 @@ ACTIVE PLUGINS
       .join(newLine)}
 ` : '';
 
-const ALL_USAGE = [GENERAL_USAGE, EXTENSION_USAGE, PLUGIN_USAGE].filter(Boolean).join("");
+const imageNames = peekImageNames();
+const IMAGES_USAGE = imageNames.length ? `
+IMAGES
+    ${imageNames.join(", ")}
+
+    Run devops image list --full to also see the applications in each image.
+` : '';
+
+const ALL_USAGE = [GENERAL_USAGE, EXTENSION_USAGE, PLUGIN_USAGE, IMAGES_USAGE].filter(Boolean).join("");
 
 const allCommands = { ...coreCommands, ...extensionCommands, ...pluginCommands };
 

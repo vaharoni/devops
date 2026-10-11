@@ -1,3 +1,4 @@
+import { exampleImageName } from "../../libs/config";
 import {
 } from "../../libs/k8s-image-config";
 import { CLICommandParser, printUsageAndExit, StrongParams } from "../common";
@@ -7,9 +8,10 @@ import { k8sJobWaiter, printJobStatuses } from "../../libs/k8s-job-waiter";
 import { dbMigrateJobName } from "../../libs/k8s-constants";
 
 const oneLiner = "Creates a k8s job and waits for it to run";
+const exampleImage = exampleImageName();
 const keyExamples = `
-    $ devops job db-migrate gen    main-node <sha> --env staging
-    $ devops job db-migrate create main-node <sha> --env staging --timeout 120
+    $ devops job db-migrate gen    ${exampleImage} <sha> --env staging
+    $ devops job db-migrate create ${exampleImage} <sha> --env staging --timeout 120
 `.trim();
 
 const usage = `
@@ -26,12 +28,12 @@ EXAMPLES
 const handlers = {
   gen: (opts: StrongParams) => {
     console.log(
-      generateDbMigrateJob(opts.required("env"), opts.required("image"), opts.required("sha"))
+      generateDbMigrateJob(opts.required("env"), opts.requiredImage(), opts.required("sha"))
     )
   },
   create: async (opts: StrongParams) => {
     const env = opts.required("env");
-    const image = opts.required("image");
+    const image = opts.requiredImage();
     const sha = opts.required("sha");
     const timeout = opts.optional("timeout") ?? '240';
     const manifest = generateDbMigrateJob(env, image, sha);

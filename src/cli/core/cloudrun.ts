@@ -51,7 +51,7 @@ EXAMPLES
 
 const handlers = {
   "build-dev": (opts: StrongParams) => {
-    buildDev(opts.required("image"));
+    buildDev(opts.requiredImage());
   },
   _deploy: (opts: StrongParams) => {
     const rawForwardEnv = opts.optional("forwardEnv");
@@ -62,7 +62,7 @@ const handlers = {
     const maxInstancesStr = opts.optional("maxInstances");
 
     deploy({
-      image: opts.required("image"),
+      image: opts.requiredImage(),
       env: opts.required("env"),
       sha: opts.required("sha"),
       region: opts.required("region"),

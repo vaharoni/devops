@@ -214,6 +214,8 @@ Each image runs a lean debug pod that can provide a shell into the cluster. This
 ./devops console <image-name> --env staging
 ```
 
+To see the available image names, run `./devops image list`, or `./devops image list --full` to also see the applications in each image. Commands that take an image name print this list when the name is missing or wrong.
+
 
 # TBD: Future topics
 

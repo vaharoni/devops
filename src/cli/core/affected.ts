@@ -4,15 +4,16 @@ import {
   isImageAffected,
   isWorkspaceAffected,
 } from "../../libs/affected-entities";
-import { getImageData } from "../../libs/config";
+import { assertImageExists, exampleImageName, getImageData } from "../../libs/config";
 import { CLICommandParser, printUsageAndExit, StrongParams } from "../common";
 
 const oneLiner =
   "Command to check whether an image or a workspace is affected by certain commit(s)";
+const exampleImage = exampleImageName();
 const keyExamples = `
     $ devops affected list-images
     $ devops affected workspace db --base <sha1> --head <sha2>
-    $ devops affected image main-node --from-live-version
+    $ devops affected image ${exampleImage} --from-live-version
     $ devops affected find-migrator --from-live-version
 `;
 
@@ -89,7 +90,7 @@ async function run(cmdObj: CLICommandParser) {
     }
     case "image": {
       const affected = isImageAffected(
-        params.required("imageOrWorkspace"),
+        assertImageExists(params.required("imageOrWorkspace")!),
         commonOpts
       );
       console.log(affected ? "true" : "false");

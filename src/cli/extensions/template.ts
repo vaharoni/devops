@@ -5,17 +5,18 @@ import { generateDbMigrateJob, generateDebugPod, generateWorkspaceDeployment, Im
 import chalk from "chalk";
 import { getWorkspace } from "../../libs/discovery";
 import { getWorkspaceImages } from "../../libs/discovery/images";
-import { getImageData, getImageNames } from "../../libs/config";
+import { assertImageExists, exampleImageName, getImageData, getImageNames } from "../../libs/config";
 
 const SUPPORTED_CONTEXT_TYPES = ['deployment', 'db-migrate', 'debug'];
 
 const oneLiner = "Utilities to help validate manifest templates rendering.";
+const exampleImage = exampleImageName();
 const keyExamples = `
     $ devops template context deployment www
     $ devops template context debug
     $ devops template context db-migrate
     $ devops template gen     deployment www
-    $ devops template gen     debug      main-node
+    $ devops template gen     debug      ${exampleImage}
     $ devops template gen     db-migrate
 `.trim();
 
@@ -127,7 +128,7 @@ const handlers = {
       )
     },
     'debug': (opts: StrongParams) => {
-      const image = opts.required('workspaceOrImage');
+      const image = assertImageExists(opts.required('workspaceOrImage')!);
       console.warn(chalk.green(`\nThis is a sample of generated manifests for the debug image ${image}:\n`))
       console.log(
         generateDebugPod(

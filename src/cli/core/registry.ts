@@ -47,18 +47,18 @@ const handlers = {
   "repo-url": (opts: StrongParams) => {
     console.log(
       containerRegistryRepoPath(
-        opts.required("image"),
+        opts.requiredImage(),
         opts.required("env"),
         opts.required("sha")
       )
     );
   },
   "image-name": (opts: StrongParams) => {
-    console.log(containerRegistryImageName(opts.required("image"), opts.required("env")));
+    console.log(containerRegistryImageName(opts.requiredImage(), opts.required("env")));
   },
   prune: (opts: StrongParams) => {
     const regName = containerRegistryPath();
-    const image = opts.required("image");
+    const image = opts.requiredImage();
     const repoName = containerRegistryImageName(
       image,
       opts.required("env")

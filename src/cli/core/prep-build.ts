@@ -3,7 +3,7 @@ import os from "os";
 import path from "path";
 import _ from "lodash";
 import { CLICommandParser, dotEnvFilesForEnv, printUsageAndExit } from "../common";
-import { getImageData, getTemplateData } from "../../libs/config";
+import { assertImageExists, exampleImageName, getImageData, getTemplateData } from "../../libs/config";
 import { getMonorepoSecretObject } from "../../libs/k8s-secrets-manager";
 import { getImageDescendentData } from "../../libs/discovery/images";
 import { isLocalOrRemoteEnv } from "../../libs/k8s-constants";
@@ -14,8 +14,9 @@ import chalk from "chalk";
 
 const oneLiner =
   "Copies all dependencies of an image to a temporary folder in preparation for a Docker build";
+const exampleImage = exampleImageName();
 const keyExamples = `
-    $ devops prep-build main-node
+    $ devops prep-build ${exampleImage}
 `.trim();
 
 const usage = `
@@ -44,7 +45,7 @@ EXAMPLES
 async function run(cmdObj: CLICommandParser) {
   if (cmdObj.help || cmdObj.args.length === 0) printUsageAndExit(usage);
   const [image] = cmdObj.args;
-  const imageData = getImageData(image);
+  const imageData = getImageData(assertImageExists(image));
   const imageTemplate = imageData["image-template"];
   const dockerFile = `${imageTemplate}.Dockerfile`;
   const dockerFilePath = path.join(".devops/docker-images", dockerFile);

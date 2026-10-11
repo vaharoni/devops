@@ -6,6 +6,7 @@ import { globEnvYamlFiles } from "../libs/discovery";
 import { loadDotEnvFiles } from "../libs/dotenv";
 import { ALWAYS_INJECTED_PREFIX, envRequirementsFromFiles, scopeEnvToWorkspace, workspaceEnvYamlFiles } from "../libs/env-scope";
 import { CombinedEnvValidator } from "../libs/validate-env";
+import { assertImageExists, availableImagesMessage } from "../libs/config";
 
 type ParsedArgs<TBoolKeys extends readonly string[], TParamKeys extends readonly string[]> = {
   args: string[];
@@ -363,6 +364,17 @@ export class StrongParams {
       printUsageAndExit(this.usage);
     }
     return this.args[key];
+  }
+
+  /** Like required("image"), but also exits with the list of available images if the image does not exist */
+  requiredImage() {
+    const image = this.args["image"];
+    if (!image) {
+      console.warn(this.usage);
+      console.error(`Missing required argument: image\n\n${availableImagesMessage()}\n`);
+      process.exit(1);
+    }
+    return assertImageExists(image);
   }
 
   optional(key: string) {

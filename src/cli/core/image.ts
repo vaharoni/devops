@@ -2,26 +2,35 @@ import { deleteImageVersion, getImageVersion, getWorkspaceScale, resetWorkspaceS
 import { CLICommandParser, printUsageAndExit, StrongParams } from "../../../src/cli/common";
 import { generateImageDeployments } from "../../libs/k8s-generate";
 import { applyHandler } from "../../libs/k8s-helpers";
-import { getImageType } from "../../libs/config";
+import { exampleImageName, formatImageList, getImageType } from "../../libs/config";
 
-const oneLiner = "Applies image-related manifests, retrieves or set the version deployed, and scales deployments of applications";
+const oneLiner = "Lists images, applies image-related manifests, retrieves or set the version deployed, and scales deployments of applications";
+const exampleImage = exampleImageName();
 const keyExamples = `
-    $ devops image get        type   main-node
-    $ devops image deployment gen    main-node sha  --env staging
-    $ devops image deployment create main-node sha  --env staging
-    $ devops image deployment delete main-node      --env staging
-    $ devops image version    get    main-node      --env staging
-    $ devops image version    set    main-node sha  --env staging
-    $ devops image version    unset  main-node      --env staging
-    $ devops image scale      get    main-node       --env staging
-    $ devops image scale      get    main-node www   --env staging
-    $ devops image scale      set    main-node www 3 --env staging
-    $ devops image scale      unset  main-node       --env staging
-    $ devops image scale      unset  main-node www   --env staging
+    $ devops image list
+    $ devops image list --full
+    $ devops image get        type   ${exampleImage}
+    $ devops image deployment gen    ${exampleImage} sha  --env staging
+    $ devops image deployment create ${exampleImage} sha  --env staging
+    $ devops image deployment delete ${exampleImage}      --env staging
+    $ devops image version    get    ${exampleImage}      --env staging
+    $ devops image version    set    ${exampleImage} sha  --env staging
+    $ devops image version    unset  ${exampleImage}      --env staging
+    $ devops image scale      get    ${exampleImage}       --env staging
+    $ devops image scale      get    ${exampleImage} www   --env staging
+    $ devops image scale      set    ${exampleImage} www 3 --env staging
+    $ devops image scale      unset  ${exampleImage}       --env staging
+    $ devops image scale      unset  ${exampleImage} www   --env staging
 `.trim();
 
 const usage = `
 ${oneLiner}
+
+LIST IMAGES
+    devops image list [--full]
+
+    Prints the names of the images declared in .devops/config/images.yaml. 
+    With --full, the applications of each image are listed under it.
 
 GET IMAGE TYPE
     devops image get type <image-name>
@@ -58,7 +67,7 @@ EXAMPLES
 const handlers = {
   get: {
     type: (opts: StrongParams) => {
-      console.log(getImageType(opts.required("image")));
+      console.log(getImageType(opts.requiredImage()));
     },
   },
   deployment: {
@@ -66,7 +75,7 @@ const handlers = {
       console.log(
         generateImageDeployments(
           opts.required("env"), 
-          opts.required("image"),
+          opts.requiredImage(),
           opts.required("sha")
         )
       )
@@ -77,7 +86,7 @@ const handlers = {
         'apply', 
         generateImageDeployments(
           opts.required("env"), 
-          opts.required("image"),
+          opts.requiredImage(),
           opts.required("sha")
         )
       )
@@ -88,7 +97,7 @@ const handlers = {
         'delete', 
         generateImageDeployments(
           opts.required("env"), 
-          opts.required("image"),
+          opts.requiredImage(),
           "dummy-sha"
         )
       )
@@ -97,7 +106,7 @@ const handlers = {
   scale: {
     set: (opts: StrongParams) => {
       const workspace = opts.required("workspace");
-      const image = opts.required("image");
+      const image = opts.requiredImage();
       const replicas = Number(opts.required("replicas"));
       const res = setWorkspaceScale(
         opts.required("env"),
@@ -119,21 +128,21 @@ const handlers = {
         console.log(
           getWorkspaceScale(
             opts.required("env"),
-            opts.required("image"),
+            opts.requiredImage(),
           )
         )
       } else {
         console.log(
           getWorkspaceScale(
             opts.required("env"),
-            opts.required("image"),
+            opts.requiredImage(),
             workspace
           )
         )
       }
     },
     unset: (opts: StrongParams) => {
-      const image = opts.required("image");
+      const image = opts.requiredImage();
       const workspace = opts.optional("workspace");
   
       const prev = resetWorkspaceScale(opts.required("env"), image, workspace);
@@ -152,21 +161,21 @@ const handlers = {
     get: (opts: StrongParams) => {
       const version = getImageVersion(
         opts.required("env"),
-        opts.required("image")
+        opts.requiredImage()
       )
       console.log(version ?? "")
     },
     set: (opts: StrongParams) => {
       setImageVersion(
         opts.required("env"),
-        opts.required("image"),
+        opts.requiredImage(),
         opts.required("sha")
       )
     },
     unset: (opts: StrongParams) => {
       deleteImageVersion(
         opts.required("env"),
-        opts.required("image")
+        opts.requiredImage()
       )
     },
   },
@@ -174,6 +183,13 @@ const handlers = {
 
 function run(cmdObj: CLICommandParser) {
   if (cmdObj.help || cmdObj.args.length < 1) printUsageAndExit(usage);
+
+  if (cmdObj.args[0] === "list") {
+    const parsed = cmdObj.parseOptions({ booleans: ["--full"] });
+    if (parsed.args.length !== 1) printUsageAndExit(usage);
+    console.log(formatImageList({ full: Boolean(parsed.options["--full"]) }));
+    return;
+  }
 
   const [command, subcommand, image, param1, param2] = cmdObj.args;
   const commandHandler = handlers[command as keyof typeof handlers];
