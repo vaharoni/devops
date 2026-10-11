@@ -5,6 +5,7 @@ import { CLICommandParser, printUsageAndExit } from "./cli/common";
 import * as coreImports from "./cli/core";
 import * as extensionImports from "./cli/extensions";
 import { getConst, peekImageNames } from "./libs/config";
+import { DEVOPS_VERSION } from "./version";
 import { existsSync, readdirSync } from "fs";
 import path from "path";
 
@@ -87,7 +88,7 @@ if (existsSync('.devops/plugins')) {
 const pluginCommandsKeyLength = maxKeyLength(pluginCommands);
 
 const GENERAL_USAGE = `
-Devops utilities for the monorepo.
+Devops utilities for the monorepo (v${DEVOPS_VERSION}).
 
 USAGE
     devops <command> <args> <env-options>

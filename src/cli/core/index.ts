@@ -13,3 +13,4 @@ export * from "./namespace";
 export * from "./prep-build";
 export * from "./registry";
 export * from "./test";
+export * from "./version";
