@@ -1,9 +1,5 @@
 import { CLICommandParser, printUsageAndExit } from "../common";
-import path from "path";
 import { getWorkspace } from "../../libs/discovery";
-import { pkgRoot } from "../../pkg-root";
-
-const execShPath = path.join(pkgRoot, "cli/exec.sh");
 
 const oneLiner =
   "Runs a script defined in package.json after injecting env variables";
@@ -17,6 +13,7 @@ GENERAL USAGE
 
 NOTES
     - Only works for node projects. Use 'devopspy' for python projects.
+    - Only env variables declared in the env.yaml files of the project and its dependencies are injected.
     - Does not allow interactive mode. If you need interactivity, use devops exec instead.
 
 EXAMPLES
@@ -33,8 +30,8 @@ async function runFn(cmdObj: CLICommandParser) {
 
   cmdObj
     .executorFromEnv(
-      `${execShPath} ${rootPath} bun run ${script} ${remaining}`,
-      { checkEnvYaml: true }
+      `bun run ${script} ${remaining}`,
+      { checkEnvYaml: true, envScope: workspace, cwd: rootPath }
     )
     .spawn();
 }

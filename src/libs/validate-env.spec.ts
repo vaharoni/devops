@@ -221,3 +221,52 @@ describe('CombinedEnvValidator', () => {
     expect(Object.keys(subject.errors)).toEqual(['TEST_ENV2']);
   });
 });
+
+describe('CombinedEnvValidator options', () => {
+  function createSubject(
+    yamlContent: string[],
+    dotEnvContent: string,
+    options: ConstructorParameters<typeof CombinedEnvValidator>[2],
+  ) {
+    const validator = new SingleEnvValidator('dummy-yaml', options?.env);
+    vi.spyOn(validator, '_readFile').mockReturnValue(yamlContent);
+    const parser = new DotEnvParser('dummy-dotenv');
+    vi.spyOn(parser, '_readFile').mockReturnValue(dotEnvContent);
+
+    const subject = new CombinedEnvValidator(['dummy-yaml'], ['dummy-dotenv'], options);
+    vi.spyOn(subject, '_loadYamlFiles').mockImplementation(
+      () => (subject.yamlValidators = [validator]),
+    );
+    vi.spyOn(subject, '_loadDotEnvFiles').mockImplementation(
+      () => (subject.dotEnvParsers = [parser]),
+    );
+    return subject;
+  }
+
+  it('validates against the given env instead of process.env', () => {
+    const subject = createSubject(['TEST_ENV1'], 'TEST_ENV1=hi', {
+      env: { TEST_ENV1: 'hi' },
+    });
+    subject.validate();
+    expect(subject.errors).toEqual({});
+  });
+
+  it('computes warnings against knownKeys when given', () => {
+    const subject = createSubject(['TEST_ENV1'], 'TEST_ENV1=hi\nTEST_ENV2=other-app\nTEST_ENV3=unused', {
+      env: { TEST_ENV1: 'hi' },
+      knownKeys: new Set(['TEST_ENV1', 'TEST_ENV2']),
+    });
+    subject.validate();
+    expect(subject.warnings.length).toEqual(1);
+    expect(subject.warnings[0]).toContain('TEST_ENV3');
+  });
+
+  it('does not warn when warnUnused is false', () => {
+    const subject = createSubject(['TEST_ENV1'], 'TEST_ENV1=hi\nTEST_ENV3=unused', {
+      env: { TEST_ENV1: 'hi' },
+      warnUnused: false,
+    });
+    subject.validate();
+    expect(subject.warnings).toEqual([]);
+  });
+});

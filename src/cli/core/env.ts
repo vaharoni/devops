@@ -3,12 +3,12 @@ import {
   getMonorepoSecretStr,
   setMonorepoSecret,
 } from "../../libs/k8s-secrets-manager";
-import { CombinedEnvValidator } from "../../libs/validate-env";
-import { globEnvYamlFiles } from "../../libs/discovery";
+import { loadDotEnvFiles } from "../../libs/dotenv";
 import {
   CLICommandParser,
   dotEnvFilesForEnv,
   printUsageAndExit,
+  validateEnvYamlFiles,
 } from "../common";
 
 const oneLiner = "Commands to manipulate env variables";
@@ -38,26 +38,8 @@ function run(cmdObj: CLICommandParser) {
   const [command, ...rest] = cmdObj.args;
   switch (command) {
     case "validate": {
-      const envYamlFiles = globEnvYamlFiles();
-
-      // We have to have a _validate so that we go through a CommandExecutor which injects env variables into the process
-      cmdObj
-        .executorFromEnv(
-          `devops env _validate ${envYamlFiles.join(" ")}`,
-          { quiet: false }
-        )
-        .exec();
-      break;
-    }
-
-    case "_validate": {
-      const options = cmdObj.parseOptions({ booleans: ["--skip-dotenv"] });
-      const [_subcmd, ...envYamlFiles] = options.args;
-      const envFiles = options.options["--skip-dotenv"]
-        ? []
-        : dotEnvFilesForEnv(cmdObj.env);
-      const validator = new CombinedEnvValidator(envYamlFiles, envFiles);
-      validator.validate();
+      const env = { ...loadDotEnvFiles(dotEnvFilesForEnv(cmdObj.env)), ...process.env };
+      validateEnvYamlFiles(cmdObj.env, { env });
       break;
     }
 

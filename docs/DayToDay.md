@@ -12,7 +12,9 @@ This means you could do something like this:
 ```shell
 ./devops run my-app:dev --env staging
 ```
-which injects all global variables in `.env.global` and `.env.staging` to the running process. This allows you to run a service locally and test it against the remote staging database, for example. 
+which injects the global variables in `.env.global` and `.env.staging` to the running process (`.env.staging` wins when a key is in both, and variables already set in your shell win over both). This allows you to run a service locally and test it against the remote staging database, for example. 
+
+Values in `.env` files are taken literally: there is no `${VAR}` expansion and no `$(command)` substitution. Unquoted values end at ` #`, double-quoted values support `\n`-style escapes, and single-quoted values are literal (except for `\'` and `\\`).
 
 Pods that run on the cluster on either staging or production take their environment variables from a Kubernetes Secret of their respective environment. You can control this Secret with `./devops env`, e.g.:
 ```shell
@@ -29,7 +31,12 @@ kubectl get deploy -n project-staging
 kubectl rollout restart deploy my-deployment -n project-staging
 ```
 
-In order to find missing environment variables as soon as possible, each app or lib should declare its environment variable dependencies in a file called `env.yaml`. This file should be placed in the root of that app or lib, i.e. where the package file resides. All `./devops` commands inject the environment variables based on the `MONOREPO_ENV`, and then validate them based on all `env.yaml` files present.
+Each app or lib declares the environment variables it reads in a file called `env.yaml`, placed in its root (where the package file resides). These declarations decide what gets injected, not just what gets validated:
+- `./devops run <workspace>:<script>` and `./devops exec --in <workspace>` inject only the variables declared in the `env.yaml` files of that workspace and its dependencies, plus `MONOREPO_*` variables, and validate only those files. A variable your code reads but never declares is therefore missing locally, just as it would be in the pod.
+- `./devops exec` without `--in`, and commands such as `./devops prisma`, inject all variables.
+- `./devops env validate` validates all `env.yaml` files and warns about `.env` entries that no `env.yaml` declares.
+
+Pods get the same scoping. An init container is the only container that mounts the environment's Secret. It writes only the variables the workspace declares to a memory-backed volume, which is all the application container sees. `./devops console` still mounts the whole Secret, so debugging sessions have every variable.
 See the [env.example.yaml](../src/target-templates/.devops/env.example.yaml) file to learn more about the file's structure.
 
 ## How to install packages inside existing apps and libs

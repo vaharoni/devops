@@ -51,7 +51,15 @@ During the deployment process, in addition to deploying manifests per applicatio
 
 For each project, there are typically 2 environments - one for production and one for staging. These are reflected in k8s namespaces and should be created once by running `./devops namespace create --env <env>` for each environment.
 
-Each environment has a `Secret` object that contains all the env variables for that environment. Each pod first mounts this secret as a `.env` file which is injected when using `./devops run` or `./devops exec` to execute scripts. You can manage environment variables using `./devops env`. To help catch missing environment variables early, each package (i.e. application or lib) can declare its environment dependencies in an `env.yaml` file. The `./devops run` and `./devops exec` commands first check that the mounted `Secret` conforms with the dependencies declared in all `env.yaml` files. Check out the structure of `env.yaml` files in the `.devops/env.example.yaml` that was generated after running `bunx devops init`.
+Each environment has a `Secret` object that contains all the env variables for that environment. You can manage environment variables using `./devops env`. Each package (i.e. application or lib) declares its environment dependencies in an `env.yaml` file. Check out the structure of `env.yaml` files in the `.devops/env.example.yaml` that was generated after running `bunx devops init`.
+
+Pods only receive the variables their workspace needs:
+- `./devops prep-build` writes `.devops/env-keys.json` into the image, mapping every workspace in the image to the variables declared in the `env.yaml` files of the workspace and its dependencies.
+- An init container (`materialize-env.sh`) is the only container that mounts the `Secret`. It filters the `Secret` using `env-keys.json` and writes the result as `config/.env.global` to a memory-backed `emptyDir` shared with the application container.
+- The application container mounts only that `emptyDir`. `./devops run` and `./devops exec` load `config/.env.global` and validate it against the relevant `env.yaml` files.
+- The debug pod used by `./devops console` mounts the whole `Secret` instead.
+
+Env variables needed during the image build (e.g. `NEXT_PUBLIC_*`) are written by `./devops prep-build` to `<build-folder>.build-env`, outside the build context, filtered to the variables declared by the image's workspaces. They are passed to `docker build` as a build secret (`--secret id=env,src=...`) and mounted only for the duration of the `RUN` steps that need them, so they never end up in an image layer.
 
 In addition, each image maintains a `ConfigMap` object per environment where the latest git SHA of its successful deployment is stored. This `ConfigMap` is updated as the very last step of the deployment process by the github action. When a deployment workflow begins, each image retrieves this version and checks to see whether any of its content were updated between the `HEAD` commit and that version. If there were changes in any file in one of the packages the image depends on, the image is deemed "affected" and is built and deployed. In a multi image setup, this can speed up deployment as only relevant images are rebuilt.
 

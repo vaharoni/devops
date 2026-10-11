@@ -1,8 +1,4 @@
 import { CLICommandParser } from "../common";
-import path from "path";
-import { pkgRoot } from "../../pkg-root";
-
-const execShPath = path.join(pkgRoot, "cli/exec.sh");
 
 const oneLiner = "Runs prisma commands in the db project after injecting the environment variables";
 const keyExamples = `$ devops prisma migrate dev`;
@@ -21,8 +17,8 @@ EXAMPLES
 
 async function run(cmdObj: CLICommandParser) {
   cmdObj.executorFromEnv(
-    `${execShPath} db bunx prisma ${cmdObj.args.join(" ")}`,
-    { checkEnvYaml: false }
+    `bunx prisma ${cmdObj.args.join(" ")}`,
+    { checkEnvYaml: false, cwd: "db" }
   ).spawn()
 }
 

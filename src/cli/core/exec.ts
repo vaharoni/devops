@@ -1,9 +1,5 @@
 import { CLICommandParser, CommandExecutor, printUsageAndExit } from "../common";
-import path from "path";
 import { getWorkspace } from "../../libs/discovery";
-import { pkgRoot } from "../../pkg-root";
-
-const execShPath = path.join(pkgRoot, "cli/exec.sh");
 
 const oneLiner =
   "Executes a command after injecting env variables, either globally or in a workspace";
@@ -20,6 +16,9 @@ USAGE
     devops exec --in <workspace> <command>
     devops exec --in <workspace> <command> --interactive
 
+    With --in, only env variables declared in the env.yaml files of the workspace and its dependencies are injected.
+    Without it, all env variables are injected.
+
 EXAMPLES
     ${keyExamples}
 `;
@@ -34,10 +33,11 @@ function run(cmdObj: CLICommandParser) {
   let executor: CommandExecutor;
   if (workspace) {
     const rootPath = getWorkspace(workspace).rootPath;
-    executor = cmdObj.executorFromEnv(
-      `${execShPath} ${rootPath} ${parsed.argsStr}`,
-      { checkEnvYaml: true }
-    );
+    executor = cmdObj.executorFromEnv(parsed.argsStr, {
+      checkEnvYaml: true,
+      envScope: workspace,
+      cwd: rootPath,
+    });
   } else {
     executor = cmdObj.executorFromEnv(parsed.argsStr, { checkEnvYaml: true });
   }

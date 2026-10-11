@@ -5,7 +5,8 @@
 # Changes the current directory to some-dir and then runs the following command before returning to the original directory:
 #   some-command arg1 arg2
 #
-# We cannot use `cwd` in exec or spawn since dotenvx won't inject the env variables properly
+# Deprecated: kept for backward compatibility with plugins that import `execShPath`. Use the `cwd` option of
+# CommandExecutor instead.
 
 # Change to the provided directory
 pushd "$1" &> /dev/null || exit

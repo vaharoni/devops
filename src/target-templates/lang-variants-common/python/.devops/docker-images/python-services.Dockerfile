@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
 ENV UV_SYSTEM_PYTHON=1
@@ -19,11 +20,13 @@ RUN \
   --mount=type=cache,target=/root/.cache/uv \
   uv sync --all-packages --all-extras
 
+# Env variables needed during the build are provided as a build secret created by devops prep-build
+# (docker build --secret id=env,src=<build-folder>.build-env). Unlike COPY, a secret mount never ends up in an image layer.
 # For prisma client, if used
-RUN ./devopspy run-many generate
-RUN ./devopspy run-many build
+RUN --mount=type=secret,id=env,target=/app/config/.env.global,required=true ./devopspy run-many generate
+RUN --mount=type=secret,id=env,target=/app/config/.env.global,required=true ./devopspy run-many build
 
-# The config folder will be mounted when the pod starts with up-to-date env variables that are used in runtime by server-side code
+# The config folder is populated when the pod starts with up-to-date env variables that are used in runtime by server-side code
 RUN rm -rf config/
 
 ENTRYPOINT [ "./python-run.sh" ]

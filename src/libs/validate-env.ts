@@ -1,15 +1,30 @@
 import fs from 'fs';
 import yaml from 'yaml';
 import { IGNORED_PATHS } from './discovery/process-common';
+import { parseDotEnv } from './dotenv';
 
-type EnvRequirement = 'optional' | 'boolean' | 'required' | string[];
-type ParsedEnvYaml = Record<string, EnvRequirement>;
+export type EnvRequirement = 'optional' | 'boolean' | 'required' | string[];
+export type ParsedEnvYaml = Record<string, EnvRequirement>;
 type CombinedErrors = Record<string, string[]>;
 type KeysFromFiles = Record<string, string[]>;
+type EnvSource = Record<string, string | undefined>;
+
+type CombinedEnvValidatorOptions = {
+  /** The env to validate against. Defaults to process.env */
+  env?: EnvSource;
+  /**
+   * Keys that are considered "used" when computing warnings about .env entries missing from env.yaml files.
+   * Defaults to the keys declared in envYamlPaths. Useful when envYamlPaths is scoped to a subset of workspaces.
+   */
+  knownKeys?: Set<string>;
+  /** Whether to warn about .env entries missing from env.yaml files. Defaults to true */
+  warnUnused?: boolean;
+};
 
 export class CombinedEnvValidator {
   envYamlPaths: string[];
   dotEnvPaths: string[];
+  options: CombinedEnvValidatorOptions;
 
   yamlValidators: SingleEnvValidator[] = [];
   dotEnvParsers: DotEnvParser[] = [];
@@ -20,11 +35,12 @@ export class CombinedEnvValidator {
   errors: CombinedErrors = {};
   warnings: string[] = [];
 
-  constructor(envYamlPaths: string[], dotEnvPaths: string[] = []) {
+  constructor(envYamlPaths: string[], dotEnvPaths: string[] = [], options: CombinedEnvValidatorOptions = {}) {
     this.envYamlPaths = envYamlPaths.filter(path => 
       !IGNORED_PATHS.some((ignoredPath) => path.includes(ignoredPath))
     )
     this.dotEnvPaths = dotEnvPaths;
+    this.options = options;
   }
 
   validate() {
@@ -49,7 +65,7 @@ export class CombinedEnvValidator {
 
   _loadYamlFiles(envYamlPaths: string[]) {
     envYamlPaths.forEach((path) => {
-      const validator = new SingleEnvValidator(path);
+      const validator = new SingleEnvValidator(path, this.options.env);
       this.yamlValidators.push(validator);
     });
   }
@@ -105,8 +121,10 @@ export class CombinedEnvValidator {
   }
 
   _extractWarnings() {
+    if (this.options.warnUnused === false) return;
+    const knownKeys = this.options.knownKeys ?? this.keysFromYamlFiles;
     const unusedKeys = Object.keys(this.keysFromDotEnvFiles).filter(
-      (x) => !this.keysFromYamlFiles.has(x),
+      (x) => !knownKeys.has(x),
     );
     unusedKeys.forEach((x) => {
       this.warnings.push(`${x} in: ${this.keysFromDotEnvFiles[x].join(', ')}`);
@@ -116,7 +134,7 @@ export class CombinedEnvValidator {
   _finalize() {
     if (this.warnings.length > 0) {
       console.error(
-        'WARNING: some env variables exist in .env but not in env.yaml:',
+        'WARNING: some env variables exist in .env but are not declared in any env.yaml. They are not injected into workspace-scoped commands:',
       );
       this.warnings.forEach((warning) => console.error(`\t${warning}`));
       console.error();
@@ -157,15 +175,7 @@ export class DotEnvParser {
   }
 
   _parse(text: string) {
-    const lines = text.split('\n');
-    const withoutComments = lines
-      .map((x) => x.replace(/#.*$/, '').trim())
-      .filter(Boolean);
-    const keys = withoutComments
-      .map((x) => x.split('=').map((y) => y.trim()))
-      .filter((x) => x.length > 1)
-      .map((x) => x[0]);
-    return keys;
+    return Object.keys(parseDotEnv(text));
   }
 }
 
@@ -174,14 +184,22 @@ export class SingleEnvValidator {
   parsedEnvYaml: ParsedEnvYaml | undefined;
   parsingError: string | undefined;
   errors: Record<string, string> = {};
+  env: EnvSource;
 
-  constructor(envYamlPath: string) {
+  constructor(envYamlPath: string, env: EnvSource = process.env) {
     this.envYamlPath = envYamlPath;
+    this.env = env;
   }
 
   validate() {
-    this.parsedEnvYaml = this._parse();
+    this.parse();
     if (!this.parsingError) this._addAllErrors();
+  }
+
+  /** Parses the file without validating values. Check parsingError after calling. */
+  parse() {
+    this.parsedEnvYaml = this._parse();
+    return this.parsedEnvYaml;
   }
 
   _readFile() {
@@ -241,7 +259,7 @@ export class SingleEnvValidator {
 
   _addAllErrors() {
     Object.entries(this.parsedEnvYaml!).forEach(([key, requirement]) => {
-      const value = process.env[key];
+      const value = this.env[key];
       if (requirement !== 'optional' && !value) {
         this._addError(key, `${key} is required but missing`);
       } else if (

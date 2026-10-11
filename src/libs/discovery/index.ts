@@ -63,11 +63,13 @@ export function getWorkspace(workspaceName: string) {
   return workspace;
 }
 
-export function globEnvYamlFiles(): string[] {
+/** Returns the env.yaml files of the given workspaces, or of all workspaces if none are given. Only existing files are returned. */
+export function globEnvYamlFiles(workspaceNames?: string[]): string[] {
   const allWorkspaces = workspaces();
-  const workspacePaths = [
-    ...new Set(Object.values(allWorkspaces).map((w) => w.rootPath)),
-  ];
+  const selected = workspaceNames
+    ? workspaceNames.map((name) => getWorkspace(name))
+    : Object.values(allWorkspaces);
+  const workspacePaths = [...new Set(selected.map((w) => w.rootPath))];
   return workspacePaths
     .map((wsPath) => path.join(rootPath, wsPath, "env.yaml"))
     .filter((p) => fs.existsSync(p));

@@ -162,9 +162,11 @@ CLOUDRUN_SHA=$(./devops cloudrun build-dev <image-name>)
   --env <environment> \
   --region <region> \
   --allow-unauthenticated \  # Optional: for public services
-  --forward-env VAR1,VAR2 \  # Optional: forward env vars
+  --forward-env VAR1,VAR2 \  # Optional: extra env vars to forward
   -- --service-account <runtime-sa-id>
 ```
+
+Variables declared in the `env.yaml` files of the image's workspaces are forwarded automatically. Missing optional variables are skipped, missing required ones fail the deploy. `--forward-env` adds variables on top of those.
 
 ## Reference Scripts
 

@@ -1,11 +1,15 @@
 import fs from "fs-extra";
 import os from "os";
 import path from "path";
-import { CLICommandParser, printUsageAndExit } from "../common";
+import _ from "lodash";
+import { CLICommandParser, dotEnvFilesForEnv, printUsageAndExit } from "../common";
 import { getImageData, getTemplateData } from "../../libs/config";
-import { getMonorepoSecretStr } from "../../libs/k8s-secrets-manager";
+import { getMonorepoSecretObject } from "../../libs/k8s-secrets-manager";
 import { getImageDescendentData } from "../../libs/discovery/images";
 import { isLocalOrRemoteEnv } from "../../libs/k8s-constants";
+import { loadDotEnvFiles, serializeDotEnv } from "../../libs/dotenv";
+import { ALWAYS_INJECTED_PREFIX, workspaceEnvRequirements } from "../../libs/env-scope";
+import { buildEnvPathFor, ENV_KEYS_FILE } from "../../libs/build-env";
 import chalk from "chalk";
 
 const oneLiner =
@@ -20,8 +24,18 @@ ${oneLiner}
 USAGE
     devops prep-build <image> --env <env>
 
+    Prints the path of the build folder to stdout. The env variables needed during the build are written to
+    <build-folder>.build-env, outside the build context, so they never end up in an image layer. Pass them to
+    docker as a build secret, for example:
+
+      docker build --secret id=env,src=<build-folder>.build-env <build-folder>
+
+    The Dockerfile then mounts them where devops expects them:
+
+      RUN --mount=type=secret,id=env,target=/app/config/.env.global,required=true ./devops run-many build
+
     If <env> is a remote environment (e.g. staging, production), the environment variables are 
-    fetched from the cluster and injected in case they are needed during the build process.
+    fetched from the cluster. Only variables declared in the env.yaml files of the image's workspaces are included.
 
 EXAMPLES
     ${keyExamples}
@@ -75,35 +89,27 @@ async function run(cmdObj: CLICommandParser) {
   fs.mkdirSync(path.join(destFolder, ".devops"));
   fs.copySync(".devops/config", path.join(destFolder, ".devops/config"));
 
-  // Create config directory. It should be deleted by the docker image so that it can be mounted as a volume when the pod is run
-  console.warn(`CREATING config for the build process`);
-  fs.mkdirSync(path.join(destFolder, "config"));
-  const destGlobalEnvPath = path.join(destFolder, "config/.env.global");
-  if (isLocalOrRemoteEnv(cmdObj.env) === "remote") {
-    const envFileData = getMonorepoSecretStr(cmdObj.env);
-    fs.writeFileSync(destGlobalEnvPath, envFileData);
-  } else {
-    let anyCopied = false;
-    const localGlobalEnvPath = "config/.env.global";
-    const localEnvPath = `config/.env.${cmdObj.env}`;
-    const destEnvPath = path.join(destFolder, `config/.env.${cmdObj.env}`);
-    if (fs.existsSync(localGlobalEnvPath)) {
-      console.warn(`COPYING ${localGlobalEnvPath} to ${destGlobalEnvPath}`);
-      fs.copyFileSync(localGlobalEnvPath, destGlobalEnvPath);
-      anyCopied = true;
-    }
-    if (fs.existsSync(localEnvPath)) {
-      console.warn(`COPYING ${localEnvPath} to ${destEnvPath}`);
-      fs.copyFileSync(localEnvPath, destEnvPath);
-      anyCopied = true;
-    }
-    if (!anyCopied) {
-      console.warn(chalk.red(`\nWarning: local environment ${cmdObj.env} has no .env files. Environment variables will not be injected.\n`));
-    }
-  }
+  // Map each workspace in the image to the env variables it needs, so pods can be given only those (see materialize_env)
+  const imageWorkspaces = getImageDescendentData(image);
+  const envKeys = Object.fromEntries(
+    imageWorkspaces.map((project) => [
+      project.name,
+      Object.keys(workspaceEnvRequirements(project.name, project.language)).sort(),
+    ])
+  );
+  console.warn(`CREATING ${ENV_KEYS_FILE}`);
+  fs.writeJSONSync(path.join(destFolder, ENV_KEYS_FILE), envKeys, { spaces: 2 });
+
+  // The build env is written outside the build context and passed to docker as a build secret
+  const buildEnvPath = buildEnvPathFor(destFolder);
+  console.warn(`CREATING ${buildEnvPath} for the build process`);
+  const allEnv = loadBuildEnv(cmdObj.env);
+  const imageEnvKeys = new Set(Object.values(envKeys).flat());
+  const buildEnv = _.pickBy(allEnv, (_value, key) => imageEnvKeys.has(key) || key.startsWith(ALWAYS_INJECTED_PREFIX));
+  fs.writeFileSync(buildEnvPath, serializeDotEnv(buildEnv), { mode: 0o600 });
 
   // Copy all dependencies
-  getImageDescendentData(image).forEach((project) => {
+  imageWorkspaces.forEach((project) => {
     console.warn(`COPYING ${project.rootPath}`);
     if (project.rootPath === ".devops") return;
     fs.copySync(project.rootPath, path.join(destFolder, project.rootPath));
@@ -117,6 +123,17 @@ async function run(cmdObj: CLICommandParser) {
   });
 
   console.log(destFolder);
+}
+
+function loadBuildEnv(monorepoEnv: string): Record<string, string> {
+  if (isLocalOrRemoteEnv(monorepoEnv) === "remote") {
+    return _.mapValues(getMonorepoSecretObject(monorepoEnv), (value) => String(value));
+  }
+  const envFiles = dotEnvFilesForEnv(monorepoEnv);
+  if (envFiles.length === 0) {
+    console.warn(chalk.red(`\nWarning: local environment ${monorepoEnv} has no .env files. Environment variables will not be injected.\n`));
+  }
+  return loadDotEnvFiles(envFiles);
 }
 
 export const prepBuild = { command: 'prep-build', oneLiner, keyExamples, run };

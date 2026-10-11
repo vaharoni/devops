@@ -3,6 +3,9 @@ import { execSync, spawn, type StdioOptions } from "child_process";
 import fs from "fs";
 import { allSupportedEnvs } from "../libs/k8s-constants";
 import { globEnvYamlFiles } from "../libs/discovery";
+import { loadDotEnvFiles } from "../libs/dotenv";
+import { ALWAYS_INJECTED_PREFIX, envRequirementsFromFiles, scopeEnvToWorkspace, workspaceEnvYamlFiles } from "../libs/env-scope";
+import { CombinedEnvValidator } from "../libs/validate-env";
 
 type ParsedArgs<TBoolKeys extends readonly string[], TParamKeys extends readonly string[]> = {
   args: string[];
@@ -153,6 +156,13 @@ type CommandExecutorOptions = {
   quiet?: boolean;
   checkEnvYaml?: boolean;
   redactedCommand?: string;
+  /**
+   * A workspace name. When set, only the env file variables declared in the env.yaml files of the workspace and its
+   * dependencies are injected, and only those env.yaml files are validated. When omitted, all variables are injected.
+   */
+  envScope?: string;
+  /** The directory to run the command in, relative to the monorepo root */
+  cwd?: string;
 };
 export class CommandExecutor {
   commandStr: string;
@@ -160,6 +170,9 @@ export class CommandExecutor {
   quiet: boolean;
   redactedCommand?: string;
   checkEnvYaml: boolean;
+  envScope?: string;
+  cwd?: string;
+  _fileEnv?: Record<string, string>;
 
   constructor(
     commandStr: string,
@@ -168,6 +181,8 @@ export class CommandExecutor {
       quiet = false,
       redactedCommand,
       checkEnvYaml = false,
+      envScope,
+      cwd,
     }: CommandExecutorOptions = {}
   ) {
     this.env = env;
@@ -175,6 +190,8 @@ export class CommandExecutor {
     this.commandStr = commandStr;
     this.checkEnvYaml = checkEnvYaml;
     this.redactedCommand = redactedCommand;
+    this.envScope = envScope;
+    this.cwd = cwd;
   }
 
   /** Non-interactive use only. stdout is returned. */
@@ -202,7 +219,7 @@ export class CommandExecutor {
     const fullCommand = this._prepareFullCommand();
     const envToUse = this._getProcessEnv(env);
     try {
-      const output = execSync(fullCommand, { env: envToUse });
+      const output = execSync(fullCommand, { env: envToUse, cwd: this.cwd });
       if (onlyStatusCode) return 0;
       if (!this.quiet) console.log(output.toString());
       if (asObject) return { statusCode: 0, stdout: output.toString() };
@@ -232,6 +249,7 @@ export class CommandExecutor {
         const childProcess = spawn(fullCommand, {
           stdio,
           env: envToUse,
+          cwd: this.cwd,
           shell: true,
         });
 
@@ -261,11 +279,11 @@ export class CommandExecutor {
   }
 
   _prepareFullCommand() {
-    const envPrefix = this.env ? this._envInjectorPrefix() : "";
-    const fullCommand = [envPrefix, this.commandStr].join(" ").trim();
+    const fullCommand = this.commandStr.trim();
 
     const envPrefixLog = this.env ? `MONOREPO_ENV=${this.env} MONOREPO_ROOT=${process.cwd()}` : "";
-    const fullCommandLog = [envPrefixLog, fullCommand].join(" ").trim();
+    const cwdLog = this.cwd ? `(in ${this.cwd})` : "";
+    const fullCommandLog = [envPrefixLog, cwdLog, fullCommand].filter(Boolean).join(" ");
     if (this.redactedCommand) {
       console.warn(
         chalk.yellow(
@@ -279,28 +297,45 @@ export class CommandExecutor {
     return fullCommand;
   }
 
+  /** Variables already present in the process take precedence over those loaded from env files */
   _getProcessEnv(envOverride = {}) {
-    return { ...process.env, MONOREPO_ENV: this.env, MONOREPO_ROOT: process.cwd(), ...envOverride };
+    return { ...this._getFileEnv(), ...process.env, MONOREPO_ENV: this.env, MONOREPO_ROOT: process.cwd(), ...envOverride };
   }
 
-  _envInjectorPrefix() {
-    const envFiles = dotEnvFilesForEnv(this.env);
-    if (envFiles.length === 0) {
-      return "";
-    } else {
-      return `bunx dotenvx -q run -f ${envFiles.join(" ")} -- `;
+  _getFileEnv() {
+    if (!this.env) return {};
+    if (!this._fileEnv) {
+      const fileEnv = loadDotEnvFiles(dotEnvFilesForEnv(this.env));
+      this._fileEnv = this.envScope ? scopeEnvToWorkspace(fileEnv, this.envScope) : fileEnv;
     }
+    return this._fileEnv;
   }
 
   _checkEnvYamlFiles() {
     if (!this.checkEnvYaml) return;
-    const envYamlFiles = globEnvYamlFiles();
-    const checkEnvCmd = new CommandExecutor(
-      `devops env _validate ${envYamlFiles.join(" ")}`,
-      { env: this.env, quiet: true, checkEnvYaml: false }
-    );
-    checkEnvCmd.exec();
+    validateEnvYamlFiles(this.env, { env: this._getProcessEnv(), envScope: this.envScope });
   }
+}
+
+/**
+ * Validates env.yaml files against the given env, exiting the process on errors.
+ * If envScope is given, only the env.yaml files of that workspace and its dependencies are validated.
+ */
+export function validateEnvYamlFiles(
+  monorepoEnv: string | undefined,
+  { env, envScope }: { env: Record<string, string | undefined>; envScope?: string }
+) {
+  const allEnvYamlFiles = globEnvYamlFiles();
+  const envYamlFiles = envScope ? workspaceEnvYamlFiles(envScope) : allEnvYamlFiles;
+  const declaredKeys = Object.keys(envRequirementsFromFiles(allEnvYamlFiles));
+  const frameworkKeys = Object.keys(env).filter((key) => key.startsWith(ALWAYS_INJECTED_PREFIX));
+  const validator = new CombinedEnvValidator(envYamlFiles, dotEnvFilesForEnv(monorepoEnv), {
+    env,
+    knownKeys: new Set([...declaredKeys, ...frameworkKeys]),
+    // Images only contain the env.yaml files of their own workspaces, so unused keys cannot be determined reliably
+    warnUnused: process.env.IS_KUBERNETES !== "true",
+  });
+  validator.validate();
 }
 
 export function dotEnvFilesForEnv(env?: string) {

@@ -22,7 +22,8 @@ USAGE
     devops cloudrun deploy <image> <sha> --env <env> --region <region> [options]
 
     Options:
-      --forward-env ENV1,ENV2     Comma-separated env var names to forward into the service
+      --forward-env ENV1,ENV2     Comma-separated env var names to forward into the service, in addition to
+                                  those declared in the env.yaml files of the image's workspaces
       --allow-unauthenticated     Allow unauthenticated access
       --cpu <cpu>                 CPU, e.g. 0.25, 0.5, 1
       --memory <mem>              Memory, e.g. 256Mi, 512Mi, 1Gi
@@ -34,8 +35,10 @@ USAGE
       Notes: 
       - The image must already be pushed to the artifact registry.
       - <env> also supports local environments (e.g. development).
-      - For remote monorepo environments, variables specified in --forward-env that 
-        are not present in the current process's env are fetched from the cluster.
+      - Variables declared in the env.yaml files of the image's workspaces are forwarded automatically.
+        Missing optional variables are skipped.
+      - For remote monorepo environments, forwarded variables that are not present in the 
+        current process's env are fetched from the cluster.
 
   Build a cloudrun image locally in development environment:
     devops cloudrun build-dev cloudrun-image

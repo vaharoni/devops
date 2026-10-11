@@ -14,7 +14,7 @@ inputs:
     description: 'The name of the service account used to run the Cloud Run service'
     required: true
   forward_env:
-    description: 'The environment variables to forward to the Cloud Run service (comma separated, e.g. ENV1,ENV2)'
+    description: 'Extra environment variables to forward to the Cloud Run service (comma separated, e.g. ENV1,ENV2). Variables declared in the env.yaml files of the image are forwarded automatically.'
     required: false
   allow_unauthenticated:
     description: 'Whether to allow unauthenticated access to the Cloud Run service. Send "true" to allow unauthenticated access.'

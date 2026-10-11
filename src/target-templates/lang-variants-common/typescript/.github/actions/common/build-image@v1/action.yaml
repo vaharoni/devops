@@ -42,6 +42,8 @@ runs:
         echo "ECR_URL=$(devops registry repo-url ${{ env.IMAGE_NAME }} ${{ github.sha }})" >> $GITHUB_ENV
         folder=$(devops prep-build ${{ env.IMAGE_NAME }})
         mv $folder /home/runner/build
+        # Env variables needed by the build. Kept outside the build context and passed as a build secret.
+        mv $folder.build-env /home/runner/build.env
         echo MONOREPO_ENV=${{ env.MONOREPO_ENV }}
 
     - name: Setup cache
@@ -73,6 +75,13 @@ runs:
         cache-to: type=gha,mode=max
         build-args: |
           MONOREPO_ENV=${{ env.MONOREPO_ENV }}
+        secret-files: |
+          env=/home/runner/build.env
+
+    - name: Remove build env
+      if: always()
+      shell: bash
+      run: rm -f /home/runner/build.env
 
     - name: Prune registry
       if: steps.check_affected.outputs.affected == 'true'
