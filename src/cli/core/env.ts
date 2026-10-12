@@ -38,7 +38,13 @@ function run(cmdObj: CLICommandParser) {
   const [command, ...rest] = cmdObj.args;
   switch (command) {
     case "validate": {
-      const env = { ...loadDotEnvFiles(dotEnvFilesForEnv(cmdObj.env)), ...process.env };
+      // Same variables as commands run through the executor, which always set MONOREPO_ENV and MONOREPO_ROOT
+      const env = {
+        ...loadDotEnvFiles(dotEnvFilesForEnv(cmdObj.env)),
+        ...process.env,
+        MONOREPO_ENV: cmdObj.env,
+        MONOREPO_ROOT: process.cwd(),
+      };
       validateEnvYamlFiles(cmdObj.env, { env });
       break;
     }
