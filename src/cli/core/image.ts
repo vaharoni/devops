@@ -1,8 +1,9 @@
-import { deleteImageVersion, getImageVersion, getWorkspaceScale, resetWorkspaceScale, setImageVersion, setWorkspaceScale } from "../../libs/k8s-image-config";
+import { deleteImageVersion, getImageVersion, getImageVersions, getWorkspaceScale, resetWorkspaceScale, setImageVersion, setWorkspaceScale } from "../../libs/k8s-image-config";
 import { CLICommandParser, printUsageAndExit, StrongParams } from "../../../src/cli/common";
 import { generateImageDeployments } from "../../libs/k8s-generate";
 import { applyHandler } from "../../libs/k8s-helpers";
-import { exampleImageName, formatImageList, getImageType } from "../../libs/config";
+import { exampleImageName, formatImageList, getImageNames, getImageType } from "../../libs/config";
+import yaml from "yaml";
 
 const oneLiner = "Lists images, applies image-related manifests, retrieves or set the version deployed, and scales deployments of applications";
 const exampleImage = exampleImageName();
@@ -55,10 +56,12 @@ MANAGINE APPLICATION SCALE
     Both 'set' and 'unset' return the previous scale count prior to the operation.
 
 MANAGING IMAGE VERSIONS
-    devops image version get|unset <image> 
+    devops image version get [<image>]
+    devops image version unset <image>
     devops image version set <image> <sha>
 
     Meant to be called during deployment in order to maintain a record of the most recent deployed version.
+    Without an image, 'get' prints the version of every image as YAML (<image>: <version>, null if never deployed).
 
 EXAMPLES
     ${keyExamples}
@@ -159,6 +162,10 @@ const handlers = {
   },
   version: {
     get: (opts: StrongParams) => {
+      if (!opts.optional("image")) {
+        console.log(yaml.stringify(getImageVersions(opts.required("env"), getImageNames())).trimEnd());
+        return;
+      }
       const version = getImageVersion(
         opts.required("env"),
         opts.requiredImage()

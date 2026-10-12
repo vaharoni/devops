@@ -56,6 +56,28 @@ export function getImageVersion(monorepoEnv: string, image: string) {
   return data.version;
 }
 
+/** The deployed version of each of the given images, fetched with a single kubectl call. Images never deployed map to null. */
+export function getImageVersions(monorepoEnv: string, images: string[]): Record<string, string | null> {
+  const { statusCode, stdout, stderr } = new CommandExecutor(
+    kubectlCommand(
+      `get configmap -o jsonpath='{range .items[*]}{.metadata.name}{"\\t"}{.data.version}{"\\n"}{end}'`,
+      { monorepoEnv }
+    ),
+    { quiet: true }
+  ).exec({ asObject: true });
+  if (statusCode !== 0) {
+    console.error(`Failed to list config maps: ${stderr}`);
+    process.exit(1);
+  }
+  const versionsByConfigMap = new Map(
+    stdout
+      .split("\n")
+      .filter(Boolean)
+      .map((line) => line.split("\t") as [string, string | undefined])
+  );
+  return Object.fromEntries(images.map((image) => [image, versionsByConfigMap.get(imageConfigMap(image)) || null]));
+}
+
 export function setImageVersion(
   monorepoEnv: string,
   image: string,
